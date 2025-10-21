@@ -19,9 +19,9 @@ const Home = () => {
       {/* Mittlerer Bereich mit Text */}
       <main className="main-content">
         <section>
-          <h1>Willkommen im Salon Elegance</h1>
+          <h1>Willkommen im ZC Salon</h1>
           <p>
-            Bei Salon Elegance steht Ihr Wohlbefinden im Mittelpunkt.  
+            Bei Salon ZC steht Ihr Wohlbefinden im Mittelpunkt.  
             Unser Team aus erfahrenen Stylisten berät Sie individuell  
             und sorgt für Ihren perfekten Look.
           </p>
