@@ -1,0 +1,57 @@
+/* Grundlayout für Home-Seite */
+.home-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Linke Seite – Sidebar */
+.sidebar {
+  flex: 1;
+  padding: 1rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Mittlerer Hauptinhalt */
+.main-content {
+  flex: 2;
+  padding: 2rem;
+}
+
+.main-content section {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Rechte Seite – Platzhalter für Bilder */
+.image-section {
+  flex: 1;
+  padding: 1rem;
+}
+
+.image-placeholder {
+  text-align: center;
+  border: 1px dashed #ccc;
+  padding: 2rem;
+}
+
+/* 📱 Mobile Struktur */
+@media (max-width: 768px) {
+  .home-container {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .main-content,
+  .image-section {
+    width: 100%;
+  }
+}
