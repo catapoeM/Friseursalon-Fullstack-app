@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import homeRouter from './routes/home.js';
+import homeRoutes from './routes/homeRoutes.js';
 
 const app = express();
 const port = process.env.port ?? 8000;
@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Use routes
-app.use('/', homeRouter);
+app.use('/api/home', homeRoutes);
 
 // Start server
 app.listen(port, () => {

@@ -1,11 +1,30 @@
-import Home from './pages/Home';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home.jsx";
+import Preise from "./pages/Preise.jsx";
+import Produkte from "./pages/Produkte.jsx";
+import Termin from "./pages/Termin.jsx";
+import Zeiten from "./pages/Zeiten.jsx";
+import Kontakt from "./pages/Kontakt.jsx";
+import Datenschutz from "./pages/Datenschutz.jsx";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <Home />
-    </div>
+    <Router>
+      <div className="app-layout">
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/preise" element={<Preise />} />
+            <Route path="/produkte" element={<Produkte />} />
+            <Route path="/termin" element={<Termin />} />
+            <Route path="/zeiten" element={<Zeiten />} />
+            <Route path="/kontakt" element={<Kontakt />} />
+            <Route path="/datenschutz" element={<Datenschutz />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;

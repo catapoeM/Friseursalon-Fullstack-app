@@ -1,19 +1,41 @@
-import { useEffect, useState } from 'react';
 
-export default function Home() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('/api')
-      .then(res => res.text())
-      .then(data => setMessage(data))
-      .catch(err => console.error(err));
-  }, []);
-
+const Home = () => {
   return (
-    <div>
-      <h1>React + Express Example</h1>
-      <p>Backend says: {message}</p>
+    <div className="home-container">
+      {/* Linke Navigationsseite */}
+      <aside className="sidebar">
+        <nav>
+          <ul>
+            <li><a href="/preise">Preise</a></li>
+            <li><a href="/produkte">Produkte</a></li>
+            <li><a href="/termin">Termin buchen</a></li>
+            <li><a href="/zeiten">Öffnungszeiten</a></li>
+            <li><a href="/kontakt">Kontakt</a></li>
+            <li><a href="/datenschutz">Datenschutz</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Mittlerer Bereich mit Text */}
+      <main className="main-content">
+        <section>
+          <h1>Willkommen im Salon Elegance</h1>
+          <p>
+            Bei Salon Elegance steht Ihr Wohlbefinden im Mittelpunkt.  
+            Unser Team aus erfahrenen Stylisten berät Sie individuell  
+            und sorgt für Ihren perfekten Look.
+          </p>
+        </section>
+      </main>
+
+      {/* Rechte Seite für spätere Bilder */}
+      <aside className="image-section">
+        <div className="image-placeholder">
+          <p>Hier kommen später Bilder des Salons oder Teams.</p>
+        </div>
+      </aside>
     </div>
   );
-}
+};
+
+export default Home;
