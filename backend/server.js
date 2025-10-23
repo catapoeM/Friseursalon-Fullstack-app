@@ -10,7 +10,9 @@ app.use(helmet());
 app.use(cors());
 
 // Middleware to parse JSON
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+
 
 // Use routes
 app.use('/api/home', homeRoutes);
