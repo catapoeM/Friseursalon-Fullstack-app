@@ -1,13 +1,14 @@
 import express from 'express';
-import { getBooking, postBooking } from '../controllers/booking.js';
-import { body } from 'express-validator';
+import { getBooking, postBooking, notFound } from '../controllers/booking.js';
+import { terminValidator } from '../validators/bookingValidator.js';
+import { handleValidation } from '../middlewares/handleValidation.js';
 
 const router = express.Router();
 
-router.get('/termin', getBooking);
+router.get('/', getBooking);
 
-router.post('/termin', 
-    body('name').escape().trim().isLength({min: 2, max: 50}),
-    body('date').escape(),     postBooking);
+router.post('/', terminValidator, handleValidation, postBooking);
+
+router.use('', notFound);
 
 export default router;
