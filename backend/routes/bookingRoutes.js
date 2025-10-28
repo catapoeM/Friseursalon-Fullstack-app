@@ -1,13 +1,13 @@
 import express from 'express';
-import { getBooking, postBooking, notFound } from '../controllers/booking.js';
+import { getBookings, notFound } from '../controllers/bookingController.js';
 import { terminValidator } from '../validators/bookingValidator.js';
 import { handleValidation } from '../middlewares/handleValidation.js';
 
 const router = express.Router();
 
-router.get('/', getBooking);
+router.get('/', getBookings);
 
-router.post('/', terminValidator, handleValidation, postBooking);
+//router.post('/', terminValidator, handleValidation, postBooking);
 
 router.use('', notFound);
 
