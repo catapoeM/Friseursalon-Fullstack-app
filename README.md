@@ -24,6 +24,9 @@ Mehrsprachigkeit (optional): Deutsch / Englisch.
 🧩 Tech Stack (mit Echtzeit)
 
 Frontend: React + React Router + Tailwind CSS + Socket.IO Client
+
 Backend: Node.js + Express.js + Socket.IO Server
+
 Datenbank: MongoDB + Mongoose ODM
+
 Deployment: flexibel (z. B. Render, Vercel, Netlify oder eigener Server)
