@@ -9,12 +9,14 @@ import homeRoutes from './routes/homeRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import Booking from './models/bookingModel.js';
 
+// Load environment Variables
 dotenv.config();
-connectDB();
-const app = express();
 
-const PORT = process.env.PORT || 8000;
-const MONGO_URI = process.env.MONGO_URI;
+// Connect to MongoDB
+connectDB();
+
+const app = express();
+//const MONGO_URI = process.env.MONGO_URI;
 
 app.use(helmet());
 app.use(cors());
@@ -32,34 +34,31 @@ app.use('/api/booking', bookingRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {cors:{origin: "*"} });
 
-// socket.IO echtzeitlogik
-io.on("connection", async(socket) => {
-    console.log(`Client verbunden: ${socket.id}`);
+// Socket.IO Events
+io.on("connection", async (socket) => {
+  console.log(`Client connected: ${socket.id}`);
 
-    // Alle bestehenden Buchungen beim verbinden senden
+  // Alle bestehenden Buchungen senden
+  try {
+    const bookings = await import("./models/bookingModel.js").then(mod => mod.default.find());
+    socket.emit("loadBookings", bookings);
+  } catch (error) {
+    console.error(error);
+  }
+
+  socket.on("newBooking", async (data) => {
     try {
-        const bookings = await Booking.find();
-        socket.emit("loadBookings", bookings);
+      const Booking = (await import("./models/bookingModel.js")).default;
+      const newBooking = new Booking(data);
+      await newBooking.save();
+      io.emit("bookingUpdated", newBooking);
     } catch (error) {
-        console.log("Fehler beim Laden der Buchungen:", error.message);
+      console.error(error);
     }
+  });
 
-    // Neuen Termin empfangen und broadcasten
-    socket.on("newBooking", async (data) => {
-        try {
-            const newBooking = new Booking(data);
-            await newBooking.save();
-            io.emit("bookingUpdated", newBooking); // Echtzeit an alle Clients senden
-            console.log("Neuer Termin erstellt:", newBooking);
-        } catch (error) {
-            console.error("Fehler beim Erstellen des Termins:", error.message);
-        }
-    });
-
-    socket.on("disconnect", () => {
-        console.log(`Client getrennt: ${socket.id}`);
-    });
+  socket.on("disconnect", () => console.log(`Client disconnected: ${socket.id}`));
 });
 
-// Start server
-server.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
