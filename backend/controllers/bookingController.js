@@ -1,11 +1,16 @@
 import Booking from "../models/bookingModel.js";
+import { validatePhoneNumber }  from "../middlewares/handleValidation.js";
 
 export const getBookings = async (req, res) => {
-    try {
-        const bookings = await Booking.find();
-        res.status(200).json(bookings);
-    }   catch (error) {
-        res.status(500).json({message: error.message});
+    if (validatePhoneNumber(req.body.phone)) {
+        try {
+            const bookings = await Booking.find();
+            res.status(200).json(bookings);
+        }   catch (error) {
+            res.status(500).json({message: error.message});
+        }
+    }else {
+        return res.status(400).json({message: "Ungültige Telefonnummer"})
     }
 };
 
