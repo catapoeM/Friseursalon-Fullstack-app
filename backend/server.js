@@ -7,7 +7,6 @@ import connectDB from "./config/db.js";
 import helmet from 'helmet';
 import homeRoutes from './routes/homeRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
-import Booking from './models/bookingModel.js';
 
 // Load environment Variables
 dotenv.config();
