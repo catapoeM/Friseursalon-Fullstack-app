@@ -15,6 +15,7 @@ export const getBookings = async (req, res) => {
 };
 
 export const createBooking = async (bookingData) => {
+    console.log(bookingData + " bookingData");
     const booking = new Booking(bookingData);
     await booking.save();
     return booking;

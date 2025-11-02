@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {parsePhoneNumberFromString} from 'libphonenumber-js';
+import BookingDatePicker from "./BookingDatePicker";
 
 export default function BookingForm({ onBooking }) {
   const [formData, setFormData] = useState({ name: "", service: "", date: "", time: "" });
@@ -25,7 +26,11 @@ export default function BookingForm({ onBooking }) {
       <input name="phone" placeholder="+43 123 45 67 89 09" value={formData.phone} onChange={handleChange}/>
       <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
       <input name="service" placeholder="Service" value={formData.service} onChange={handleChange} />
-      <input name="date" type="date" value={formData.date} onChange={handleChange} />
+      <BookingDatePicker
+        onChange={(date) =>
+          setFormData({ ...formData, date: date.toISOString().split("T")[0] })
+        }
+      />
       <input name="time" type="time" value={formData.time} onChange={handleChange} />
       <button type="submit">Buchen</button>
     </form>
