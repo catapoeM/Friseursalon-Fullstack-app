@@ -1,7 +1,7 @@
 import Booking from "../models/bookingModel.js";
 import { validatePhoneNumber }  from "../middlewares/handleValidation.js";
 
-export const getBookings = async (req, res) => {
+const getBookings = async (req, res) => {
     if (validatePhoneNumber(req.body.phone)) {
         try {
             const bookings = await Booking.find();
@@ -14,13 +14,24 @@ export const getBookings = async (req, res) => {
     }
 };
 
-export const createBooking = async (bookingData) => {
-    console.log(bookingData + " bookingData");
-    const booking = new Booking(bookingData);
-    await booking.save();
-    return booking;
+const createBooking = async (req, res) => {
+    const {firstName, lastName, date, time, service, phone} = req.body;
+    const bookingData = {firstName, lastName, date, time, service, phone}
+    try {
+        const booking = new Booking(bookingData);
+        await booking.save();
+        
+        return res.status(200).json(booking);
+
+    } catch (error) {
+        res.status(400).json({message: "Error ", error});
+    }
+    
+
 };
 
-export const notFound = (req, res) => {
+const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
+
+export {getBookings, createBooking, notFound}
