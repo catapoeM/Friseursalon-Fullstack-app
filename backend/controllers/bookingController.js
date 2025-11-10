@@ -1,32 +1,31 @@
 import Booking from "../models/bookingModel.js";
-import { validatePhoneNumber }  from "../middlewares/handleValidation.js";
+import { validatePhoneNumber}  from "../validators/bookingValidation.js";
 
 const getBookings = async (req, res) => {
-    if (validatePhoneNumber(req.body.phone)) {
-        try {
-            const bookings = await Booking.find();
-            res.status(200).json(bookings);
-        }   catch (error) {
-            res.status(500).json({message: error.message});
-        }
-    }else {
-        return res.status(400).json({message: "Ungültige Telefonnummer"})
+    try {
+        const bookings = await Booking.find();
+        res.status(200).json(bookings);
+    }   catch (error) {
+        res.status(500).json({message: error.message});
     }
 };
 
 const createBooking = async (req, res) => {
     const {firstName, lastName, date, time, service, phone} = req.body;
-    const bookingData = {firstName, lastName, date, time, service, phone}
-    try {
-        const booking = new Booking(bookingData);
-        await booking.save();
-        
-        return res.status(200).json(booking);
+    if (validatePhoneNumber(phone)) {
+        const bookingData = {firstName, lastName, date, time, service, phone}
+        try {
+            const booking = new Booking(bookingData);
+            await booking.save();
+            
+            return res.status(200).json(booking);
 
-    } catch (error) {
-        res.status(400).json({message: "Error ", error});
+        } catch (error) {
+            return res.status(400).json({message: "Error ", error});
+        }
+    }else {
+        return res.status(400).json({message: "Ungültige Telefonnummer"})
     }
-    
 
 };
 

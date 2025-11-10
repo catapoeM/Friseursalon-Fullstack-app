@@ -23,15 +23,16 @@ export default function BookingForm({ onBooking }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-      <input name="phone" placeholder="+43 123 45 67 89 09" value={formData.phone} onChange={handleChange}/>
-      <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
-      <input name="service" placeholder="Service" value={formData.service} onChange={handleChange} />
+      <input name="phone" placeholder="+43 123 45 67 89 09" value={formData.phone} onChange={handleChange} required="true"/>
+      <input name="firstName" placeholder="Vorname" value={formData.firstName} onChange={handleChange} required="true"/>
+      <input name="lastName" placeholder="Nachname" value={formData.lastName} onChange={handleChange} required="true"/>
+      <input name="service" placeholder="Service" value={formData.service} onChange={handleChange} required="true"/>
       <BookingDatePicker
         onChange={(date) =>
           setFormData({ ...formData, date: date.toISOString().split("T")[0] })
         }
-      />
-      <input name="time" type="time" value={formData.time} onChange={handleChange} />
+      required="true"/>
+      <input name="time" type="time" value={formData.time} onChange={handleChange} required="true"/>
       <button type="submit">Buchen</button>
     </form>
   );

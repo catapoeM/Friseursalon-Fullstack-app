@@ -1,17 +1,12 @@
 import express from 'express';
-import { createBooking, notFound } from '../controllers/bookingController.js';
+import { getBookings, createBooking, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
-import { validation } from '../validators/bookingValidation.js';
+import { validation, isFutureDate } from '../validators/bookingValidation.js';
 
 const router = express.Router();
 
-// Custom helper to check if date is in the future
-const isFutureDate = (value) => {
-  const today = new Date();
-  const selected = new Date(value);
-  return selected >= today;
-};
+router.get('/', getBookings)
 
 router.post('/', [
     body('firstName')
