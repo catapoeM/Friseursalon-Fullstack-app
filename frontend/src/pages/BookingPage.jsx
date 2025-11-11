@@ -5,7 +5,7 @@ import BookingList from "../components/BookingList";
 
 const socket = io("http://localhost:5000"); // Backend-URL
 
-const BookingPage = () => {
+export default function BookingPage() {
   const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
@@ -36,5 +36,3 @@ const BookingPage = () => {
     </div>
   );
 }
-
-export default BookingPage;
