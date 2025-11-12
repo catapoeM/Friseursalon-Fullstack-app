@@ -10,6 +10,18 @@ const getBookings = async (req, res) => {
     }
 };
 
+const getOneBooking = async (req, res) => {
+    const id = req.params.id;
+
+    // Booking searching with Phone number or Family name
+    const foundOneBooking = await Booking.findById(id);
+
+    if (!foundOneBooking) {
+        return res.status(404).send('Buchung wurde nicht gefunden...')
+    }
+    res.json(foundOneBooking);
+}
+
 const createBooking = async (req, res) => {
     const {firstName, lastName, date, time, service, phone} = req.body;
     if (validatePhoneNumber(phone)) {
@@ -33,4 +45,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {getBookings, createBooking, notFound}
+export {createBooking, getOneBooking, getBookings, notFound}

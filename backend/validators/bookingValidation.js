@@ -1,17 +1,21 @@
-import { validationResult } from "express-validator";
+import { validationResult, matchedData } from "express-validator";
 import {parsePhoneNumberFromString} from 'libphonenumber-js';
 
 // check the req.body for errors;
-const validation = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-    // 🧾 Step 2: return them in response
-    return res.status(400).json({
-        success: false,
-        errors: errors.array().map((err) => err.msg),
-    });
-    }
-    next();
+const checkValidation = (req, res, next) => {
+    // Validieren der Parameter
+  const result = validationResult(req);
+
+  // Early return pattern, hier beenden
+  if (!result.isEmpty()) {
+    return res.status(422).send(result.array());
+  }
+
+  // Werte aus bereinigten Daten rausholen und in Request-Objekt
+  req.matchedData = matchedData(req);
+
+  // in die nächste Middleware weiterschalten
+  next();
 }
 
 // Vaditate if the phone number is real
@@ -27,4 +31,4 @@ const isFutureDate = (value) => {
   return selected >= today;
 };
 
-export {validation, validatePhoneNumber, isFutureDate};
+export {checkValidation, validatePhoneNumber, isFutureDate};

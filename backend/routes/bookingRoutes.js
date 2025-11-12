@@ -1,14 +1,13 @@
 import express from 'express';
-import { getBookings, createBooking, notFound } from '../controllers/bookingController.js';
+import { getBookings, getOneBooking , deleteBooking , createBooking, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
-import { validation, isFutureDate } from '../validators/bookingValidation.js';
+import { checkValidation, isFutureDate } from '../validators/bookingValidation.js';
+import { checkToken } from '../common/middlewares.js';
 
 const router = express.Router();
 
-router.get('/', getBookings)
-
-router.post('/', [
+router.post('/',
     body('firstName')
         .trim()
         .notEmpty()
@@ -39,10 +38,18 @@ router.post('/', [
         .notEmpty()
         .withMessage('Telefonnummer ist erforderlich')
         .matches(/^\+?[0-9\s\-]{7,15}$/)
-        .withMessage('Ungültige Telefonnummer') 
-    ],
-    validation,
+        .withMessage('Ungültige Telefonnummer'),
+    checkValidation,
     createBooking);
+
+// Get ALL Bookings as ADMIN
+router.get('/', checkToken, getBookings);
+
+// Get One booking as User
+router.get('/:id', checkToken, getOneBooking);
+
+// Delete a booking as User OR ADMIN
+router.delete('/:id', checkToken, deleteBooking);
 
 router.use('', notFound);
 

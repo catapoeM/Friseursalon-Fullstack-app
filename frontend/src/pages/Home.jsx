@@ -8,7 +8,6 @@ const Home = () => {
           <ul>
             <li><a href="/preise">Preise</a></li>
             <li><a href="/produkte">Produkte</a></li>
-            <li><a href="/verify">Login</a></li>
             <li><a href="/booking">Termin buchen</a></li>
             <li><a href="/zeiten">Öffnungszeiten</a></li>
             <li><a href="/kontakt">Kontakt</a></li>
