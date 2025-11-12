@@ -1,9 +1,9 @@
 import express from 'express';
-import { getBookings, getOneBooking , deleteBooking , createBooking, notFound } from '../controllers/bookingController.js';
+import { getAllBookings, getMyBookings , deleteBooking, createBooking, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
-import { checkValidation, isFutureDate } from '../validators/bookingValidation.js';
-import { checkToken } from '../common/middlewares.js';
+import { isFutureDate } from '../validators/bookingValidation.js';
+import { checkToken, checkValidation } from '../common/middlewares.js';
 
 const router = express.Router();
 
@@ -43,10 +43,10 @@ router.post('/',
     createBooking);
 
 // Get ALL Bookings as ADMIN
-router.get('/', checkToken, getBookings);
+router.get('/', checkToken, getAllBookings);
 
 // Get One booking as User
-router.get('/:id', checkToken, getOneBooking);
+router.get('/:id', checkToken, getMyBookings);
 
 // Delete a booking as User OR ADMIN
 router.delete('/:id', checkToken, deleteBooking);

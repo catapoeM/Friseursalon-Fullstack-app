@@ -1,6 +1,23 @@
 import jwt from 'jsonwebtoken';
-import Booking, {booking} from '../models/bookingModel';
+import Booking from '../models/bookingModel.js';
+import { validationResult, matchedData } from "express-validator";
 
+// check the req.body for errors;
+const checkValidation = (req, res, next) => {
+    // Validieren der Parameter
+  const result = validationResult(req);
+
+  // Early return pattern, hier beenden
+  if (!result.isEmpty()) {
+    return res.status(422).send(result.array());
+  }
+
+  // Werte aus bereinigten Daten rausholen und in Request-Objekt
+  req.matchedData = matchedData(req);
+
+  // in die nächste Middleware weiterschalten
+  next();
+}
 
 const checkToken = async (req, res, next) => {
   // wenn ein Browser ein sog. "Preflight" (Anfrage, ob der Browser)
@@ -39,4 +56,4 @@ const checkToken = async (req, res, next) => {
   next();
 };
 
-export {checkToken};
+export {checkToken, checkValidation};
