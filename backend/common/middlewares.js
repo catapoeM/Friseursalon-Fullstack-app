@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import Booking from '../models/bookingModel.js';
+import {Booking} from '../models/bookingModel.js';
 import { validationResult, matchedData } from "express-validator";
 
 // check the req.body for errors;
