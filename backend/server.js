@@ -7,6 +7,7 @@ import connectDB from "./config/db.js";
 import helmet from 'helmet';
 import homeRoutes from './routes/homeRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Load environment Variables
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(express.json());
 // Use routes
 app.use('/api/home', homeRoutes);
 app.use('/api/booking', bookingRoutes);
+app.use('/api/user', userRoutes);
 
 // HTTP + Socket.IO Server
 const server = http.createServer(app);

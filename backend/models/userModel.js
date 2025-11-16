@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
 
 const passwordsSchema = new mongoose.Schema({
     password: {type: String, required: true},
-    member: {type: mongoose.Types.ObjectId, required: true, ref: 'Member'}
+    user: {type: mongoose.Types.ObjectId, required: true, ref: 'User'}
 })
 
 // Trigger, der VOR dem Speichern eines Members mit .save() ausgeführt wird.

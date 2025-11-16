@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import {User, Password} from "../models/userModel.js";
+import {getHash} from '../common/index.js';
 
 const createUser = async (req, res) => {
     
@@ -9,16 +11,16 @@ const createUser = async (req, res) => {
     // Objekt mit den neuen Daten erstellen
     const data = req.matchedData;
 
-    // Objekt in Member-Model speichern
+    // Objekt in User-Model speichern
     const createdUser = new User(data);
     const newUser = await createdUser.save({session});
     
     // Neue ID auslesen
-    const member = newUser._id;
+    const user = newUser._id;
     // Objekt mit ID und Passwort erstellen
     const password = getHash(data.password);
     // Objekt in Password-Model speichern
-    const createdPassword = new Password({member, password});
+    const createdPassword = new Password({user, password});
     await createdPassword.save({session});
 
     await session.commitTransaction();
@@ -55,4 +57,8 @@ const loginUser = async (req, res) => {
     return res.send(token);
 }
 
-export {createUser, loginUser}
+const notFound = (req, res) => {
+    res.status(404).send('<h1>Seite nicht gefunden</h1>');
+};
+
+export {createUser, loginUser, notFound}

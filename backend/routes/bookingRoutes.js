@@ -1,6 +1,5 @@
 import express from 'express';
 import { getAllBookings, getMyBookings , deleteBooking, createBooking, notFound } from '../controllers/bookingController.js';
-import { loginUser, createUser } from '../controllers/userController.js';
 import { body } from 'express-validator';
 
 import { isFutureDate } from '../validators/bookingValidation.js';
@@ -43,25 +42,6 @@ router.post('/',
         .withMessage('Ungültige Telefonnummer'),
     checkValidation,
     createBooking);
-
-router.post(
-  '/',
-  body('email').escape().trim().isEmail(),
-  body('firstName').escape().trim().isLength({ min: 2, max: 50 }),
-  body('lastName').escape().trim().isLength({ min: 2, max: 50 }),
-  body('password').isLength({ min: 8, max: 50 }),
-  checkValidation,
-  createUser
-);
-
-// Login as admin
-router.post(
-  '/login',
-  body('login').escape().trim().isLength({ min: 4, max: 50 }),
-  body('password').isLength({ min: 8, max: 50 }),
-  checkValidation,
-  loginUser
-);
 
 // Get ALL Bookings as ADMIN
 router.get('/', checkToken, getAllBookings);
