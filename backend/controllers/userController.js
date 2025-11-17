@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import {User, Password} from "../models/userModel.js";
-import {getHash} from '../common/index.js';
+import {getHash, checkHash, getToken} from '../common/index.js';
 
 const createUser = async (req, res) => {
     
@@ -13,17 +13,13 @@ const createUser = async (req, res) => {
 
     // Objekt in User-Model speichern
     const createdUser = new User(data);
-    const newUser = await createdUser.save({session});
     
     // Neue ID auslesen
-    const user = newUser._id;
+    const newUser = createdUser._id;
     // Objekt mit ID und Passwort erstellen
     const password = getHash(data.password);
     // Objekt in Password-Model speichern
-    const createdPassword = new Password({user, password});
-    await createdPassword.save({session});
-
-    await session.commitTransaction();
+    new Password({newUser, password});
     // Daten nach Speicherung  ausgeben
     res.status(201).json(newUser);
 };
@@ -33,7 +29,7 @@ const loginUser = async (req, res) => {
     
     // User suchen über Email-Adresse ODER Nickname
     const foundUser = await User.findOne({
-        $or: [{nickname: login}, {email: login}]
+        $or: [{phone: login}, {email: login}]
     });
 
     if (!foundUser) {
@@ -44,6 +40,8 @@ const loginUser = async (req, res) => {
     const foundPassword = await Password.findOne({
         User: foundUser._id
     });
+    console.log('was ist newUser', foundUser)
+    console.log('was ist password', foundPassword)
     if (!foundPassword) {
         return res.status(401).send('Incorrect login or password ...')
     }

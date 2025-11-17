@@ -12,4 +12,8 @@ const getHash = (plainText) => {
   return bcrypt.hashSync(plainText, 10);
 };
 
-export {getToken, getHash};
+const checkHash = (plainText, hash) => {
+  return bcrypt.compareSync(plainText, hash);
+};
+
+export {getToken, getHash, checkHash};
