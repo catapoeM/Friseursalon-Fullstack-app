@@ -1,5 +1,5 @@
 import express from 'express';
-import { loginUser, createUser, notFound } from '../controllers/userController.js';
+import { loginUser, createUser, getAllUsers, notFound } from '../controllers/userController.js';
 import { checkToken, checkValidation } from '../common/middlewares.js';
 import { body } from 'express-validator';
 
@@ -31,6 +31,8 @@ router.post(
   checkValidation,
   loginUser
 );
+
+router.get('/', checkToken, getAllUsers);
 
 router.use('', notFound);
 

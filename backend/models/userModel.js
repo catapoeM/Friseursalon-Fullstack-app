@@ -13,13 +13,17 @@ const passwordsSchema = new mongoose.Schema({
     user: {type: mongoose.Types.ObjectId, required: true, ref: 'User'}
 })
 
-// Trigger, der VOR dem Speichern eines Members mit .save() ausgeführt wird.
-userSchema.pre('save', async function() {
-    const user = this;
-    
-});
+const bookingSchema = new mongoose.Schema({
+    firstName: {type: String, required: true},
+    lastName: {type: String, required: true},
+    service: {type: String, required: true},
+    date: {type: String, required: true},
+    time: {type: String, required: true},
+    phone: {type: String, required: true},
+}, {timestamps: true});
 
 const User = mongoose.model("User", userSchema);
 const Password = mongoose.model('Password', passwordsSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
 
-export {User, Password}
+export {User, Password, Booking}

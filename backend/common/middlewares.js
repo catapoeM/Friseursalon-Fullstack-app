@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import {Booking} from '../models/bookingModel.js';
+import {User} from '../models/userModel.js';
 import { validationResult, matchedData } from "express-validator";
 
 // check the req.body for errors;
@@ -42,15 +42,13 @@ const checkToken = async (req, res, next) => {
   // ID des Users aus Token decodieren
   const { id } = decoded;
 
-  // Booking über die ID suchen
-  const foundBooking = await Booking.findById(id);
-
-  if (!foundBooking) {
-    return res.status(401).send('Invalid token');
+  const foundUser = await User.findById(id);
+  if (!foundUser) {
+    return res.status(401).send('Invalid token1');
   }
 
   // gefundenen Booking in das request-Objekt schreiben
-  req.verifiedBooking = foundBooking;
+  req.verifiedBooking = foundUser;
 
   // bei erfolgreicher Prüfung in die nächste Middleware weiterschalten
   next();

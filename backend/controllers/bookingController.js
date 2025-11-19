@@ -1,4 +1,4 @@
-import {Booking} from "../models/bookingModel.js";
+import {Booking} from "../models/userModel.js";
 import { validatePhoneNumber}  from "../validators/bookingValidation.js";
 
 const getAllBookings = async (req, res) => {
