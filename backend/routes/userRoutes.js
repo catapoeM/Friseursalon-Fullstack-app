@@ -2,6 +2,7 @@ import express from 'express';
 import { loginUser, createUser, getAllUsers, notFound } from '../controllers/userController.js';
 import { checkToken, checkValidation } from '../common/middlewares.js';
 import { body } from 'express-validator';
+import { validatePhoneNumber } from '../validators/bookingValidation.js';
 
 const router = express.Router();
 
@@ -17,8 +18,7 @@ router.post(
         .trim()
         .notEmpty()
         .withMessage('Telefonnummer ist erforderlich')
-        .matches(/^\+?[0-9\s\-]{7,15}$/)
-        .withMessage('Ungültige Telefonnummer'),
+        .custom(validatePhoneNumber),
   checkValidation,
   createUser
 );

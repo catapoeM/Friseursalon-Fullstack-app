@@ -1,5 +1,6 @@
-import {Booking} from "../models/userModel.js";
-import { validatePhoneNumber}  from "../validators/bookingValidation.js";
+import {Booking} from "../models/bookingModel.js";
+import { User } from "../models/userModel.js";
+import mongoose from 'mongoose';
 
 const getAllBookings = async (req, res) => {
     try {
@@ -32,20 +33,20 @@ const getMyBookings = async (req, res) => {
 }
 
 const createBooking = async (req, res) => {
-    const {firstName, lastName, date, time, service, phone, email} = req.body;
-    if (validatePhoneNumber(phone)) {
-        const bookingData = {firstName, lastName, date, time, service, phone, email}
-        try {
-            const booking = new Booking(bookingData);
-            await booking.save();
-            
-            return res.status(200).json(booking);
-
-        } catch (error) {
-            return res.status(400).json({message: "Error ", error});
+    try {
+        const data = req.matchedData;
+        const existing = await Booking.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
+        if (existing) {
+        return res.status(400).json({ message: "Email oder Telefon existiert bereits" });
         }
-    }else {
-        return res.status(400).json({message: "Ungültige Telefonnummer"})
+        const booking = await Booking.create(data);
+        res.status(201).json(booking);
+    } catch (err) {
+        if (err.code === 11000) {
+            const field = Object.keys(err.keyValue)[0];
+            return res.status(400).json({message: `${field} ist bereits vergeben.`})
+        }
+        res.status(500).json({ message: err.message });
     }
 };
 
@@ -54,7 +55,7 @@ const deleteBooking = async (req, res) => {
     const {id} = req.params;
 
     // Member.findByIdAndDelete() suchen und löschen
-    const deletedOneBooking = await Member.findOneAndDelete({_id: id});
+    const deletedOneBooking = await User.findOneAndDelete({_id: id});
 
     if (!deletedOneBooking) {
         return res.status(404).send('Booking not found ...')

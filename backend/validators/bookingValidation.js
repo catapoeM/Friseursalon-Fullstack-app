@@ -1,9 +1,20 @@
-import {parsePhoneNumberFromString} from 'libphonenumber-js';
+import parsePhoneNumber  from 'libphonenumber-js';
 
-// Vaditate if the phone number is real
-const validatePhoneNumber = (phone) => {
-    const phoneNumber = parsePhoneNumberFromString(phone, "AT");
-    return phoneNumber && phoneNumber.isValid();
+// Vaditate if the phoneNumber number is real
+const validatePhoneNumber = (phoneN) => {
+  try {
+    const phoneNumber = parsePhoneNumber(phoneN, 'AT')
+    if (phoneNumber) {
+      if (phoneNumber.country === 'AT' && phoneNumber.isPossible()
+        && phoneNumber.isValid())
+      {
+        return phoneNumber.number;
+      }
+    }
+  } catch (error) {
+      console.error('Invalid phone number:', error.message)
+  }
+  
 };
 
 // Custom helper to check if date is in the future
