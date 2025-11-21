@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const bookingSchema = new mongoose.Schema({
     firstName: {type: String, required: true},
@@ -10,10 +10,13 @@ const bookingSchema = new mongoose.Schema({
     email: {type: String, required: true, unique: true},
 }, {timestamps: true});
 
-// Wichtig: unique Indexe für Email und Phone
-bookingSchema.index({ email: 1 }, { unique: true });
-bookingSchema.index({ phone: 1 }, { unique: true });
+const visitorVerificationSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  code: { type: String, required: true },
+  expiresAt: { type: Date, required: true }
+});
 
 const Booking = mongoose.model("Booking", bookingSchema);
+const VisitorVerification = mongoose.model("Visitor", visitorVerificationSchema);
 
-export {Booking}
+export {Booking, VisitorVerification}

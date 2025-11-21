@@ -1,14 +1,20 @@
 import express from 'express';
-import { getAllBookings, getMyBookings , deleteBooking, createBooking, notFound } from '../controllers/bookingController.js';
+import { getAllBookings, getMyBooking , deleteBooking, visitorCreateBooking, deleteAllBookings, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
 import { isFutureDate, validatePhoneNumber } from '../validators/bookingValidation.js';
-import { checkToken, checkValidation } from '../common/middlewares.js';
+import { checkToken, checkValidation, requestCode, verifyCode } from '../common/middlewares.js';
 
 const router = express.Router();
 
-// Create booking
-router.post('/',
+// Request code for the visitor to its booking
+router.post('/visitor/request-code', requestCode);
+
+// Verify code for the visitor to its booking
+router.post('/visitor/verify-code', verifyCode);
+
+// Create booking as visitor
+router.post('/visitor/create',
     body('firstName')
         .trim()
         .notEmpty()
@@ -38,9 +44,8 @@ router.post('/',
     body('phone')
         .notEmpty()
         .withMessage('Telefonnummer ist erforderlich')
-        .isMobilePhone("any")
+        .isMobilePhone()
         .withMessage("Ungültige Telefonnummer (Express)")
-        //.matches(/^\+?[0-9\s\-]{7,15}$/)
         .custom(validatePhoneNumber),
     body('email')
         .notEmpty()
@@ -48,16 +53,23 @@ router.post('/',
         .isEmail()
         .withMessage("Ungültige Email"),
     checkValidation,
-    createBooking);
+    checkToken,
+    visitorCreateBooking);
 
 // Get ALL Bookings as ADMIN
 router.get('/', checkToken, getAllBookings);
 
 // Get One booking as User
-router.get('/:id', checkToken, getMyBookings);
+router.get('/mybooking/:id', checkToken, getMyBooking);
+
+// Get One booking as visitor
+router.get('/mybooking', getMyBooking);
 
 // Delete a booking as User OR ADMIN
-router.delete('/:id', checkToken, deleteBooking);
+router.delete('/mybooking/:id', checkToken, deleteBooking);
+
+// Delete a booking as User OR ADMIN
+router.delete('/', checkToken, deleteAllBookings);
 
 router.use('', notFound);
 

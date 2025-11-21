@@ -4,8 +4,8 @@ import bcrypt from 'bcrypt';
 
 dotenv.config();
 
-const getToken = (data) => {
-  return jwt.sign(data, process.env.jwt_secret, { expiresIn: '1h' });
+const getToken = (data, secret, expiresTime) => {
+  return jwt.sign(data, secret, { expiresIn: expiresTime });
 };
 
 const getHash = (plainText) => {

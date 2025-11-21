@@ -1,6 +1,5 @@
 import {Booking} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import mongoose from 'mongoose';
 
 const getAllBookings = async (req, res) => {
     try {
@@ -11,7 +10,7 @@ const getAllBookings = async (req, res) => {
     }
 };
 
-const getMyBookings = async (req, res) => {
+const getMyBooking = async (req, res) => {
     const {login, authCode} = req.matchedData;
     
     // Member suchen über Email-Adresse ODER Nickname
@@ -32,15 +31,16 @@ const getMyBookings = async (req, res) => {
     res.send(token);
 }
 
-const createBooking = async (req, res) => {
+const visitorCreateBooking = async (req, res) => {
     try {
         const data = req.matchedData;
         const existing = await Booking.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
+        console.log(existing, ' existing')
         if (existing) {
-        return res.status(400).json({ message: "Email oder Telefon existiert bereits" });
+        return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
         }
         const booking = await Booking.create(data);
-        res.status(201).json(booking);
+        return res.status(201).json(booking);
     } catch (err) {
         if (err.code === 11000) {
             const field = Object.keys(err.keyValue)[0];
@@ -63,8 +63,20 @@ const deleteBooking = async (req, res) => {
     res.send('Booking was successfully deleted!')
 }
 
+const deleteAllBookings = async (req, res) => {
+    try {
+        const findDocuments = await Booking.find({});
+        if (findDocuments) {
+            await Booking.deleteMany({});
+            return res.send('Database User DELETED')
+        }
+    } catch (error) {
+        res.send(error, ' Error')
+    }
+};
+
 const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {createBooking, getMyBookings, getAllBookings, deleteBooking, notFound}
+export {visitorCreateBooking, getMyBooking, getAllBookings, deleteBooking, deleteAllBookings, notFound}
