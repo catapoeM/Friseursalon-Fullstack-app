@@ -1,6 +1,6 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
-const bookingSchema = new mongoose.Schema({
+const bookingsSchema = new mongoose.Schema({
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
     service: {type: String, required: true},
@@ -16,7 +16,7 @@ const visitorVerificationSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true }
 });
 
-const Booking = mongoose.model("Booking", bookingSchema);
+const Bookings = mongoose.model("Bookings", bookingsSchema);
 const VisitorVerification = mongoose.model("Visitor", visitorVerificationSchema);
 
-export {Booking, VisitorVerification}
+export {Bookings, VisitorVerification}

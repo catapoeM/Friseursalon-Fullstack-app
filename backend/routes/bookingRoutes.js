@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllBookings, getMyBooking , deleteBooking, visitorCreateBooking, deleteAllBookings, notFound } from '../controllers/bookingController.js';
+import { getAllBookings, getMyBookings , deleteBooking, visitorCreateBooking, deleteAllBookings, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
 import { isFutureDate, validatePhoneNumber } from '../validators/bookingValidation.js';
@@ -56,14 +56,14 @@ router.post('/visitor/create',
     checkToken,
     visitorCreateBooking);
 
-// Get ALL Bookings as ADMIN
-router.get('/', checkToken, getAllBookings);
+// Get ALL Bookings
+router.get('/', getAllBookings);
 
-// Get One booking as User
-router.get('/mybooking/:id', checkToken, getMyBooking);
+// Get  myBookings as User
+router.get('/mybookings', checkToken, getMyBookings);
 
 // Get One booking as visitor
-router.get('/mybooking', getMyBooking);
+router.get('/mybooking', getMyBookings);
 
 // Delete a booking as User OR ADMIN
 router.delete('/mybooking/:id', checkToken, deleteBooking);

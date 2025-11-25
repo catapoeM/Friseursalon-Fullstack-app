@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {User} from '../models/userModel.js';
-import { Booking, VisitorVerification } from '../models/bookingModel.js';
+import { Bookings, VisitorVerification } from '../models/bookingModel.js';
 import { getToken } from './index.js';
 import { validationResult, matchedData } from "express-validator";
 import nodemailer from "nodemailer";
@@ -35,12 +35,14 @@ const checkToken = async (req, res, next) => {
 
   // Token vom Header einlesen
   const { authorization } = req.headers;
+  console.log(authorization.token, ' auth')
   if (!authorization || authorization.length < 10) {
     return res.status(401).send('Invalid token');
   }
 
   // Token aus 'authorization' rausholen
   const token = authorization.split(' ')[1];
+  console.log(token, ' token')
 
   // Token prüfen auf Gültigkeit und Ablauf
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -53,7 +55,7 @@ const checkToken = async (req, res, next) => {
     return res.status(401).send('Invalid token1');
   }
 
-  // gefundenen Booking in das request-Objekt schreiben
+  // gefundenen Bookings in das request-Objekt schreiben
   req.verifiedBooking = foundUser;
 
   // bei erfolgreicher Prüfung in die nächste Middleware weiterschalten

@@ -1,32 +1,43 @@
-import {Booking} from "../models/bookingModel.js";
+import {Bookings} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
+import { getToken } from "../common/index.js";
+
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const getAllBookings = async (req, res) => {
     try {
-        const bookings = await Booking.find();
-        res.status(200).json(bookings);
+        /*const allBookingsByDateAndTime = 
+            await Bookings.find({}, 
+            {date: 1, time: 1, _id: 0})
+            .sort({date: 1});
+        */
+       const allBookingsByDateAndTime = await Bookings.find({}).sort({date: 1})
+        return res.status(200).json(allBookingsByDateAndTime);
     }   catch (error) {
         res.status(500).json({message: error.message});
     }
 };
 
-const getMyBooking = async (req, res) => {
-    const {login, authCode} = req.matchedData;
+const getMyBookings = async (req, res) => {
+    const {login} = req.matchedData;
     
     // Member suchen über Email-Adresse ODER Nickname
-    const foundBooking = await Booking.find({
+    const foundBooking = await Bookings.find({
         $or: [{phone: login}, {email: login}]
-    });
+    }).sort({date: 1, time: 1});
 
-    // Booking searching with Phone number or Family name
-   //const foundBooking = await Booking.findById(id);
+    // Bookings searching with Phone number or Family name
+   //const foundBooking = await Bookings.findById(id);
 
     if (!foundBooking) {
         return res.status(404).send('Buchung wurde nicht gefunden...')
     }
     
     // Token erzeugen mit ID des Members
-    const token = getToken({id: foundBooking._id});
+    const token = getToken({id: foundBooking._id}, process.env.JWT_SECRET, '1h');
+    console.log(token, ' token')
     // Token an der Client senden
     res.send(token);
 }
@@ -34,12 +45,12 @@ const getMyBooking = async (req, res) => {
 const visitorCreateBooking = async (req, res) => {
     try {
         const data = req.matchedData;
-        const existing = await Booking.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
+        const existing = await Bookings.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
         console.log(existing, ' existing')
         if (existing) {
         return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
         }
-        const booking = await Booking.create(data);
+        const booking = await Bookings.create(data);
         return res.status(201).json(booking);
     } catch (err) {
         if (err.code === 11000) {
@@ -58,16 +69,16 @@ const deleteBooking = async (req, res) => {
     const deletedOneBooking = await User.findOneAndDelete({_id: id});
 
     if (!deletedOneBooking) {
-        return res.status(404).send('Booking not found ...')
+        return res.status(404).send('Bookings not found ...')
     }
-    res.send('Booking was successfully deleted!')
+    res.send('Bookings was successfully deleted!')
 }
 
 const deleteAllBookings = async (req, res) => {
     try {
-        const findDocuments = await Booking.find({});
+        const findDocuments = await Bookings.find({});
         if (findDocuments) {
-            await Booking.deleteMany({});
+            await Bookings.deleteMany({});
             return res.send('Database User DELETED')
         }
     } catch (error) {
@@ -79,4 +90,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {visitorCreateBooking, getMyBooking, getAllBookings, deleteBooking, deleteAllBookings, notFound}
+export {visitorCreateBooking, getMyBookings, getAllBookings, deleteBooking, deleteAllBookings, notFound}
