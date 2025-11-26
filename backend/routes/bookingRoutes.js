@@ -1,17 +1,14 @@
 import express from 'express';
-import { getAllBookings, getMyBookings , deleteBooking, visitorCreateBooking, deleteAllBookings, notFound } from '../controllers/bookingController.js';
+import { getAllBookings, getMyBookings , deleteBooking, visitorCreateBooking, deleteAllBookings, requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
 import { isFutureDate, validatePhoneNumber } from '../validators/bookingValidation.js';
-import { checkToken, checkValidation, requestCode, verifyCode } from '../common/middlewares.js';
+import { checkToken, checkValidation} from '../common/middlewares.js';
 
 const router = express.Router();
 
-// Request code for the visitor to its booking
-router.post('/visitor/request-code', requestCode);
-
-// Verify code for the visitor to its booking
-router.post('/visitor/verify-code', verifyCode);
+// Get ALL Bookings
+router.get('/', getAllBookings);
 
 // Create booking as visitor
 router.post('/visitor/create',
@@ -53,11 +50,13 @@ router.post('/visitor/create',
         .isEmail()
         .withMessage("Ungültige Email"),
     checkValidation,
-    checkToken,
     visitorCreateBooking);
 
-// Get ALL Bookings
-router.get('/', getAllBookings);
+// Request code for the visitor to its booking
+router.post('/visitor/request-code', requestCode);
+
+// Verify code for the visitor to its booking
+router.post('/visitor/verify-code', verifyCode);
 
 // Get  myBookings as User
 router.get('/mybookings', checkToken, getMyBookings);

@@ -1,9 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {User} from '../models/userModel.js';
-import { Bookings, VisitorVerification } from '../models/bookingModel.js';
-import { getToken } from './index.js';
 import { validationResult, matchedData } from "express-validator";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -62,62 +59,5 @@ const checkToken = async (req, res, next) => {
   next();
 };
 
-const requestCode = async (req, res) => {
-  const email = req.body.email;
-  console.log(email, ' email')
-  const code = Math.floor(100000 + Math.random() * 900000);
 
-  await VisitorVerification.findOneAndUpdate(
-    { email },
-    {
-      email,
-      code: code,
-      expiresAt: Date.now() + 1000 * 60 * 10 // 10 min
-    },
-    {upsert: true}
-  );
-  const transporter = nodemailer.createTransport({
-    host: process.env.NODEMAILER_HOST,
-    port: process.env.NODEMAILER_PORT,
-    secure: false,
-    tls: {
-      rejectUnauthorized: false
-    },
-    auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS
-    }
-  });
-
-  await transporter.sendMail({
-    from: '"Test" <test@example.com>',
-    to: process.env.NODEMAILER_USER,
-    subject: "Your verification code",
-    text: `Code: ${code}. Valid for 10 minutes.`
-  });
-
-  res.json({message: "Code sent"});
-}
-
-const verifyCode = async (req, res) => {
-  const { email, code } = req.body;
-
-  const entry = await VisitorVerification.findOne({email})
-
-  if (!entry) {
-    return res.status(400).json({error: "No code requested"});
-  }
-  if (entry.code !== code) {
-    return res.status(400).json({error: "Invalid code"});
-  }
-  if (entry.expiresAt < Date.now()) {
-    return res.status(400).json({error: "Code expired"});
-  }
-
-  // Token erzeugen mit ID des Members
-  const token = getToken({email}, process.env.VISITOR_SECRET, '10m');
-
-  res.json({verified: true, token});
-}
-
-export {checkToken, checkValidation, requestCode, verifyCode};
+export {checkToken, checkValidation};

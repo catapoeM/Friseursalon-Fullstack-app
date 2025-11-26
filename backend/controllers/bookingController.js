@@ -1,6 +1,8 @@
-import {Bookings} from "../models/bookingModel.js";
+import {Bookings, VisitorVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
 import { getToken } from "../common/index.js";
+import nodemailer from "nodemailer";
+
 
 import dotenv from 'dotenv';
 
@@ -19,6 +21,87 @@ const getAllBookings = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+const visitorCreateBooking = async (req, res) => {
+    try {
+        const data = req.matchedData;
+        const existing = await Bookings.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
+        console.log(existing, ' existing')
+        if (existing) {
+        return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
+        }
+        // Speichert in Session
+        req.session.booking = data;
+
+        // Weiterleiten zur Code-Anfrage
+        res.redirect(req.baseUrl + '/request-code')
+    } catch (err) {
+        if (err.code === 11000) {
+            const field = Object.keys(err.keyValue)[0];
+            return res.status(400).json({message: `${field} ist bereits vergeben.`})
+        }
+        res.status(500).json({ message: err.message });
+    }
+};
+
+const requestCode = async (req, res) => {
+    if (!req.session.booking) {
+        return res.redirect(req.baseUrl)
+    }
+    var email = req.session.booking.data.email;
+    const code = Math.floor(100000 + Math.random() * 900000);
+    req.session.verificationCode = code;
+    try {
+        await VisitorVerification.findOneAndUpdate(
+            {
+                email,
+                code,
+                expiresAt: Date.now() + 1000 * 60 * 10 // 10 min
+            },
+            {upsert: true}
+        );
+        const transporter = nodemailer.createTransport({
+            host: process.env.NODEMAILER_HOST,
+            port: process.env.NODEMAILER_PORT,
+            secure: false,
+            tls: {
+                rejectUnauthorized: false
+            },
+            auth: {
+                user: process.env.NODEMAILER_USER,
+                pass: process.env.NODEMAILER_PASS
+            }
+        });
+    
+        await transporter.sendMail({
+            from: '"Test" <test@example.com>',
+            to: process.env.NODEMAILER_USER,
+            subject: "Your verification code",
+            text: `Code: ${code}. Valid for 10 minutes.`
+        });
+    
+        // Weiterleitung zur Eingabemaske
+        res.redirect(req.baseUrl + '/verify-code');
+    }   catch(error) {
+        
+    }
+}
+
+const verifyCode = async (req, res) => {
+    try {
+        const entry = await VisitorVerification.findOne({
+            where: {email: req.session.data.email}
+        })
+        if (req.body.code === entry.bookind.data.code) {
+            await Bookings.update({ status: "confirmed" }, {
+        where: { email: req.session.data.email }
+    });
+        res.json('Booking confirmed');
+        }
+    }   catch(error) {
+        console.log(error, 'Error found on request code route!');
+    }
+}
 
 const getMyBookings = async (req, res) => {
     const {login} = req.matchedData;
@@ -41,25 +124,6 @@ const getMyBookings = async (req, res) => {
     // Token an der Client senden
     res.send(token);
 }
-
-const visitorCreateBooking = async (req, res) => {
-    try {
-        const data = req.matchedData;
-        const existing = await Bookings.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
-        console.log(existing, ' existing')
-        if (existing) {
-        return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
-        }
-        const booking = await Bookings.create(data);
-        return res.status(201).json(booking);
-    } catch (err) {
-        if (err.code === 11000) {
-            const field = Object.keys(err.keyValue)[0];
-            return res.status(400).json({message: `${field} ist bereits vergeben.`})
-        }
-        res.status(500).json({ message: err.message });
-    }
-};
 
 const deleteBooking = async (req, res) => {
     // ID aus Params holen
@@ -90,4 +154,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {visitorCreateBooking, getMyBookings, getAllBookings, deleteBooking, deleteAllBookings, notFound}
+export {visitorCreateBooking, getMyBookings, getAllBookings, deleteBooking, deleteAllBookings, requestCode, verifyCode, notFound}
