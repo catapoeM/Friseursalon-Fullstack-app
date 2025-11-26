@@ -1,6 +1,6 @@
 import {Bookings, VisitorVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import { getToken } from "../common/index.js";
+import { generateNumericCode, getToken } from "../common/index.js";
 import nodemailer from "nodemailer";
 
 
@@ -32,9 +32,10 @@ const visitorCreateBooking = async (req, res) => {
         }
         // Speichert in Session
         req.session.booking = data;
-
+        console.log(req.session.booking, ' req.session.booking')
+        console.log(req.baseUrl)
         // Weiterleiten zur Code-Anfrage
-        res.redirect(req.baseUrl + '/request-code')
+        res.redirect('http://localhost:5000' + req.baseUrl + '/visitor/request-code')
     } catch (err) {
         if (err.code === 11000) {
             const field = Object.keys(err.keyValue)[0];
@@ -45,11 +46,12 @@ const visitorCreateBooking = async (req, res) => {
 };
 
 const requestCode = async (req, res) => {
+    console.log(req.session, ' reqqq')
     if (!req.session.booking) {
         return res.redirect(req.baseUrl)
     }
-    var email = req.session.booking.data.email;
-    const code = Math.floor(100000 + Math.random() * 900000);
+    var email = req.session.booking.email;
+    const code = generateNumericCode(6);
     req.session.verificationCode = code;
     try {
         await VisitorVerification.findOneAndUpdate(
@@ -81,7 +83,7 @@ const requestCode = async (req, res) => {
         });
     
         // Weiterleitung zur Eingabemaske
-        res.redirect(req.baseUrl + '/verify-code');
+        res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
     }   catch(error) {
         
     }

@@ -5,15 +5,20 @@ import bcrypt from 'bcrypt';
 dotenv.config();
 
 const getToken = (data, secret, expiresTime) => {
-  return jwt.sign(data, secret, { expiresIn: expiresTime });
+    return jwt.sign(data, secret, { expiresIn: expiresTime });
 };
 
 const getHash = (plainText) => {
-  return bcrypt.hashSync(plainText, 10);
+    return bcrypt.hashSync(plainText, 10);
 };
 
 const checkHash = (plainText, hash) => {
-  return bcrypt.compareSync(plainText, hash);
+    return bcrypt.compareSync(plainText, hash);
 };
 
-export {getToken, getHash, checkHash};
+const generateNumericCode = (length) => {
+    const min = Math.pow(10, length - 1);
+    const max = Math.pow(10, length) - 1;
+    return Math.floor(min + Math.random() * (max - min + 1));
+}
+export {getToken, getHash, checkHash, generateNumericCode};
