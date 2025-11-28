@@ -13,7 +13,8 @@ const bookingsSchema = new mongoose.Schema({
 const visitorVerificationSchema = new mongoose.Schema({
   email: { type: String, required: true },
   code: { type: String, required: true },
-  expiresAt: { type: Date, required: true }
+  createdAt: {type: Date, index: {expires: 0},
+  }
 });
 
 const Bookings = mongoose.model("Bookings", bookingsSchema);

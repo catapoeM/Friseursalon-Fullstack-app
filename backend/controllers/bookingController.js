@@ -25,10 +25,11 @@ const getAllBookings = async (req, res) => {
 const visitorCreateBooking = async (req, res) => {
     try {
         const data = req.matchedData;
-        const existing = await Bookings.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
+        console.log(data, ' data')
+        const existing = await Bookings.findOne().select({email: data.email});
         console.log(existing, ' existing')
         if (existing) {
-        return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
+            return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
         }
         // Speichert in Session
         req.session.booking = data;
@@ -46,22 +47,21 @@ const visitorCreateBooking = async (req, res) => {
 };
 
 const requestCode = async (req, res) => {
-    console.log(req.session, ' reqqq')
+    console.log(req.session.booking, ' session booking')
     if (!req.session.booking) {
         return res.redirect(req.baseUrl)
     }
-    var email = req.session.booking.email;
+    const email = req.session.booking.email;
     const code = generateNumericCode(6);
-    req.session.verificationCode = code;
+    req.session.booking.verificationCode = code;
     try {
-        await VisitorVerification.findOneAndUpdate(
-            {
-                email,
-                code,
-                expiresAt: Date.now() + 1000 * 60 * 10 // 10 min
-            },
-            {upsert: true}
-        );
+        const verificationCodeUpdate = await VisitorVerification.create({
+            email,
+            code,
+            expiresAt: new Date(Date.now() + 10 * 60 * 1000) // expires in 10 minutes
+        });
+
+        console.log(verificationCodeUpdate, ' verificationCodeUpdate')
         const transporter = nodemailer.createTransport({
             host: process.env.NODEMAILER_HOST,
             port: process.env.NODEMAILER_PORT,
@@ -75,12 +75,13 @@ const requestCode = async (req, res) => {
             }
         });
     
-        await transporter.sendMail({
+        const emailSent = await transporter.sendMail({
             from: '"Test" <test@example.com>',
             to: process.env.NODEMAILER_USER,
             subject: "Your verification code",
             text: `Code: ${code}. Valid for 10 minutes.`
         });
+        console.log(emailSent, ' email sent');
     
         // Weiterleitung zur Eingabemaske
         res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
@@ -91,14 +92,15 @@ const requestCode = async (req, res) => {
 
 const verifyCode = async (req, res) => {
     try {
-        const entry = await VisitorVerification.findOne({
-            where: {email: req.session.data.email}
-        })
-        if (req.body.code === entry.bookind.data.code) {
-            await Bookings.update({ status: "confirmed" }, {
-        where: { email: req.session.data.email }
-    });
-        res.json('Booking confirmed');
+        const email = req.session.booking.email;
+        const entry = await VisitorVerification.where({email}).findOneAndDelete({code: req.session.booking.verificationCode});
+        console.log(entry, ' entry')
+        if (entry && req.session.booking) {
+            const bookingSaved = await Bookings.create(req.session.booking);
+            return res.json('Booking confirmed - ' + bookingSaved);
+
+        }else {
+            return res.json('Booking not found!')
         }
     }   catch(error) {
         console.log(error, 'Error found on request code route!');

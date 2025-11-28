@@ -56,7 +56,13 @@ router.post('/visitor/create',
 router.post('/visitor/request-code', requestCode);
 
 // Verify code for the visitor to its booking
-router.post('/visitor/verify-code', verifyCode);
+router.post('/visitor/verify-code',
+    body('verifyCode')
+        .trim()
+        .notEmpty()
+        .isLength({min: 6, max: 6})
+        .withMessage('Invalid code. Too large or too small number'),
+     checkValidation, verifyCode);
 
 // Get  myBookings as User
 router.get('/mybookings', checkToken, getMyBookings);
