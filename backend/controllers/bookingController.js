@@ -24,11 +24,14 @@ const getAllBookings = async (req, res) => {
 
 const visitorCreateBooking = async (req, res) => {
     try {
+        const {phone, email} = req.matchedData;
         const data = req.matchedData;
         console.log(data, ' data')
-        const existing = await Bookings.findOne().select({email: data.email});
-        console.log(existing, ' existing')
-        if (existing) {
+        const foundBooking = await Bookings.findOne({
+            $or: [{phone}, {email}]
+        })
+        console.log(foundBooking, ' foundBooking')
+        if (foundBooking) {
             return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
         }
         // Speichert in Session

@@ -31,8 +31,8 @@ router.post('/visitor/create',
     body('time')
         .notEmpty()
         .withMessage('Uhrzeit ist erforderlich')
-        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
-        .withMessage('Uhrzeit muss im Format HH:MM (24h) sein'),
+        .matches(/^(1[0-8]):00$/)
+        .withMessage('Bitte eine gültige Uhrzeit zwischen 10:00 und 18:00 im Format HH:00 angeben (nur ganze Stunden erlaubt).'),
     body('service')
         .notEmpty()
         .withMessage('Service ist erforderlich')

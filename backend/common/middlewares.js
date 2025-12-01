@@ -2,8 +2,26 @@ import jwt from 'jsonwebtoken';
 import {User} from '../models/userModel.js';
 import { validationResult, matchedData } from "express-validator";
 import dotenv from "dotenv";
+import session from 'express-session';
+import { app } from '../server.js';
 
 dotenv.config();
+
+const sessionFunction = () => {
+  var sess = {
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {maxAge: 1000 * 60 * 15 } // 15 minutes
+  }
+  
+  if (app.get('env') === 'production') {
+    app.set('trust proxy', 1) // trust first proxy
+    sess.cookie.secure = true // serve secure cookies
+  }
+  app.use(session(sess));
+}
+
 
 // check the req.body for errors;
 const checkValidation = (req, res, next) => {
@@ -60,4 +78,4 @@ const checkToken = async (req, res, next) => {
 };
 
 
-export {checkToken, checkValidation};
+export {checkToken, checkValidation, sessionFunction};
