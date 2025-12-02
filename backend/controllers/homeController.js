@@ -1,11 +1,7 @@
-import crypto from 'crypto';
+
 
 const getHome = (req, res) => {
-    console.log(req.session, ' req.session vvv')
-    if (!req.session.visitorId) {
-        req.session.visitorId = crypto.randomUUID();
-    }    
-    res.json({message: 'HomePage'});
+    res.json(req.session);
 };
 
 const postHome = (req, res) => {

@@ -3,7 +3,7 @@ import { getAllBookings, getMyBookings , deleteBooking, visitorCreateBooking, de
 import { body } from 'express-validator';
 
 import { isFutureDate, validatePhoneNumber } from '../validators/bookingValidation.js';
-import { checkToken, checkValidation} from '../common/middlewares.js';
+import { checkToken, checkValidation, createVisitorId} from '../common/middlewares.js';
 
 const router = express.Router();
 
@@ -50,10 +50,11 @@ router.post('/visitor/create',
         .isEmail()
         .withMessage("Ungültige Email"),
     checkValidation,
+    createVisitorId,
     visitorCreateBooking);
 
 // Request code for the visitor to its booking
-router.post('/visitor/request-code', requestCode);
+router.post('/visitor/request-code', createVisitorId, requestCode);
 
 // Verify code for the visitor to its booking
 router.post('/visitor/verify-code',
@@ -62,7 +63,7 @@ router.post('/visitor/verify-code',
         .notEmpty()
         .isLength({min: 6, max: 6})
         .withMessage('Invalid code. Too large or too small number'),
-     checkValidation, verifyCode);
+     checkValidation, createVisitorId, verifyCode);
 
 // Get  myBookings as User
 router.get('/mybookings', checkToken, getMyBookings);

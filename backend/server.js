@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import homeRoutes from './routes/homeRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import session from 'express-session';
 
 // Load environment Variables
 dotenv.config();
@@ -24,6 +25,20 @@ app.use(cors());
 // Middleware to parse JSON
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+
+const expires = 15 * 60 * 1000;
+var sess = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {maxAge: expires } // 15 minutes
+}
+  
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1) // trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+}
+app.use(session(sess));
 
 
 
@@ -64,5 +79,3 @@ io.on("connection", async (socket) => {
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-export {app};

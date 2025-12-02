@@ -13,9 +13,11 @@ const bookingsSchema = new mongoose.Schema({
 const visitorVerificationSchema = new mongoose.Schema({
   email: { type: String, required: true },
   code: { type: String, required: true },
-  createdAt: {type: Date, index: {expires: 0},
-  }
+  expiresAt: { type: Date, required: true },
 });
+
+// Automatisch löschen, wenn abgelaufen (MongoDB TTL index)
+visitorVerificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const Bookings = mongoose.model("Bookings", bookingsSchema);
 const VisitorVerification = mongoose.model("Visitor", visitorVerificationSchema);

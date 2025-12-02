@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -16,9 +17,33 @@ const checkHash = (plainText, hash) => {
     return bcrypt.compareSync(plainText, hash);
 };
 
-const generateNumericCode = (length) => {
-    const min = Math.pow(10, length - 1);
-    const max = Math.pow(10, length) - 1;
-    return Math.floor(min + Math.random() * (max - min + 1));
+const createEmailAndSend = async (code) => {
+    try {
+        const transporter = await nodemailer.createTransport({
+            host: process.env.NODEMAILER_HOST,
+            port: process.env.NODEMAILER_PORT,
+            secure: false,
+            tls: {
+                rejectUnauthorized: false
+            },
+            auth: {
+                user: process.env.NODEMAILER_USER,
+                pass: process.env.NODEMAILER_PASS
+            }
+        });
+    
+        const emailSent = await transporter.sendMail({
+            from: '"Test" <test@example.com>',
+            to: process.env.NODEMAILER_USER,
+            subject: "Your verification code",
+            text: `Code: ${code}. Valid for 5 minutes.`
+        });
+        
+        console.log(emailSent, ' email sent');
+        return emailSent;
+    }catch (err) {
+        return res.status(500).json({message: err.message});
+    }
 }
-export {getToken, getHash, checkHash, generateNumericCode};
+
+export {getToken, getHash, checkHash, createEmailAndSend};
