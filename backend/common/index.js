@@ -40,7 +40,7 @@ const createEmailAndSend = async (code) => {
         });
         
         console.log(emailSent, ' email sent');
-        return emailSent;
+        return true;
     }catch (err) {
         return res.status(500).json({message: err.message});
     }
