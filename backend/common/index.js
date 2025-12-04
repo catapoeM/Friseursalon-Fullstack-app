@@ -46,4 +46,14 @@ const createEmailAndSend = async (code) => {
     }
 }
 
-export {getToken, getHash, checkHash, createEmailAndSend};
+const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
+    // In Date umwandeln
+    let date = new Date(stringDate );
+    // 24 Stunden hinzufügen
+    date.setHours(date.getHours() + extraHours);
+    // zurück zu ISO-String
+    const newDateWithExtraHours = date.toISOString();
+    return newDateWithExtraHours;
+}
+
+export {getToken, getHash, checkHash, createEmailAndSend, fromStringToDatePlusExtraHours};

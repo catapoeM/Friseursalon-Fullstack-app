@@ -1,6 +1,6 @@
 import {Bookings, VisitorVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import { getToken, createEmailAndSend } from "../common/index.js";
+import { getToken, createEmailAndSend, fromStringToDatePlusExtraHours } from "../common/index.js";
 import random from 'random';
 
 
@@ -10,12 +10,7 @@ dotenv.config();
 
 const getAllBookings = async (req, res) => {
     try {
-        /*const allBookingsByDateAndTime = 
-            await Bookings.find({}, 
-            {date: 1, time: 1, _id: 0})
-            .sort({date: 1});
-        */
-       const allBookingsByDateAndTime = await Bookings.find({}).sort({date: 1})
+       const allBookingsByDateAndTime = await Bookings.find({}).sort({start: 1})
         return res.status(200).json(allBookingsByDateAndTime);
     }   catch (error) {
         res.status(500).json({message: error.message});
@@ -95,11 +90,15 @@ const verifyCode = async (req, res) => {
         if (req.session &&
             req.session.booking && req.session.booking.email) {
             const email = req.session.booking.email;
-            const entry = await VisitorVerification.where({email}).findOneAndDelete({code: req.session.booking.verificationCode});
-            console.log(entry, ' entry')
+            const entry = await VisitorVerification.where({email}).findOne();
+            console.log(entry, ' entry');
+            const expiresAt = fromStringToDatePlusExtraHours(req.session.booking.end, 24);
+            req.session.booking.expiresAt = expiresAt;
             if (entry) {
                 const bookingSaved = await Bookings.create(req.session.booking);
                 delete req.session.booking;
+                //Löscht jeden Code der im DB befindet mit dem Email
+                await VisitorVerification.where({email}).deleteMany();
                 return res.json('Booking confirmed - ' + bookingSaved);
     
             }else {
@@ -119,7 +118,7 @@ const getMyBookings = async (req, res) => {
     // Member suchen über Email-Adresse ODER Nickname
     const foundBooking = await Bookings.find({
         $or: [{phone: login}, {email: login}]
-    }).sort({date: 1, time: 1});
+    }).sort({start: 1, time: 1});
 
     // Bookings searching with Phone number or Family name
    //const foundBooking = await Bookings.findById(id);

@@ -2,7 +2,9 @@ import express from 'express';
 import { getAllBookings, getMyBookings , deleteBooking, visitorCreateBooking, deleteAllBookings, requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
-import { isFutureDate, validatePhoneNumber } from '../validators/bookingValidation.js';
+import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
+    endWithinHours, endNotAfter19, durationValid,
+     validatePhoneNumber } from '../validators/bookingValidation.js';
 import { checkToken, checkValidation, createVisitorId} from '../common/middlewares.js';
 
 const router = express.Router();
@@ -23,16 +25,24 @@ router.post('/visitor/create',
         .withMessage('Nachname darf nicht leer sein')
         .isLength({min: 2, max: 50})
         .withMessage('Nachname muss mindestens 2 und maximum 50 Zeichen lang sein'),
-    body('date')
+    body('start')
         .notEmpty()
-        .withMessage('Datum ist erforderlich')
-        .custom(isFutureDate)
-        .withMessage('Datum muss in der Zukunft liegen'),
-    body('time')
+        .isISO8601()
+        .toDate()
+        .withMessage("Start must be a valid date.")
+        .custom(startAtLeastTwoHoursAhead)
+        .custom(startOnValidWeekday)
+        .custom(startWithinHours)
+        .withMessage("Start mind. +2 Stunden in Zukunft; Nur Dienstag–Freitag; Arbeitszeit 10–19 Uhr"),
+    body('end')
         .notEmpty()
-        .withMessage('Uhrzeit ist erforderlich')
-        .matches(/^(1[0-8]):00$/)
-        .withMessage('Bitte eine gültige Uhrzeit zwischen 10:00 und 18:00 im Format HH:00 angeben (nur ganze Stunden erlaubt).'),
+        .isISO8601()
+        .toDate()
+        .withMessage("End must be a valid date.")
+        .custom(endWithinHours)
+        .custom(endNotAfter19)
+        .custom(durationValid)
+        .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
     body('service')
         .notEmpty()
         .withMessage('Service ist erforderlich')
