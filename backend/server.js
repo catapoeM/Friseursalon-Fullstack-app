@@ -31,7 +31,10 @@ var sess = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {maxAge: expires } // 15 minutes
+  cookie: {maxAge: expires,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production"
+  } // 15 minutes
 }
   
 if (app.get('env') === 'production') {

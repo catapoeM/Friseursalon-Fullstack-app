@@ -1,6 +1,6 @@
 import {Bookings, VisitorVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import { getToken, createEmailAndSend, fromStringToDatePlusExtraHours } from "../common/index.js";
+import { createEmailAndSend, fromStringToDatePlusExtraHours } from "../common/index.js";
 import random from 'random';
 
 
@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Rufe alle Buchungen auf von der Buchungsliste
 const getAllBookings = async (req, res) => {
     try {
        const allBookingsByDateAndTime = await Bookings.find({}).sort({start: 1})
@@ -16,6 +17,27 @@ const getAllBookings = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+// Rufe Meine Buchungen von der Buchungsliste auf
+const getMyBookings = async (req, res) => {
+    try {
+        if (req.session && req.session.booking && req.session.booking.email) {
+            // Member suchen über Email-Adresse
+            const foundBooking = await Bookings.find({email}).sort({start: 1, time: 1});
+            if (foundBooking) {
+                return res.status(200).send(foundBooking, ' Booking found!');
+            }
+            else {
+                return res.status(404).send('Buchung wurde nicht gefunden...')
+            }
+        }else {
+            //res.redirect('http://localhost:5000' + req.baseUrl + '/visitor/request-code')
+            return res.status(404).send('To find your booking please go to the "request-code" page and verify it!')
+        }
+    } catch (error) {
+        console.log(error, 'Error found on *getMyBookings!');
+    }
+}
 
 const visitorCreateBooking = async (req, res) => {
     try {
@@ -47,15 +69,19 @@ const visitorCreateBooking = async (req, res) => {
     }
 };
 
+
 const requestCode = async (req, res) => {
     // Wenn session nicht aufgefunden wird dann >
-    console.log(req.session.booking, ' session booking')
+    console.log(req.session, ' session booking')
     if (!req.session.booking) {
-        //return res.redirect(req.baseUrl)
-        return res.send(req.session)
-    }else if (req.session && req.session.booking && req.session.booking.email) {
-        // Email im session speichern
-        const email = req.session.booking.email;
+        console.log("Please provide your email to be able to verify your identity!");
+        const {email} = req.matchedData;
+        console.log(req + ' req matched email')
+        req.session.booking = {
+            email
+        }
+    }
+    if (email) {
         const code = random.int(100000, 999999).toString();
         const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
         // Anrufen die Funktion, um die Email an den Client zu schicken
@@ -81,6 +107,8 @@ const requestCode = async (req, res) => {
         }else {
             res.status(500).json("Email not sent + Error") 
         }
+    }else {
+        res.status(404).json(email, " Email not found!");
     }
 }
 
@@ -96,7 +124,6 @@ const verifyCode = async (req, res) => {
             req.session.booking.expiresAt = expiresAt;
             if (entry) {
                 const bookingSaved = await Bookings.create(req.session.booking);
-                delete req.session.booking;
                 //Löscht jeden Code der im DB befindet mit dem Email
                 await VisitorVerification.where({email}).deleteMany();
                 return res.json('Booking confirmed - ' + bookingSaved);
@@ -112,27 +139,6 @@ const verifyCode = async (req, res) => {
     }
 }
 
-const getMyBookings = async (req, res) => {
-    const {login} = req.matchedData;
-    
-    // Member suchen über Email-Adresse ODER Nickname
-    const foundBooking = await Bookings.find({
-        $or: [{phone: login}, {email: login}]
-    }).sort({start: 1, time: 1});
-
-    // Bookings searching with Phone number or Family name
-   //const foundBooking = await Bookings.findById(id);
-
-    if (!foundBooking) {
-        return res.status(404).send('Buchung wurde nicht gefunden...')
-    }
-    
-    // Token erzeugen mit ID des Members
-    const token = getToken({id: foundBooking._id}, process.env.JWT_SECRET, '1h');
-    console.log(token, ' token')
-    // Token an der Client senden
-    res.send(token);
-}
 
 const deleteBooking = async (req, res) => {
     // ID aus Params holen

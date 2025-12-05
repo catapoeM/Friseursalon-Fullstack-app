@@ -56,7 +56,9 @@ router.post('/visitor/create',
         .custom(validatePhoneNumber),
     body('email')
         .notEmpty()
-        .withMessage('Telefonnummer ist erforderlich')
+        .escape()
+        .trim()
+        .withMessage('Email ist erforderlich')
         .isEmail()
         .withMessage("Ungültige Email"),
     checkValidation,
@@ -64,7 +66,14 @@ router.post('/visitor/create',
     visitorCreateBooking);
 
 // Request code for the visitor to its booking
-router.post('/visitor/request-code', createVisitorId, requestCode);
+router.post('/visitor/request-code',
+    body('email')
+        .escape()
+        .trim()
+        .notEmpty()
+        .isEmail()
+        .withMessage("Ungültige Email"),
+        checkValidation, createVisitorId, requestCode);
 
 // Verify code for the visitor to its booking
 router.post('/visitor/verify-code',
@@ -76,7 +85,7 @@ router.post('/visitor/verify-code',
      checkValidation, createVisitorId, verifyCode);
 
 // Get  myBookings as User
-router.get('/mybookings', checkToken, getMyBookings);
+router.get('/mybookings', createVisitorId, getMyBookings);
 
 // Get One booking as visitor
 router.get('/mybooking', getMyBookings);
