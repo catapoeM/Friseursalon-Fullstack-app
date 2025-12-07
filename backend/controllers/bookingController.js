@@ -1,4 +1,4 @@
-import {Bookings, VisitorVerification} from "../models/bookingModel.js";
+import {Bookings, UserVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
 import { createEmailAndSend, fromStringToDatePlusExtraHours } from "../common/index.js";
 import random from 'random';
@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Rufe alle Buchungen auf von der Buchungsliste
+// Rufe alle Buchungen auf von der Buchungsliste (Time slot: calendar available dates)
 const getAllBookings = async (req, res) => {
     try {
        const allBookingsByDateAndTime = await Bookings.find({}).sort({start: 1})
@@ -19,36 +19,39 @@ const getAllBookings = async (req, res) => {
 };
 
 // Rufe Meine Buchungen von der Buchungsliste auf
+// Damin man seine Buchungen bekommt, muss man als visitor: entweder authentifizieren (email -> code -> verify)
+// oder Wenn man schon authentifiziert wurde un mit token (Wenn token noch gültig ist)
 const getMyBookings = async (req, res) => {
     try {
         if (req.session && req.session.booking && req.session.booking.email) {
             // Member suchen über Email-Adresse
-            const foundBooking = await Bookings.find({email}).sort({start: 1, time: 1});
-            if (foundBooking) {
-                return res.status(200).send(foundBooking, ' Booking found!');
+            const foundBookings = await Bookings.find({email}).sort({start: 1, time: 1});
+            if (foundBookings) {
+                return res.status(200).send(foundBookings, ' Bookings found!');
             }
             else {
                 return res.status(404).send('Buchung wurde nicht gefunden...')
             }
         }else {
             //res.redirect('http://localhost:5000' + req.baseUrl + '/visitor/request-code')
-            return res.status(404).send('To find your booking please go to the "request-code" page and verify it!')
+            return res.status(404).send('To find your booking please go to the "request-code" page and verify it! (Authenticate)' )
         }
     } catch (error) {
         console.log(error, 'Error found on *getMyBookings!');
     }
 }
 
-const visitorCreateBooking = async (req, res) => {
+
+const createBooking = async (req, res) => {
     try {
         // Phone und Email aus req.matchedData rausholen
         const {phone, email} = req.matchedData;
         // Suche in DB, ob es eine Buchung mit dem Phone oder Email gibt
-        const foundBooking = await Bookings.findOne({
+        const foundBookings = await Bookings.findOne({
             $or: [{phone}, {email}]
         })
         // Wenn true dann man muss die Buchung ändern
-        if (foundBooking) {
+        if (foundBookings) {
             return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
         }
         const data = req.matchedData;
@@ -58,7 +61,7 @@ const visitorCreateBooking = async (req, res) => {
         console.log(req.session.booking, ' req.session.booking')
         console.log(req.baseUrl)
         // Weiterleiten zur Code-Anfrage
-        //res.redirect('http://localhost:5000' + req.baseUrl + '/visitor/request-code')
+        //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
         res.send(req.session)
     } catch (err) {
         if (err.code === 11000) {
@@ -71,44 +74,44 @@ const visitorCreateBooking = async (req, res) => {
 
 
 const requestCode = async (req, res) => {
-    // Wenn session nicht aufgefunden wird dann >
-    console.log(req.session, ' session booking')
-    if (!req.session.booking) {
-        console.log("Please provide your email to be able to verify your identity!");
-        const {email} = req.matchedData;
-        console.log(req + ' req matched email')
-        req.session.booking = {
-            email
+    try {
+        // Wenn session nicht aufgefunden wird dann >
+        console.log(req.session, ' session booking')
+        if (!req && !req.session && !req.session.booking) {
+            console.log(req.session.booking + ' No session booking!')
         }
-    }
-    if (email) {
-        const code = random.int(100000, 999999).toString();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
-        // Anrufen die Funktion, um die Email an den Client zu schicken
-        const emailSent = await createEmailAndSend(code);
-        // Code im session speichern
-        console.log(emailSent, ' sent')
-        if (emailSent) {
-            req.session.booking.verificationCode = code;
-            try {
-                const verificationCodeUpdate = await VisitorVerification.create({
-                    email,
-                    code,
-                    expiresAt
-                });
-        
-                console.log(verificationCodeUpdate, ' verificationCodeUpdate')
-                // Weiterleitung zur Eingabemaske
-                //res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
-                return res.json("emailSent");
-            }   catch(error) {
-                    return res.status(500).json({message: err.message});
+        else if (req && req.session && req.session.booking && req.session.booking.email){
+            const email = req.session.booking.email;
+            const code = random.int(100000, 999999).toString();
+            const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
+            // Anrufen die Funktion, um die Email an den Client zu schicken
+            const emailSent = await createEmailAndSend(code);
+            // Code im session speichern
+            console.log(emailSent, ' sent')
+            if (emailSent) {
+                req.session.booking.verificationCode = code;
+                try {
+                    const verificationCodeUpdate = await UserVerification.create({
+                        email,
+                        code,
+                        expiresAt
+                    });
+            
+                    console.log(verificationCodeUpdate, ' verificationCodeUpdate')
+                    // Weiterleitung zur Eingabemaske
+                    //res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
+                    return res.json("emailSent");
+                }   catch(error) {
+                        return res.status(500).json({message: err.message});
+                }
+            }else {
+                res.status(500).json("Email not sent + Error") 
             }
         }else {
-            res.status(500).json("Email not sent + Error") 
+            res.status(404).json(email, " Email not found!");
         }
-    }else {
-        res.status(404).json(email, " Email not found!");
+    }   catch (err) {
+            console.log(error, 'Error found on request code controller!');
     }
 }
 
@@ -118,14 +121,14 @@ const verifyCode = async (req, res) => {
         if (req.session &&
             req.session.booking && req.session.booking.email) {
             const email = req.session.booking.email;
-            const entry = await VisitorVerification.where({email}).findOne();
+            const entry = await UserVerification.where({email}).findOne();
             console.log(entry, ' entry');
             const expiresAt = fromStringToDatePlusExtraHours(req.session.booking.end, 24);
             req.session.booking.expiresAt = expiresAt;
             if (entry) {
                 const bookingSaved = await Bookings.create(req.session.booking);
                 //Löscht jeden Code der im DB befindet mit dem Email
-                await VisitorVerification.where({email}).deleteMany();
+                await UserVerification.where({email}).deleteMany();
                 return res.json('Booking confirmed - ' + bookingSaved);
     
             }else {
@@ -135,7 +138,7 @@ const verifyCode = async (req, res) => {
             res.status(500).json({ message: 'Session err!' });
         }
     }   catch(error) {
-        console.log(error, 'Error found on request code controller!');
+        console.log(error, 'Error found on verify code controller!');
     }
 }
 
@@ -169,4 +172,6 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {visitorCreateBooking, getMyBookings, getAllBookings, deleteBooking, deleteAllBookings, requestCode, verifyCode, notFound}
+export {createBooking, getMyBookings, 
+    getAllBookings, deleteBooking, deleteAllBookings, 
+    requestCode, verifyCode, notFound}

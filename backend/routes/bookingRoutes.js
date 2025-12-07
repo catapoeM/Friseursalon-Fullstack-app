@@ -1,5 +1,7 @@
 import express from 'express';
-import { getAllBookings, getMyBookings , deleteBooking, visitorCreateBooking, deleteAllBookings, requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
+import { getAllBookings, getMyBookings , 
+    deleteBooking, createBooking, deleteAllBookings, 
+    requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
 import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
@@ -13,7 +15,7 @@ const router = express.Router();
 router.get('/', getAllBookings);
 
 // Create booking as visitor
-router.post('/visitor/create',
+router.post('/create',
     body('firstName')
         .trim()
         .notEmpty()
@@ -48,6 +50,16 @@ router.post('/visitor/create',
         .withMessage('Service ist erforderlich')
         .isIn(['Haarschnitt', 'Färben', 'Styling', 'Bartpflege'])
         .withMessage('Ungültiger Service'),
+    body('stylist')
+        .notEmpty()
+        .withMessage('Stylist ist erforderlich')
+        .isIn(['Catalina', 'Cristian'])
+        .withMessage('Ungültiger Stylist'),
+    body('clientType')
+        .notEmpty()
+        .withMessage('Client typ ist erforderlich')
+        .isIn(['Woman', 'Man', 'Child'])
+        .withMessage('Ungültiger Client typ'),
     body('phone')
         .notEmpty()
         .withMessage('Telefonnummer ist erforderlich')
@@ -63,20 +75,20 @@ router.post('/visitor/create',
         .withMessage("Ungültige Email"),
     checkValidation,
     createVisitorId,
-    visitorCreateBooking);
+    createBooking);
 
 // Request code for the visitor to its booking
-router.post('/visitor/request-code',
+router.post('/request-code', /*
     body('email')
         .escape()
         .trim()
         .notEmpty()
         .isEmail()
-        .withMessage("Ungültige Email"),
+        .withMessage("Ungültige Email"),*/
         checkValidation, createVisitorId, requestCode);
 
 // Verify code for the visitor to its booking
-router.post('/visitor/verify-code',
+router.post('/verify-code',
     body('verifyCode')
         .trim()
         .notEmpty()
