@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
+import CryptoJS from 'crypto-js';
 
 dotenv.config();
 
@@ -17,9 +18,23 @@ const checkHash = (plainText, hash) => {
     return bcrypt.compareSync(plainText, hash);
 };
 
-const createEmailAndSend = async (code) => {
+// Function to encrypt an object
+const encryptObject = (obj) => {
+    const jsonString = JSON.stringify(obj);
+    const encryptedObj = CryptoJS.AES.encrypt(jsonString, process.env.CRYPTOJS_SECRET).toString();
+    return encryptedObj;
+}
+
+// Function to decrypt to an object
+const decryptObject = (encryptedObj) => {
+    const bytes = CryptoJS.AES.decrypt(encryptedObj, process.env.CRYPTOJS_SECRET);
+    const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decryptedString);
+}
+
+const createEmailAndSend = async (emailContent) => {
     try {
-        const transporter = await nodemailer.createTransport({
+        const transporter = nodemailer.createTransport({
             host: process.env.NODEMAILER_HOST,
             port: process.env.NODEMAILER_PORT,
             secure: false,
@@ -32,14 +47,9 @@ const createEmailAndSend = async (code) => {
             }
         });
     
-        const emailSent = await transporter.sendMail({
-            from: '"Test" <test@example.com>',
-            to: process.env.NODEMAILER_USER,
-            subject: "Your verification code",
-            text: `Code: ${code}. Valid for 5 minutes.`
-        });
+        const emailSent = await transporter.sendMail(emailContent);
         
-        console.log(emailSent, ' email sent');
+        console.log(emailSent, ' emailContent sent');
         return true;
     }catch (err) {
         return res.status(500).json({message: err.message});
@@ -56,4 +66,4 @@ const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
     return newDateWithExtraHours;
 }
 
-export {getToken, getHash, checkHash, createEmailAndSend, fromStringToDatePlusExtraHours};
+export {getToken, getHash, checkHash, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject};

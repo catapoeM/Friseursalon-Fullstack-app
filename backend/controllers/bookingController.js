@@ -1,6 +1,6 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import { createEmailAndSend, fromStringToDatePlusExtraHours } from "../common/index.js";
+import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, decryptObject, getHash, checkHash } from "../common/index.js";
 import random from 'random';
 
 
@@ -52,44 +52,55 @@ const createBooking = async (req, res) => {
         })
         // Wenn true dann man muss die Buchung ändern
         if (foundBookings) {
-            return res.status(400).json({ message: "You already have a booking. Please change your booking!" });
+            return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
         }
-        const data = req.matchedData;
+        const objData = req.matchedData;
+
         // Wenn nicht gefunden, dann im Session speichern
         // Speichert in Session
-        req.session.booking = data;
-        console.log(req.session.booking, ' req.session.booking')
+        // Vorher muss man nur encrypted objData in Session speichern
+        console.log(objData, ' objData')
+        const encryptedData = encryptObject(objData);
+        req.session.booking = encryptedData;
+        console.log(req.session.booking, ' req.session.booking (Encrypted)')
         console.log(req.baseUrl)
         // Weiterleiten zur Code-Anfrage
         //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
         res.send(req.session)
-    } catch (err) {
-        if (err.code === 11000) {
-            const field = Object.keys(err.keyValue)[0];
+    } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
             return res.status(400).json({message: `${field} ist bereits vergeben.`})
         }
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
 
 const requestCode = async (req, res) => {
     try {
-        // Wenn session nicht aufgefunden wird dann >
-        console.log(req.session, ' session booking')
-        if (!req && !req.session && !req.session.booking) {
-            console.log(req.session.booking + ' No session booking!')
-        }
-        else if (req && req.session && req.session.booking && req.session.booking.email){
-            const email = req.session.booking.email;
+        if (req && req.session && req.session.booking) {
+            const objData = decryptObject(req.session.booking);
+            console.log(objData, ' obj data!!!');
+            const email = objData.email;
+            console.log(email, ' email!!! from the obj data')
             const code = random.int(100000, 999999).toString();
             const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
+
+            const emailContent = {
+                from: '"Test" <test@example.com>',
+                to: process.env.NODEMAILER_USER,
+                subject: "Your verification code",
+                text: `Code: ${code}. Valid for 5 minutes.`
+            }
             // Anrufen die Funktion, um die Email an den Client zu schicken
-            const emailSent = await createEmailAndSend(code);
-            // Code im session speichern
-            console.log(emailSent, ' sent')
+            const emailSent = await createEmailAndSend(emailContent);
+            // bcrypt the code before saving in DB          
             if (emailSent) {
-                req.session.booking.verificationCode = code;
+                console.log(objData, ' obj data 2222222')
+                const encryptedData = encryptObject(objData);
+                req.session.booking = encryptedData;
+                console.log(req.session.booking, ' session booking 333')
                 try {
                     const verificationCodeUpdate = await UserVerification.create({
                         email,
@@ -97,45 +108,58 @@ const requestCode = async (req, res) => {
                         expiresAt
                     });
             
-                    console.log(verificationCodeUpdate, ' verificationCodeUpdate')
+                    console.log(verificationCodeUpdate, ' verificationCodeUpdate');
+                    console.log(emailSent, ' sent');
                     // Weiterleitung zur Eingabemaske
                     //res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
                     return res.json("emailSent");
                 }   catch(error) {
-                        return res.status(500).json({message: err.message});
+                        return res.status(500).json({message: error.message});
                 }
             }else {
                 res.status(500).json("Email not sent + Error") 
             }
         }else {
-            res.status(404).json(email, " Email not found!");
+            res.status(404).json(" Session not found!");
         }
-    }   catch (err) {
+    }   catch (error) {
             console.log(error, 'Error found on request code controller!');
     }
 }
 
 const verifyCode = async (req, res) => {
-    console.log(req.session.booking, ' req sess')
     try {
-        if (req.session &&
-            req.session.booking && req.session.booking.email) {
-            const email = req.session.booking.email;
-            const entry = await UserVerification.where({email}).findOne();
-            console.log(entry, ' entry');
-            const expiresAt = fromStringToDatePlusExtraHours(req.session.booking.end, 24);
-            req.session.booking.expiresAt = expiresAt;
-            if (entry) {
-                const bookingSaved = await Bookings.create(req.session.booking);
+        if (req && req.session && req.session.booking) {
+            const objData = decryptObject(req.session.booking);
+            console.log(objData, ' obj data+++')
+            const email = objData.email;
+            const userVerificationCode = await UserVerification.findOne({email});
+            console.log(userVerificationCode, ' userVerificationCode');
+            const expiresAt = fromStringToDatePlusExtraHours(objData.end, 24);
+            objData.expiresAt = expiresAt;
+            // Token erzeugen mit ID des Members
+            const token = getToken(objData, process.env.JWT_SECRET, '24h');
+            if (userVerificationCode && token) {
+                console.log(objData);
+                const bookingSaved = await Bookings.create(objData);
                 //Löscht jeden Code der im DB befindet mit dem Email
-                await UserVerification.where({email}).deleteMany();
-                return res.json('Booking confirmed - ' + bookingSaved);
+                await UserVerification.where(email).deleteMany();
+                delete req.session.booking;
+                const emailContent = {
+                    from: '"Test" <test@example.com>',
+                    to: process.env.NODEMAILER_USER,
+                    subject: "Booking confirmation!",
+                    text: `${objData.firstName} ${objData.lastName}, your booking has been confirmed!`
+                }
+                // Anrufen die Funktion, um die Email an den Client zu schicken
+                await createEmailAndSend(emailContent);
+                return res.json('Buchung wurde erfolgreich bestätigt! - ' + bookingSaved + ' Token - ' + token);
     
             }else {
-                return res.json('Booking not found!')
+                return res.json('Booking not found! or not token')
             }
         }else {
-            res.status(500).json({ message: 'Session err!' });
+            res.status(500).json({ message: 'Session error!' });
         }
     }   catch(error) {
         console.log(error, 'Error found on verify code controller!');

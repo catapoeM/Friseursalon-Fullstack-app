@@ -78,14 +78,8 @@ router.post('/create',
     createBooking);
 
 // Request code for the visitor to its booking
-router.post('/request-code', /*
-    body('email')
-        .escape()
-        .trim()
-        .notEmpty()
-        .isEmail()
-        .withMessage("Ungültige Email"),*/
-        checkValidation, createVisitorId, requestCode);
+router.post('/request-code',
+        createVisitorId, requestCode);
 
 // Verify code for the visitor to its booking
 router.post('/verify-code',
