@@ -3,8 +3,13 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import CryptoJS from 'crypto-js';
+import random from 'random';
 
 dotenv.config();
+
+const randomNumber = () => {
+   return random.int(100000, 999999).toString();
+}
 
 const getToken = (data, secret, expiresTime) => {
     return jwt.sign(data, secret, { expiresIn: expiresTime });
@@ -31,6 +36,8 @@ const decryptObject = (encryptedObj) => {
     const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
     return JSON.parse(decryptedString);
 }
+
+
 
 const createEmailAndSend = async (emailContent) => {
     try {
@@ -66,4 +73,4 @@ const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
     return newDateWithExtraHours;
 }
 
-export {getToken, getHash, checkHash, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject};
+export {getToken, getHash, checkHash, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber};

@@ -1,8 +1,6 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, decryptObject, getHash, checkHash } from "../common/index.js";
-import random from 'random';
-
+import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, decryptObject, getHash, checkHash, randomNumber } from "../common/index.js";
 
 import dotenv from 'dotenv';
 
@@ -76,6 +74,40 @@ const createBooking = async (req, res) => {
     }
 };
 
+const changeBooking = async (req, res) => {
+    try {
+        // Phone und Email aus req.matchedData rausholen
+        const {phone, email} = req.matchedData;
+        // Suche in DB, ob es eine Buchung mit dem Phone oder Email gibt
+        const foundBookings = await Bookings.findOne({
+            $or: [{phone}, {email}]
+        })
+        // Wenn true dann man muss die Buchung ändern
+        if (foundBookings) {
+            return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
+        }
+        const objData = req.matchedData;
+
+        // Wenn nicht gefunden, dann im Session speichern
+        // Speichert in Session
+        // Vorher muss man nur encrypted objData in Session speichern
+        console.log(objData, ' objData')
+        const encryptedData = encryptObject(objData);
+        req.session.booking = encryptedData;
+        console.log(req.session.booking, ' req.session.booking (Encrypted)')
+        console.log(req.baseUrl)
+        // Weiterleiten zur Code-Anfrage
+        //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
+        res.send(req.session)
+    } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
+            return res.status(400).json({message: `${field} ist bereits vergeben.`})
+        }
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 const requestCode = async (req, res) => {
     try {
@@ -84,7 +116,7 @@ const requestCode = async (req, res) => {
             console.log(objData, ' obj data!!!');
             const email = objData.email;
             console.log(email, ' email!!! from the obj data')
-            const code = random.int(100000, 999999).toString();
+            const code = randomNumber();
             const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
 
             const emailContent = {
@@ -140,6 +172,7 @@ const verifyCode = async (req, res) => {
             // Token erzeugen mit ID des Members
             const token = getToken(objData, process.env.JWT_SECRET, '24h');
             if (userVerificationCode && token) {
+                const bookingChangeLink = 'http://localhost:5000' + req.baseUrl + '/change';
                 console.log(objData);
                 const bookingSaved = await Bookings.create(objData);
                 //Löscht jeden Code der im DB befindet mit dem Email
@@ -149,7 +182,8 @@ const verifyCode = async (req, res) => {
                     from: '"Test" <test@example.com>',
                     to: process.env.NODEMAILER_USER,
                     subject: "Booking confirmation!",
-                    text: `${objData.firstName} ${objData.lastName}, your booking has been confirmed!`
+                    text: `${objData.firstName} ${objData.lastName}, your booking with the ID: ${bookingSaved._id} has been confirmed!
+                    Um Ihre Buchung zu ändern, klicken Sie hier: ${bookingChangeLink}/${bookingSaved._id}`
                 }
                 // Anrufen die Funktion, um die Email an den Client zu schicken
                 await createEmailAndSend(emailContent);
@@ -196,6 +230,6 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {createBooking, getMyBookings, 
+export {createBooking, changeBooking, getMyBookings, 
     getAllBookings, deleteBooking, deleteAllBookings, 
     requestCode, verifyCode, notFound}

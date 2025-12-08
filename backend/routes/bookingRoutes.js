@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllBookings, getMyBookings , 
-    deleteBooking, createBooking, deleteAllBookings, 
+    deleteBooking, createBooking, changeBooking, deleteAllBookings, 
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body } from 'express-validator';
 
@@ -75,7 +75,43 @@ router.post('/create',
         .withMessage("Ungültige Email"),
     checkValidation,
     createVisitorId,
-    createBooking);
+    createBooking
+);
+
+// Get ALL Bookings
+router.put('/change',
+    body('start')
+        .notEmpty()
+        .isISO8601()
+        .toDate()
+        .withMessage("Start must be a valid date.")
+        .custom(startAtLeastTwoHoursAhead)
+        .custom(startOnValidWeekday)
+        .custom(startWithinHours)
+        .withMessage("Start mind. +2 Stunden in Zukunft; Nur Dienstag–Freitag; Arbeitszeit 10–19 Uhr"),
+    body('end')
+        .notEmpty()
+        .isISO8601()
+        .toDate()
+        .withMessage("End must be a valid date.")
+        .custom(endWithinHours)
+        .custom(endNotAfter19)
+        .custom(durationValid)
+        .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
+    body('service')
+        .notEmpty()
+        .withMessage('Service ist erforderlich')
+        .isIn(['Haarschnitt', 'Färben', 'Styling', 'Bartpflege'])
+        .withMessage('Ungültiger Service'),
+    body('stylist')
+        .notEmpty()
+        .withMessage('Stylist ist erforderlich')
+        .isIn(['Catalina', 'Cristian'])
+        .withMessage('Ungültiger Stylist'),
+    checkValidation,
+    createVisitorId,
+    changeBooking
+);
 
 // Request code for the visitor to its booking
 router.post('/request-code',
