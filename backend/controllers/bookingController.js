@@ -1,6 +1,7 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
-import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, decryptObject, getHash, checkHash, randomNumber } from "../common/index.js";
+import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, cryptTheCode,
+     decryptObject, getHash, checkHash, randomNumber } from "../common/index.js";
 
 import dotenv from 'dotenv';
 
@@ -74,8 +75,24 @@ const createBooking = async (req, res) => {
     }
 };
 
-const changeBooking = async (req, res) => {
+const editBookingGet = async (req, res) => {
     try {
+        const { id } = req.params;
+        const { code } = req.query;
+
+        const booking = await Bookings.findById(id);
+
+        if (!booking) {
+            return res.status(404).send("Booking not found!");
+        }
+        const valid = checkHash(code, booking.code);
+        if (!valid) {
+            return res.status(403).send("Invalid code!!Get");
+        }
+
+        res.json(booking);
+
+        /*
         // Phone und Email aus req.matchedData rausholen
         const {phone, email} = req.matchedData;
         // Suche in DB, ob es eine Buchung mit dem Phone oder Email gibt
@@ -99,6 +116,42 @@ const changeBooking = async (req, res) => {
         // Weiterleiten zur Code-Anfrage
         //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
         res.send(req.session)
+        */
+    } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
+            return res.status(400).json({message: `${field} ist bereits vergeben.`})
+        }
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const editBookingPut = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = req.matchedData;
+        const { code } = req.query;
+
+        const booking = await Bookings.findById(id);
+        if (!booking) {
+            return res.status(404).json({error: "Booking not found!"})
+        }
+
+        
+        const valid = checkHash(code, booking.code);
+        if (!valid) {
+            return res.status(403).send("Invalid code! PUT");
+        }
+
+        booking.start = data.start;
+        booking.end = data.end;
+        booking.service = data.service;
+        booking.stylist = data.stylist;
+
+        await booking.save();
+
+        res.json({message: "Booking updated - ", booking})
+
     } catch (error) {
         if (error.code === 11000) {
             const field = Object.keys(error.keyValue)[0];
@@ -172,9 +225,15 @@ const verifyCode = async (req, res) => {
             // Token erzeugen mit ID des Members
             const token = getToken(objData, process.env.JWT_SECRET, '24h');
             if (userVerificationCode && token) {
-                const bookingChangeLink = 'http://localhost:5000' + req.baseUrl + '/change';
+                let bookingEditLink = 'http://localhost:5000' + req.baseUrl + '/';
                 console.log(objData);
+
+                const codeCrypted = cryptTheCode(userVerificationCode.code);
+                const codeHashed = getHash(codeCrypted);
+                objData.code = codeHashed;
+
                 const bookingSaved = await Bookings.create(objData);
+                bookingEditLink += bookingSaved._id + "/edit?code=" + codeHashed;
                 //Löscht jeden Code der im DB befindet mit dem Email
                 await UserVerification.where(email).deleteMany();
                 delete req.session.booking;
@@ -182,8 +241,11 @@ const verifyCode = async (req, res) => {
                     from: '"Test" <test@example.com>',
                     to: process.env.NODEMAILER_USER,
                     subject: "Booking confirmation!",
-                    text: `${objData.firstName} ${objData.lastName}, your booking with the ID: ${bookingSaved._id} has been confirmed!
-                    Um Ihre Buchung zu ändern, klicken Sie hier: ${bookingChangeLink}/${bookingSaved._id}`
+                    html: `<p> ${objData.firstName} ${objData.lastName}, your booking has been created successfully </p> 
+                            <p>
+                                <strong>Edit your booking:</strong><br>
+                                <a href="${bookingEditLink}" target="_blank">${bookingEditLink}</a>
+                            </p>`
                 }
                 // Anrufen die Funktion, um die Email an den Client zu schicken
                 await createEmailAndSend(emailContent);
@@ -230,6 +292,6 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {createBooking, changeBooking, getMyBookings, 
+export {createBooking, editBookingGet, editBookingPut, getMyBookings, 
     getAllBookings, deleteBooking, deleteAllBookings, 
     requestCode, verifyCode, notFound}

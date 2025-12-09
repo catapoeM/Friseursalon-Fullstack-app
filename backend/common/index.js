@@ -4,8 +4,14 @@ import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import CryptoJS from 'crypto-js';
 import random from 'random';
+import crypto from 'crypto';
 
 dotenv.config();
+
+const cryptTheCode = (rawCode) => {
+    rawCode = crypto.randomBytes(32).toString("hex");
+    return rawCode;
+} 
 
 const randomNumber = () => {
    return random.int(100000, 999999).toString();
@@ -73,4 +79,4 @@ const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
     return newDateWithExtraHours;
 }
 
-export {getToken, getHash, checkHash, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber};
+export {getToken, getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber};

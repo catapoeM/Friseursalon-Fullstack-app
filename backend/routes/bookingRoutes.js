@@ -1,8 +1,8 @@
 import express from 'express';
 import { getAllBookings, getMyBookings , 
-    deleteBooking, createBooking, changeBooking, deleteAllBookings, 
+    deleteBooking, createBooking, editBookingGet, editBookingPut, deleteAllBookings, 
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
-import { body } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
     endWithinHours, endNotAfter19, durationValid,
@@ -78,8 +78,17 @@ router.post('/create',
     createBooking
 );
 
-// Get ALL Bookings
-router.put('/change',
+// Get edit route mit id und code
+router.get('/:id/edit',
+    param("id").isMongoId(),
+    query("code").isString().isLength({min:6 , max:6}),
+    checkValidation,
+    createVisitorId,
+    editBookingGet
+);
+
+// Change the booking
+router.put('/:id/edit',
     body('start')
         .notEmpty()
         .isISO8601()
@@ -110,7 +119,7 @@ router.put('/change',
         .withMessage('Ungültiger Stylist'),
     checkValidation,
     createVisitorId,
-    changeBooking
+    editBookingPut
 );
 
 // Request code for the visitor to its booking

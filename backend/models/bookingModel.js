@@ -11,6 +11,7 @@ const bookingsSchema = new mongoose.Schema({
     service: {type: String, required: true},
     stylist: {type: String, required: true},
     clientType: {type: String, required: true},
+    code: {type: String, required: true},
     expiresAt: {type: Date, required: true},
 }, {timestamps: true});
 
