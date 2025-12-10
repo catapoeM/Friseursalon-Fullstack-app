@@ -12,6 +12,7 @@ const bookingsSchema = new mongoose.Schema({
     stylist: {type: String, required: true},
     clientType: {type: String, required: true},
     code: {type: String, required: true},
+    isCanceled: {type: Boolean, required: true},
     expiresAt: {type: Date, required: true},
 }, {timestamps: true});
 

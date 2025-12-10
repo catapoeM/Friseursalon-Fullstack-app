@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllBookings, getMyBookings , 
-    deleteBooking, createBooking, editBookingGet, editBookingPut, deleteAllBookings, 
+    deleteBooking, createBooking, editBookingGet, editBookingPut, deleteAllBookings, cancelBooking,
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body, param, query } from 'express-validator';
 
@@ -81,7 +81,7 @@ router.post('/create',
 // Get edit route mit id und code
 router.get('/:id/edit',
     param("id").isMongoId(),
-    query("code").isString().isLength({min:30}),
+    query("code").isString().isLength({min:32}),
     checkValidation,
     createVisitorId,
     editBookingGet
@@ -120,6 +120,15 @@ router.put('/:id/edit',
     checkValidation,
     createVisitorId,
     editBookingPut
+);
+
+// Cancel the booking
+router.patch('/:id/cancel',
+    param("id").isMongoId(),
+    query("code").isString().isLength({min:32}),
+    checkValidation,
+    createVisitorId,
+    cancelBooking
 );
 
 // Request code for the visitor to its booking

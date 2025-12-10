@@ -84,8 +84,9 @@ const editBookingGet = async (req, res) => {
         if (!booking) {
             return res.status(404).send("Booking not found!");
         }
-
-        if (code !== booking.code) {
+        const isValid = checkHash(code, booking.code);
+        console.log(code + " " +  booking.code)
+        if (!isValid) {
             return res.status(403).send("Invalid code!!Get");
         }
 
@@ -109,8 +110,8 @@ const editBookingPut = async (req, res) => {
         if (!booking) {
             return res.status(404).json({error: "Booking not found!"})
         }
-
-        if (code !== booking.code) {
+        const isValid = checkHash(code, booking.code);
+        if (!isValid) { 
             return res.status(403).send("Invalid code! PUT");
         }
 
@@ -122,6 +123,35 @@ const editBookingPut = async (req, res) => {
         await booking.save();
 
         res.json({message: "Booking updated - ", booking})
+
+    } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
+            return res.status(400).json({message: `${field} ist bereits vergeben.`})
+        }
+        res.status(500).json({ message: error.message + ' error' });
+    }
+};
+
+const cancelBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { code } = req.query;
+
+        const booking = await Bookings.findById(id);
+        if (!booking) {
+            return res.status(404).json({error: "Booking not found!"})
+        }
+        const isValid = checkHash(code, booking.code);
+        if (!isValid) {
+            return res.status(403).send("Invalid code! PUT");
+        }
+
+        booking.isCanceled = true;
+
+        await booking.save();
+
+        res.json({message: "Booking canceled - ", booking})
 
     } catch (error) {
         if (error.code === 11000) {
@@ -202,9 +232,10 @@ const verifyCode = async (req, res) => {
                 const codeCrypted = cryptTheCode(userVerificationCode.code);
                 const codeHashed = getHash(codeCrypted);
                 objData.code = codeHashed;
-
+                objData.isCanceled = false;
                 const bookingSaved = await Bookings.create(objData);
-                bookingEditLink += bookingSaved._id + "/edit?code=" + codeHashed;
+                const bookingCancelLink = bookingEditLink + bookingSaved._id + "/cancel?code=" + codeCrypted;
+                bookingEditLink += bookingSaved._id + "/edit?code=" + codeCrypted;
                 //Löscht jeden Code der im DB befindet mit dem Email
                 await UserVerification.where(email).deleteMany();
                 delete req.session.booking;
@@ -216,6 +247,10 @@ const verifyCode = async (req, res) => {
                             <p>
                                 <strong>Edit your booking:</strong><br>
                                 <a href="${bookingEditLink}" target="_blank">${bookingEditLink}</a>
+                            </p>
+                            <p>
+                                <strong>Cancel your booking:</strong><br>
+                                <a href="${bookingCancelLink}" target="_blank">${bookingCancelLink}</a>
                             </p>`
                 }
                 // Anrufen die Funktion, um die Email an den Client zu schicken
@@ -263,6 +298,6 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {createBooking, editBookingGet, editBookingPut, getMyBookings, 
+export {createBooking, editBookingGet, editBookingPut, cancelBooking, getMyBookings, 
     getAllBookings, deleteBooking, deleteAllBookings, 
     requestCode, verifyCode, notFound}
