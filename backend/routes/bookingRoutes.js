@@ -81,7 +81,7 @@ router.post('/create',
 // Get edit route mit id und code
 router.get('/:id/edit',
     param("id").isMongoId(),
-    query("code").isString().isLength({min:6 , max:6}),
+    query("code").isString().isLength({min:30}),
     checkValidation,
     createVisitorId,
     editBookingGet

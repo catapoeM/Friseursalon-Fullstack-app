@@ -79,50 +79,23 @@ const editBookingGet = async (req, res) => {
     try {
         const { id } = req.params;
         const { code } = req.query;
-
         const booking = await Bookings.findById(id);
 
         if (!booking) {
             return res.status(404).send("Booking not found!");
         }
-        const valid = checkHash(code, booking.code);
-        if (!valid) {
+
+        if (code !== booking.code) {
             return res.status(403).send("Invalid code!!Get");
         }
 
         res.json(booking);
-
-        /*
-        // Phone und Email aus req.matchedData rausholen
-        const {phone, email} = req.matchedData;
-        // Suche in DB, ob es eine Buchung mit dem Phone oder Email gibt
-        const foundBookings = await Bookings.findOne({
-            $or: [{phone}, {email}]
-        })
-        // Wenn true dann man muss die Buchung ändern
-        if (foundBookings) {
-            return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
-        }
-        const objData = req.matchedData;
-
-        // Wenn nicht gefunden, dann im Session speichern
-        // Speichert in Session
-        // Vorher muss man nur encrypted objData in Session speichern
-        console.log(objData, ' objData')
-        const encryptedData = encryptObject(objData);
-        req.session.booking = encryptedData;
-        console.log(req.session.booking, ' req.session.booking (Encrypted)')
-        console.log(req.baseUrl)
-        // Weiterleiten zur Code-Anfrage
-        //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
-        res.send(req.session)
-        */
     } catch (error) {
         if (error.code === 11000) {
             const field = Object.keys(error.keyValue)[0];
             return res.status(400).json({message: `${field} ist bereits vergeben.`})
         }
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message + ' error'});
     }
 };
 
@@ -137,9 +110,7 @@ const editBookingPut = async (req, res) => {
             return res.status(404).json({error: "Booking not found!"})
         }
 
-        
-        const valid = checkHash(code, booking.code);
-        if (!valid) {
+        if (code !== booking.code) {
             return res.status(403).send("Invalid code! PUT");
         }
 
@@ -157,7 +128,7 @@ const editBookingPut = async (req, res) => {
             const field = Object.keys(error.keyValue)[0];
             return res.status(400).json({message: `${field} ist bereits vergeben.`})
         }
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message + ' error' });
     }
 };
 
