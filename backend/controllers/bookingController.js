@@ -1,7 +1,7 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
 import { User } from "../models/userModel.js";
 import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, cryptTheCode,
-     decryptObject, getHash, checkHash, randomNumber } from "../common/index.js";
+     decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
 
 import dotenv from 'dotenv';
 
@@ -50,7 +50,7 @@ const createBooking = async (req, res) => {
             $or: [{phone}, {email}]
         })
         // Wenn true dann man muss die Buchung ändern
-        if (foundBookings) {
+        if (foundBookings || (foundBookings && !foundBookings.isCanceled)) {
             return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
         }
         const objData = req.matchedData;
@@ -80,6 +80,9 @@ const editBookingGet = async (req, res) => {
         const { id } = req.params;
         const { code } = req.query;
         const booking = await Bookings.findById(id);
+        if (booking.isCanceled) {
+            return res.status(404).json({error: "Booking not found!"})
+        }
 
         if (!booking) {
             return res.status(404).send("Booking not found!");
@@ -107,7 +110,7 @@ const editBookingPut = async (req, res) => {
         const { code } = req.query;
 
         const booking = await Bookings.findById(id);
-        if (!booking) {
+        if (!booking || booking.isCanceled) {
             return res.status(404).json({error: "Booking not found!"})
         }
         const isValid = checkHash(code, booking.code);
@@ -120,8 +123,20 @@ const editBookingPut = async (req, res) => {
         booking.service = data.service;
         booking.stylist = data.stylist;
 
+        const humanReadableDateAndTimeStart = formatDateTimeUTC(booking.start, 'de-DE');
+        //const humanReadableDateAndTimeEnd = formatDateTimeUTC(booking.end, 'de-DE');
         await booking.save();
-
+        const emailContent = {
+            from: '"Test" <test@example.com>',
+            to: process.env.NODEMAILER_USER,
+            subject: "Booking EDITED!",
+            html: `<p> ${booking.firstName} ${booking.lastName}, your booking has been edited successfully </p> 
+                    <p> Your new booking details: You have a new booking: ${humanReadableDateAndTimeStart} which will take: "" hours.</p> 
+                    <p> For the service: ${booking.service}  with the stylist: ${booking.stylist} </p>
+                </p>`
+        }
+        // Anrufen die Funktion, um die Email an den Client zu schicken
+        await createEmailAndSend(emailContent);
         res.json({message: "Booking updated - ", booking})
 
     } catch (error) {
@@ -139,7 +154,7 @@ const cancelBooking = async (req, res) => {
         const { code } = req.query;
 
         const booking = await Bookings.findById(id);
-        if (!booking) {
+        if (!booking || booking.isCanceled) {
             return res.status(404).json({error: "Booking not found!"})
         }
         const isValid = checkHash(code, booking.code);
@@ -148,10 +163,17 @@ const cancelBooking = async (req, res) => {
         }
 
         booking.isCanceled = true;
-
         await booking.save();
-
-        res.json({message: "Booking canceled - ", booking})
+        const emailContent = {
+            from: '"Test" <test@example.com>',
+            to: process.env.NODEMAILER_USER,
+            subject: "Booking CANCELED!",
+            html: `<p> ${booking.firstName} ${booking.lastName}, your booking has been canceled successfully </p> 
+                    </p>`
+        }
+        // Anrufen die Funktion, um die Email an den Client zu schicken
+        await createEmailAndSend(emailContent);
+        res.json({message: "Booking canceled - ", booking});
 
     } catch (error) {
         if (error.code === 11000) {
@@ -239,11 +261,15 @@ const verifyCode = async (req, res) => {
                 //Löscht jeden Code der im DB befindet mit dem Email
                 await UserVerification.where(email).deleteMany();
                 delete req.session.booking;
+                const humanReadableDateAndTimeStart = formatDateTimeUTC(objData.start, 'de-DE');
+                //const humanReadableDateAndTimeEnd = formatDateTimeUTC(objData.end, 'de-DE');
                 const emailContent = {
                     from: '"Test" <test@example.com>',
                     to: process.env.NODEMAILER_USER,
                     subject: "Booking confirmation!",
                     html: `<p> ${objData.firstName} ${objData.lastName}, your booking has been created successfully </p> 
+                            <p> Your booking details:  You have a booking: ${humanReadableDateAndTimeStart} which will take: "" hours.</p> 
+                            <p> For the service: ${objData.service}  with the stylist: ${objData.stylist} </p> 
                             <p>
                                 <strong>Edit your booking:</strong><br>
                                 <a href="${bookingEditLink}" target="_blank">${bookingEditLink}</a>

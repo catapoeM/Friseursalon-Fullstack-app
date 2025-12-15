@@ -18,11 +18,13 @@ router.get('/', getAllBookings);
 router.post('/create',
     body('firstName')
         .trim()
+        .escape()
         .notEmpty()
         .isLength({min: 2, max: 50})
         .withMessage('Vorname muss mindestens 2 und maximum 50 Zeichen lang sein'),
     body('lastName')
         .trim()
+        .escape()
         .notEmpty()
         .withMessage('Nachname darf nicht leer sein')
         .isLength({min: 2, max: 50})
@@ -46,51 +48,41 @@ router.post('/create',
         .custom(durationValid)
         .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
     body('service')
-        .notEmpty()
-        .withMessage('Service ist erforderlich')
         .isIn(['Haarschnitt', 'Färben', 'Styling', 'Bartpflege'])
         .withMessage('Ungültiger Service'),
     body('stylist')
-        .notEmpty()
-        .withMessage('Stylist ist erforderlich')
         .isIn(['Catalina', 'Cristian'])
         .withMessage('Ungültiger Stylist'),
     body('clientType')
-        .notEmpty()
-        .withMessage('Client typ ist erforderlich')
         .isIn(['Woman', 'Man', 'Child'])
         .withMessage('Ungültiger Client typ'),
     body('phone')
-        .notEmpty()
-        .withMessage('Telefonnummer ist erforderlich')
         .isMobilePhone()
         .withMessage("Ungültige Telefonnummer (Express)")
         .custom(validatePhoneNumber),
     body('email')
         .notEmpty()
-        .escape()
         .trim()
+        .escape()
         .withMessage('Email ist erforderlich')
         .isEmail()
         .withMessage("Ungültige Email"),
+    body('clientAdditionalNotes')
+        .optional()
+        .trim()
+        .escape()
+        .isString()
+        .isLength({min:10, max: 100})
+        .withMessage('Mindestens 10 Buchstaben, maximal 100'),
     checkValidation,
     createVisitorId,
     createBooking
 );
 
-// Get edit route mit id und code
-router.get('/:id/edit',
-    param("id").isMongoId(),
-    query("code").isString().isLength({min:32}),
-    checkValidation,
-    createVisitorId,
-    editBookingGet
-);
 
 // Change the booking
 router.put('/:id/edit',
     body('start')
-        .notEmpty()
         .isISO8601()
         .toDate()
         .withMessage("Start must be a valid date.")
@@ -99,7 +91,6 @@ router.put('/:id/edit',
         .custom(startWithinHours)
         .withMessage("Start mind. +2 Stunden in Zukunft; Nur Dienstag–Freitag; Arbeitszeit 10–19 Uhr"),
     body('end')
-        .notEmpty()
         .isISO8601()
         .toDate()
         .withMessage("End must be a valid date.")
@@ -108,15 +99,18 @@ router.put('/:id/edit',
         .custom(durationValid)
         .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
     body('service')
-        .notEmpty()
-        .withMessage('Service ist erforderlich')
         .isIn(['Haarschnitt', 'Färben', 'Styling', 'Bartpflege'])
         .withMessage('Ungültiger Service'),
     body('stylist')
-        .notEmpty()
-        .withMessage('Stylist ist erforderlich')
         .isIn(['Catalina', 'Cristian'])
-        .withMessage('Ungültiger Stylist'),
+        .withMessage('Ungültiger Stylist'),   
+    body('clientAdditionalNotes')
+        .optional()
+        .trim()
+        .escape()
+        .isString()
+        .isLength({min:10, max: 100})
+        .withMessage('Mindestens 10 Buchstaben, maximal 100'),
     checkValidation,
     createVisitorId,
     editBookingPut
@@ -124,8 +118,18 @@ router.put('/:id/edit',
 
 // Cancel the booking
 router.patch('/:id/cancel',
-    param("id").isMongoId(),
-    query("code").isString().isLength({min:32}),
+    param("id")
+        .isMongoId(),
+    query("code")
+        .isString()
+        .isLength({min:32, max: 64}),
+    body('clientAdditionalNotes')
+        .optional()
+        .trim()
+        .escape()
+        .isString()
+        .isLength({min:10, max: 100})
+        .withMessage('Mindestens 10 Buchstaben, maximal 100'),
     checkValidation,
     createVisitorId,
     cancelBooking

@@ -79,4 +79,26 @@ const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
     return newDateWithExtraHours;
 }
 
-export {getToken, getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber};
+const formatDateTimeUTC = (isoString, locale) => {
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    hour12: false
+  }).format(new Date(isoString));
+}
+/*
+const calculateTheDifferenceTimeInHours = (firstDate, secondDate) => {
+    // difference in milliseconds
+    const diffMs = secondDate - firstDate;
+    // convert to hours
+    const diffHours = diffMs / (1000 * 60 * 60);
+    console.log(diffHours, ' diff H')
+    return diffHours;
+}
+*/
+
+export {getToken, getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC};
