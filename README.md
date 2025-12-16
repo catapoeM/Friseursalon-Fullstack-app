@@ -1,21 +1,21 @@
 💈 Full Stack Friseursalon
 
-Ein modernes Full-Stack-Projekt zur Verwaltung eines Friseursalons – von Online-Terminbuchungen über Kundenverwaltung bis hin zur internen Planung.
+Ein modernes Full-Stack-Projekt zur Verwaltung eines Friseursalons – von Online-Terminbuchungen über Kundenverwaltung.
 Dieses Projekt wurde mit dem Ziel entwickelt, als echte Web-App für Friseursalons in Produktion eingesetzt zu werden.
 
 🚀 Features
 
 Online-Terminbuchung: Kunden können verfügbare Zeiten in Echtzeit einsehen und direkt Termine buchen.
 
-Kundenverwaltung: Übersicht über Kundendaten, Historie und bevorzugte Dienstleistungen.
+Die Kunden müssen sich zuerst per E-Mail mit ihrer Buchung bestätigen.
 
-Mitarbeiter-Dashboard: Verwaltung von Terminen, Arbeitszeiten und Leistungen.
+Benachrichtigungssystem: Automatische E-Mail-Bestätigung bei Buchungen, Updates oder Stornierung
 
-Admin-Panel: Gesamtüberblick über Salonaktivitäten, Umsätze und Statistiken.
+Admin-Panel: Gesamtüberblick über Salonaktivitäten
 
-Authentifizierung & Autorisierung: Sichere Anmeldung mit JWT.
+-Authentifizierung & Autorisierung: Sichere Anmeldung mit JWT
 
-Benachrichtigungssystem: Automatische E-Mail-Bestätigung bei Buchungen.
+-Verwaltung der Buchungen durch den Admin
 
 Responsive Design: Optimiert für Desktop, Tablet und Smartphone.
 
@@ -27,6 +27,6 @@ Frontend: React + React Router + Tailwind CSS + Socket.IO Client
 
 Backend: Node.js + Express.js + Socket.IO Server
 
-Datenbank: MongoDB + Mongoose ODM
+Datenbank: MongoDB + Mongoose
 
 Deployment: flexibel (z. B. Render, Vercel, Netlify oder eigener Server)
