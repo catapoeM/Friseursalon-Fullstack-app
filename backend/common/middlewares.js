@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import {User} from '../models/userModel.js';
 import { validationResult, matchedData } from "express-validator";
+import { Admin} from '../models/adminModel.js';
 import dotenv from "dotenv";
 import crypto from 'crypto';
 
@@ -30,6 +30,10 @@ const checkValidation = (req, res, next) => {
   next();
 }
 
+const getToken = (data, secret, expiresTime) => {
+    return jwt.sign(data, secret, { expiresIn: expiresTime });
+};
+
 const checkToken = async (req, res, next) => {
   // wenn ein Browser ein sog. "Preflight" (Anfrage, ob der Browser)
   // bestimmte Sachen machen darf) sendet, kommt dieser als HTTP-Methode
@@ -55,17 +59,17 @@ const checkToken = async (req, res, next) => {
   // ID des Users aus Token decodieren
   const { id } = decoded;
 
-  const foundUser = await User.findById(id);
-  if (!foundUser) {
+  const admin = await Admin.findById(id);
+  if (!admin) {
     return res.status(401).send('Invalid token1');
   }
 
   // gefundenen Bookings in das request-Objekt schreiben
-  req.verifiedBooking = foundUser;
+  req.verifiedBooking = admin;
 
   // bei erfolgreicher Prüfung in die nächste Middleware weiterschalten
   next();
 };
 
 
-export {checkToken, checkValidation, createVisitorId};
+export {getToken, checkToken, checkValidation, createVisitorId};
