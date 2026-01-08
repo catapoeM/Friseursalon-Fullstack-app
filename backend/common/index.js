@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
@@ -16,10 +15,6 @@ const cryptTheCode = (rawCode) => {
 const randomNumber = () => {
    return random.int(100000, 999999).toString();
 }
-
-const getToken = (data, secret, expiresTime) => {
-    return jwt.sign(data, secret, { expiresIn: expiresTime });
-};
 
 const getHash = (plainText) => {
     return bcrypt.hashSync(plainText, 10);
@@ -101,4 +96,4 @@ const calculateTheDifferenceTimeInHours = (firstDate, secondDate) => {
 }
 */
 
-export {getToken, getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC};
+export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC};

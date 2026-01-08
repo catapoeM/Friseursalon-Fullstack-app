@@ -1,21 +1,10 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
-import { User } from "../models/userModel.js";
-import { createEmailAndSend, fromStringToDatePlusExtraHours, getToken, encryptObject, cryptTheCode,
+import { createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, cryptTheCode,
      decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
-
+import {getToken} from "../common/middlewares.js";
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-// Rufe alle Buchungen auf von der Buchungsliste (Time slot: calendar available dates)
-const getAllBookings = async (req, res) => {
-    try {
-       const allBookingsByDateAndTime = await Bookings.find({}).sort({start: 1})
-        return res.status(200).json(allBookingsByDateAndTime);
-    }   catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
 
 // Rufe Meine Buchungen von der Buchungsliste auf
 // Damin man seine Buchungen bekommt, muss man als visitor: entweder authentifizieren (email -> code -> verify)
@@ -184,7 +173,6 @@ const cancelBooking = async (req, res) => {
     }
 };
 
-
 const requestCode = async (req, res) => {
     try {
         if (req && req.session && req.session.booking) {
@@ -294,36 +282,9 @@ const verifyCode = async (req, res) => {
     }
 }
 
-
-const deleteBooking = async (req, res) => {
-    // ID aus Params holen
-    const {id} = req.params;
-
-    // Member.findByIdAndDelete() suchen und löschen
-    const deletedOneBooking = await User.findOneAndDelete({_id: id});
-
-    if (!deletedOneBooking) {
-        return res.status(404).send('Bookings not found ...')
-    }
-    res.send('Bookings was successfully deleted!')
-}
-
-const deleteAllBookings = async (req, res) => {
-    try {
-        const findDocuments = await Bookings.find({});
-        if (findDocuments) {
-            await Bookings.deleteMany({});
-            return res.send('Database User DELETED')
-        }
-    } catch (error) {
-        res.send(error, ' Error')
-    }
-};
-
 const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {createBooking, editBookingGet, editBookingPut, cancelBooking, getMyBookings, 
-    getAllBookings, deleteBooking, deleteAllBookings, 
+export {createBooking, editBookingGet, editBookingPut, cancelBooking, getMyBookings,
     requestCode, verifyCode, notFound}

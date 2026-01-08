@@ -1,18 +1,14 @@
 import express from 'express';
-import { getAllBookings, getMyBookings , 
-    deleteBooking, createBooking, editBookingGet, editBookingPut, deleteAllBookings, cancelBooking,
+import {createBooking, editBookingPut, cancelBooking,
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body, param, query } from 'express-validator';
 
 import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
     endWithinHours, endNotAfter19, durationValid,
      validatePhoneNumber } from '../validators/bookingValidation.js';
-import { checkToken, checkValidation, createVisitorId} from '../common/middlewares.js';
+import { checkValidation, createVisitorId } from '../common/middlewares.js';
 
 const router = express.Router();
-
-// Get ALL Bookings
-router.get('/', getAllBookings);
 
 // Create booking as visitor
 router.post('/create',
@@ -78,7 +74,6 @@ router.post('/create',
     createVisitorId,
     createBooking
 );
-
 
 // Change the booking
 router.put('/:id/edit',
@@ -147,18 +142,6 @@ router.post('/verify-code',
         .isLength({min: 6, max: 6})
         .withMessage('Invalid code. Too large or too small number'),
      checkValidation, createVisitorId, verifyCode);
-
-// Get  myBookings as User
-router.get('/mybookings', createVisitorId, getMyBookings);
-
-// Get One booking as visitor
-router.get('/mybooking', getMyBookings);
-
-// Delete a booking as User OR ADMIN
-router.delete('/mybooking/:id', checkToken, deleteBooking);
-
-// Delete a booking as User OR ADMIN
-router.delete('/', checkToken, deleteAllBookings);
 
 router.use('', notFound);
 
