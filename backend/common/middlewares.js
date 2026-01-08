@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { validationResult, matchedData } from "express-validator";
-import { Admin} from '../models/adminModel.js';
+import Admin from '../models/adminModel.js';
 import dotenv from "dotenv";
 import crypto from 'crypto';
 
@@ -71,5 +71,9 @@ const checkToken = async (req, res, next) => {
   next();
 };
 
+const checkPredefinedSecretKey = (req, res, next) => {
+  
+}
 
-export {getToken, checkToken, checkValidation, createVisitorId};
+
+export {getToken, checkToken, checkValidation, createVisitorId, checkPredefinedSecretKey};
