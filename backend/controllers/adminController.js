@@ -1,35 +1,9 @@
-import mongoose, { get } from "mongoose";
-import Admin from "../models/adminModel.js";
-import Stylist from "../models/stylistModel.js";
+import {Admin, Stylist} from "../models/adminModel.js";
 import {getHash, checkHash} from '../common/index.js';
 import {getToken} from '../common/middlewares.js';
-import { body, param, query } from 'express-validator';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-const adminLogin = async (req, res) => {
-    try {
-        const {email, password} = req.body;
-    
-        const admin = await Admin.findOne({email});
-        if (!admin) {
-            return res.status(401).json({error: "Invalid credentials"})
-        }
-    
-        const match = checkHash(password, admin.password) 
-        if(!match) {
-            return res.status(401).json({ error: "Invalid credentials"})
-        }
-    
-        const token = getToken({adminId: admin._id}, process.env.JWT_SECRET, '1h')
-        
-        res.send(token)
-
-    }   catch (err) {
-            res.status(500).json({ error: "Failed to login " + err });
-    }
-}
 
 const adminRegister = async (req, res) => {
     try {
@@ -47,13 +21,37 @@ const adminRegister = async (req, res) => {
         const passwordHash = getHash(password);
         const admin = await Admin.create({email, password: passwordHash })
     
-        res.json({success: true, adminId: admin._id})
+        res.json({success: true, id: admin._id})
 
     }   catch (err) {
             res.status(500).json({ error: "Failed to register admin " + err });
     }
     
 }
+
+const adminLogin = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+    
+        const admin = await Admin.findOne({email});
+        if (!admin) {
+            return res.status(401).json({error: "Invalid credentials"})
+        }
+    
+        const match = checkHash(password, admin.password) 
+        if(!match) {
+            return res.status(401).json({ error: "Invalid credentials"})
+        }
+    
+        const token = getToken({id: admin._id}, process.env.JWT_SECRET, '1h')
+        
+        res.send(token)
+
+    }   catch (err) {
+            res.status(500).json({ error: "Failed to login " + err });
+    }
+}
+
 
 const createStylist = async (req, res) => {
     try {
@@ -73,9 +71,9 @@ const createStylist = async (req, res) => {
 const addServiceToStylist = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, duration, price, clientType } = req.body;
+        const { serviceName, duration, price, clientType } = req.body;
     
-        if (!name || !duration || !price || !clientType) {
+        if (!serviceName || !duration || !price || !clientType) {
           return res.status(400).json({ error: "Missing service fields" });
         }
     
@@ -84,13 +82,52 @@ const addServiceToStylist = async (req, res) => {
           return res.status(404).json({ error: "Stylist not found" });
         }
     
-        stylist.services.push({ name, duration, price, clientType });
+        stylist.services.push({ serviceName, duration, price, clientType });
         await stylist.save();
     
         res.json(stylist);
 
     }   catch (err) {
             res.status(500).json({ error: "Failed to create stylist " + err})
+    }
+}
+
+const updateServiceToStylist = async (req, res) => {
+    try {
+        const { id, serviceId } = req.params;
+        console.log(req.params)
+        const { serviceName, duration, price, clientType } = req.body;
+    
+        const stylist = await Stylist.findById(id);
+        console.log(stylist + ' stylist')
+        if (!stylist) {
+          return res.status(404).json({ error: "Stylist not found" });
+        }
+        
+        const service = stylist.services.id(serviceId);
+        if (!stylist) {
+          return res.status(404).json({ error: "Service not found" });
+        }
+        
+        // Update only provided fields
+        if (serviceName !== undefined) {
+            service.serviceName = serviceName;
+        }
+        if (duration !== undefined) {
+            service.duration = duration; 
+        }
+        if (price !== undefined) {
+            service.price = price;
+        }
+        if (clientType !== undefined) {
+            service.clientType = clientType;
+        }
+        await stylist.save();
+        
+        res.json(service);
+
+    }   catch (err) {
+            res.status(500).json({ error: "Failed to update service for stylist " + err})
     }
 }
 
@@ -107,4 +144,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {adminLogin, adminRegister, createStylist, addServiceToStylist, getStylists, notFound}
+export {adminLogin, adminRegister, createStylist, addServiceToStylist, updateServiceToStylist, getStylists, notFound}

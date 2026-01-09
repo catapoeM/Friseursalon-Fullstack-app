@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { validationResult, matchedData } from "express-validator";
-import Admin from '../models/adminModel.js';
+import {Admin, Stylist} from '../models/adminModel.js';
 import dotenv from "dotenv";
 import crypto from 'crypto';
 
@@ -58,8 +58,13 @@ const checkToken = async (req, res, next) => {
 
   // ID des Users aus Token decodieren
   const { id } = decoded;
+  console.log(id + ' id ', decoded)
 
   const admin = await Admin.findById(id);
+  const stylist = await Stylist.findById(id);
+  console.log(admin + ' admin ')
+  console.log(stylist + ' sty ')
+
   if (!admin) {
     return res.status(401).send('Invalid token1');
   }
