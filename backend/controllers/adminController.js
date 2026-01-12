@@ -57,14 +57,38 @@ const createStylist = async (req, res) => {
     try {
         const {name} = req.body;
         if (!name) {
-      return res.status(400).json({ error: "Stylist name is required" });
-    }
+            return res.status(400).json({ error: "Stylist name is required" });
+        }
 
     const stylist = await Stylist.create({ name });
     res.status(201).json(stylist);
 
     }   catch (err) {
             res.status(500).json({ error: "Failed to create stylist " + err});
+    }
+}
+
+// For now only the status of the stylist can be changed here: Activated/Deactivated : True/False
+const updateStylist = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const {isActive} = req.body;
+
+        const stylist = await Stylist.findById(id);
+        if (!stylist) {
+            return res.status(404).json({error: "Stylist not found!"})
+        }
+
+        stylist.isActive = isActive;
+        await stylist.save();
+
+        res.json({
+            message: "Stylist updated",
+            isActive: stylist.isActive
+        });
+
+    }   catch (err) {
+            res.status(500).json({ error: "Failed to Delete stylist " + err});
     }
 }
 
@@ -94,12 +118,11 @@ const addServiceToStylist = async (req, res) => {
 
 const updateServiceToStylist = async (req, res) => {
     try {
-        const { id, serviceId } = req.params;
-        console.log(req.params)
+        const { stylistId, serviceId } = req.params;
         const { serviceName, duration, price, clientType } = req.body;
-    
-        const stylist = await Stylist.findById(id);
-        console.log(stylist + ' stylist')
+        const stylist = await Stylist.findById(stylistId);
+        console.log(stylistId)
+        console.log(serviceId)
         if (!stylist) {
           return res.status(404).json({ error: "Stylist not found" });
         }
@@ -144,4 +167,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {adminLogin, adminRegister, createStylist, addServiceToStylist, updateServiceToStylist, getStylists, notFound}
+export {adminLogin, adminRegister, createStylist, updateStylist, addServiceToStylist, updateServiceToStylist, getStylists, notFound}

@@ -44,26 +44,21 @@ const checkToken = async (req, res, next) => {
 
   // Token vom Header einlesen
   const { authorization } = req.headers;
-  console.log(authorization.token, ' auth')
   if (!authorization || authorization.length < 10) {
     return res.status(401).send('Invalid token');
   }
 
   // Token aus 'authorization' rausholen
   const token = authorization.split(' ')[1];
-  console.log(token, ' token')
 
   // Token prüfen auf Gültigkeit und Ablauf
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   // ID des Users aus Token decodieren
   const { id } = decoded;
-  console.log(id + ' id ', decoded)
 
   const admin = await Admin.findById(id);
   const stylist = await Stylist.findById(id);
-  console.log(admin + ' admin ')
-  console.log(stylist + ' sty ')
 
   if (!admin) {
     return res.status(401).send('Invalid token1');
