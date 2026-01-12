@@ -1,18 +1,9 @@
 import express from 'express';
-import { notFound, adminRegister, adminLogin, createStylist, addServiceToStylist, getStylists, updateServiceToStylist } from '../controllers/adminController.js';
+import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist } from '../controllers/adminController.js';
 import { checkToken, checkValidation } from '../common/middlewares.js';
 import { body, check} from 'express-validator';
 
 const router = express.Router();
-
-// Login as User or Admin
-router.post(
-  '/login',
-  body('email').isEmail(),
-  body('password').isString().isLength({ min: 8, max: 50 }),
-  checkValidation,
-  adminLogin
-);
 
 router.post(
   '/register',
@@ -25,6 +16,15 @@ router.post(
   adminRegister
 )
 
+// Login as User or Admin
+router.post(
+  '/login',
+  body('email').isEmail(),
+  body('password').isString().isLength({ min: 8, max: 50 }),
+  checkValidation,
+  adminLogin
+);
+
 router.post(
   "/stylist",
   body("name")
@@ -36,6 +36,11 @@ router.post(
     .matches(/^[a-zA-ZäöüÄÖÜß\s'-]+$/)
     .withMessage("Name contains invalid characters"),
   checkToken, createStylist);
+
+router.patch("/stylist/:id",
+  body("isActive")
+    .isBoolean(),
+  checkToken, updateStylist)
 
 router.post("/stylist/:id/services",
   body("serviceName")
@@ -57,7 +62,7 @@ router.post("/stylist/:id/services",
     .withMessage("Invalid client type"),
   checkToken, addServiceToStylist);
 
-router.put("/stylist/:id/services/:id",
+router.put("/stylist/:stylistId/services/:serviceId",
   body("serviceName")
     .optional()
     .isString()
@@ -73,6 +78,8 @@ router.put("/stylist/:id/services/:id",
     .optional()
     .isIn(["Woman", "Man", "Child"]),
   checkToken, updateServiceToStylist)
+
+
 
 router.get("/stylists", checkToken, getStylists)
 
