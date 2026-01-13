@@ -1,5 +1,5 @@
 import express from 'express';
-import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist } from '../controllers/adminController.js';
+import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
 import { checkToken, checkValidation } from '../common/middlewares.js';
 import { body, check} from 'express-validator';
 
@@ -79,6 +79,8 @@ router.put("/stylist/:stylistId/services/:serviceId",
     .isIn(["Woman", "Man", "Child"]),
   checkToken, updateServiceToStylist)
 
+router.delete("/stylist/:stylistId/services/:serviceId",
+  checkToken, deleteServiceFromStylist);
 
 
 router.get("/stylists", checkToken, getStylists)

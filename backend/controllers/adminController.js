@@ -88,7 +88,7 @@ const updateStylist = async (req, res) => {
         });
 
     }   catch (err) {
-            res.status(500).json({ error: "Failed to Delete stylist " + err});
+            res.status(500).json({ error: "Failed to Deactivate stylist " + err});
     }
 }
 
@@ -154,6 +154,30 @@ const updateServiceToStylist = async (req, res) => {
     }
 }
 
+const deleteServiceFromStylist = async (req, res) => {
+    try {
+        const { stylistId, serviceId } = req.params;
+    
+        const stylist = await Stylist.findById(stylistId);
+        if (!stylist) {
+          return res.status(404).json({ error: "Stylist not found" });
+        }
+    
+        const service = stylist.services.id(serviceId);
+        if (!service) {
+            return res.status(404).json({ error: "Service not found" });
+        }
+
+        service.deleteOne(); // ⬅ removes subdocument
+        await stylist.save(); // ⬅ persists change
+    
+        res.json({ message: "Service deleted" });
+
+    }   catch (err) {
+            res.status(500).json({ error: "Failed to create stylist " + err})
+    }
+}
+
 const getStylists = async (req, res) => {
     try {
         const stylists = await Stylist.find();
@@ -167,4 +191,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {adminLogin, adminRegister, createStylist, updateStylist, addServiceToStylist, updateServiceToStylist, getStylists, notFound}
+export {adminLogin, adminRegister, createStylist, updateStylist, addServiceToStylist, updateServiceToStylist, getStylists, deleteServiceFromStylist, notFound}

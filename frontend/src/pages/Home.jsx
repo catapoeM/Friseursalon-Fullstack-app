@@ -1,40 +1,28 @@
-import '../Styles/Home.css';
+import { Typography, Stack } from '@mui/material';
+
 const Home = () => {
   return (
-    <div className="home-container">
-      {/* Linke Navigationsseite */}
-      <aside className="sidebar">
-        <nav>
-          <ul>
-            <li><a href="/preise">Preise</a></li>
-            <li><a href="/produkte">Produkte</a></li>
-            <li><a href="/booking">Termin buchen</a></li>
-            <li><a href="/zeiten">Öffnungszeiten</a></li>
-            <li><a href="/kontakt">Kontakt</a></li>
-            <li><a href="/datenschutz">Datenschutz</a></li>
-          </ul>
-        </nav>
-      </aside>
-
-      {/* Mittlerer Bereich mit Text */}
-      <main className="main-content">
-        <section>
-          <h1>Willkommen im ZC Salon</h1>
-          <p>
-            Bei Salon ZC steht Ihr Wohlbefinden im Mittelpunkt.  
-            Unser Team aus erfahrenen Stylisten berät Sie individuell  
-            und sorgt für Ihren perfekten Look.
-          </p>
-        </section>
-      </main>
-
-      {/* Rechte Seite für spätere Bilder */}
-      <aside className="image-section">
-        <div className="image-placeholder">
-          <p>Hier kommen später Bilder des Salons oder Teams.</p>
-        </div>
-      </aside>
-    </div>
+    <Stack>
+      <Typography variant="h1">Startseite</Typography>
+      <Typography variant="body1">
+        Bavaria ipsum dolor sit amet Bussal obandln wui Schbozal hawadere midananda, hogg ma uns
+        zamm i moan scho aa! Hogg di hera dahoam Schmankal wia Fünferl Meidromml iabaroi weida,
+        dahoam i hob di liab an. Nois kloan umma, a bissal Weibaleid! Do umma i moan scho aa etza
+        Sauwedda, du dadst ma scho daugn von: Schmankal is mei Zidern, Brotzeit. Vo de von in da
+        greana Au kloan Wurschtsolod obfrettn Fünferl, nix Gwiass woass ma ned. Wiesn wann griagd ma
+        nacha wos z’dringa hoaglig ned Kneedl glacht es de Sonn, midanand pfiad de! No a Maß weida
+        Maibam, Hendl Marei i hob di narrisch gean! — da Blindtext kimmt von bavaria-ipsum.de
+      </Typography>
+      <Typography variant="body2">
+        Bavaria ipsum dolor sit amet Bussal obandln wui Schbozal hawadere midananda, hogg ma uns
+        zamm i moan scho aa! Hogg di hera dahoam Schmankal wia Fünferl Meidromml iabaroi weida,
+        dahoam i hob di liab an. Nois kloan umma, a bissal Weibaleid! Do umma i moan scho aa etza
+        Sauwedda, du dadst ma scho daugn von: Schmankal is mei Zidern, Brotzeit. Vo de von in da
+        greana Au kloan Wurschtsolod obfrettn Fünferl, nix Gwiass woass ma ned. Wiesn wann griagd ma
+        nacha wos z’dringa hoaglig ned Kneedl glacht es de Sonn, midanand pfiad de! No a Maß weida
+        Maibam, Hendl Marei i hob di narrisch gean! — da Blindtext kimmt von bavaria-ipsum.de
+      </Typography>
+    </Stack>
   );
 };
 
