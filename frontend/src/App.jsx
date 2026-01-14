@@ -7,19 +7,21 @@ import Zeiten from "./pages/Zeiten.jsx";
 import Kontakt from "./pages/Kontakt.jsx";
 import Datenschutz from "./pages/Datenschutz.jsx";
 
-import DefaultLayout from './components/layouts/MainLayout.jsx'
+import DefaultLayout from './layouts/MainLayout.jsx'
 
 const App = () => {
   return (
     <Router>
-      <Routes element={<DefaultLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/preise" element={<Preise />} />
-        <Route path="/produkte" element={<Produkte />} />
-        <Route path="/booking" element={<BookingPage />} />
-        <Route path="/zeiten" element={<Zeiten />} />
-        <Route path="/kontakt" element={<Kontakt />} />
-        <Route path="/datenschutz" element={<Datenschutz />} />
+      <Routes>
+        <Route element={<DefaultLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/preise" element={<Preise />} />
+          <Route path="/produkte" element={<Produkte />} />
+          <Route path="/booking" element={<BookingPage />} />
+          <Route path="/zeiten" element={<Zeiten />} />
+          <Route path="/kontakt" element={<Kontakt />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
+        </Route>
       </Routes>
     </Router>
   );
