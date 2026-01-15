@@ -5,9 +5,16 @@ const bookingsSchema = new mongoose.Schema({
     lastName: {type: String, required: true},
     start: {type: Date, required: true},
     end: {type: Date, required: true},
-    service: {type: String, required: true},
-    stylist: {type: String, required: true},
-    clientType: {type: String, required: true},
+    stylistId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Stylist',
+      required: true
+    },
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    clientTypeId: {type: String, required: true},
     phone: {type: String, required: true, unique: true},
     email: {type: String, required: true, unique: true},
     clientAdditionalNotes: {type: String},

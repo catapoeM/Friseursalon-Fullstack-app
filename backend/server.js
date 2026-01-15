@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import homeRoutes from './routes/homeRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import stylistRoutes from './routes/stylistRoutes.js';
 import session from 'express-session';
 
 // Load environment Variables
@@ -49,6 +50,7 @@ app.use(session(sess));
 app.use('/api/home', homeRoutes);
 app.use('/api/booking', bookingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/stylists', stylistRoutes);
 
 // HTTP + Socket.IO Server
 const server = http.createServer(app);

@@ -43,12 +43,8 @@ router.post('/create',
         .custom(endNotAfter19)
         .custom(durationValid)
         .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
-    body('service')
-        .isIn(['Haarschnitt', 'Färben', 'Styling', 'Bartpflege'])
-        .withMessage('Ungültiger Service'),
-    body('stylist')
-        .isIn(['Catalina', 'Cristian'])
-        .withMessage('Ungültiger Stylist'),
+    body('serviceId'),
+    body('stylistId'),
     body('clientType')
         .isIn(['Woman', 'Man', 'Child'])
         .withMessage('Ungültiger Client typ'),

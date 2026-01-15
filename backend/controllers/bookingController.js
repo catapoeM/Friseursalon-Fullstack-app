@@ -1,4 +1,5 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
+import Stylist from "../models/stylistModel.js";
 import { createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, cryptTheCode,
      decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
 import {getToken} from "../common/middlewares.js";
@@ -41,6 +42,33 @@ const createBooking = async (req, res) => {
         // Wenn true dann man muss die Buchung ändern
         if (foundBookings || (foundBookings && !foundBookings.isCanceled)) {
             return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
+        }
+        // Phone und Email aus req.matchedData rausholen
+        const {stylistId, serviceId} = req.matchedData;
+        // 1️ Basic validation
+        if (!stylistId || !serviceId) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        // 2️ Find stylist
+        const stylist = await Stylist.findById(stylistId);
+        if (!stylist) {
+            return res.status(404).json({ error: "Stylist not found" });
+        }
+        // 3️ Find service inside stylist
+        const service = stylist.services.id(serviceId);
+        if (!service) {
+            return res.status(404).json({ error: "Service not found for this stylist" });
+        }
+
+        // 4️ Optional: check if time slot is already booked
+        const existingBooking = await Bookings.findOne({
+            stylistId,
+            date
+        });
+
+        if (existingBooking) {
+            return res.status(409).json({ error: "Time slot already booked" });
         }
         const objData = req.matchedData;
 

@@ -1,4 +1,5 @@
-import {Admin, Stylist} from "../models/adminModel.js";
+import {Admin} from "../models/adminModel.js";
+import Stylist from "../models/stylistModel.js";
 import {getHash, checkHash} from '../common/index.js';
 import {getToken} from '../common/middlewares.js';
 import dotenv from 'dotenv';
@@ -55,12 +56,18 @@ const adminLogin = async (req, res) => {
 
 const createStylist = async (req, res) => {
     try {
-        const {name} = req.body;
+        const {name, bio} = req.body;
         if (!name) {
             return res.status(400).json({ error: "Stylist name is required" });
         }
+        let stylistData = {
+            name
+        }
+        if (bio) {
+            stylistData.bio = bio;
+        }
 
-    const stylist = await Stylist.create({ name });
+    const stylist = await Stylist.create({ name: stylistData.name, bio: stylistData.bio });
     res.status(201).json(stylist);
 
     }   catch (err) {

@@ -17,8 +17,9 @@ import { useState } from "react";
 
 const navItems = [
   { label: "Home", path: "/" },
-  { label: "Termin", path: "/booking" },
+  { label: "Termin", path: "/stylists" },
   { label: "Preise", path: "/preise" },
+  { label: "Produkte", path: "/produkte" },
   { label: "Kontakt", path: "/kontakt" }
 ];
 
@@ -44,7 +45,10 @@ const Header = () => {
           </IconButton>
 
           {/* Logo / Title */}
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6"
+            component={Link}
+            to="/" sx={{ flexGrow: 1,  textDecoration: "none", color: "inherit" }}
+          >
             Friseur Salon
           </Typography>
 

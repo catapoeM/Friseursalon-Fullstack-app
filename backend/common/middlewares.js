@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { validationResult, matchedData } from "express-validator";
-import {Admin, Stylist} from '../models/adminModel.js';
+import {Admin} from '../models/adminModel.js';
+import Stylist from '../models/stylistModel.js';
 import dotenv from "dotenv";
 import crypto from 'crypto';
 

@@ -1,4 +1,5 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Link as MuiLink } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -13,6 +14,13 @@ const Footer = () => {
     >
       <Typography variant="body2" color="text.secondary">
         © {new Date().getFullYear()} Friseur Salon · Alle Rechte vorbehalten
+      </Typography>
+
+      {/* Link zu Datenschutz */}
+      <Typography variant="body2" color="text.secondary">
+        <MuiLink component={Link} to="/datenschutz" color="inherit" sx={{ ml: 1 }}>
+          Datenschutz
+        </MuiLink>
       </Typography>
     </Box>
   );

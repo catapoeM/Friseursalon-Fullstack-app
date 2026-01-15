@@ -3,7 +3,7 @@ import Home from "./pages/Home.jsx";
 import Preise from "./pages/Preise.jsx";
 import Produkte from "./pages/Produkte.jsx";
 import BookingPage from "./pages/BookingPage.jsx";
-import Zeiten from "./pages/Zeiten.jsx";
+import StylistsPage from "./pages/StylistsPage.jsx";
 import Kontakt from "./pages/Kontakt.jsx";
 import Datenschutz from "./pages/Datenschutz.jsx";
 
@@ -18,7 +18,7 @@ const App = () => {
           <Route path="/preise" element={<Preise />} />
           <Route path="/produkte" element={<Produkte />} />
           <Route path="/booking" element={<BookingPage />} />
-          <Route path="/zeiten" element={<Zeiten />} />
+          <Route path="/stylists" element={<StylistsPage />} />
           <Route path="/kontakt" element={<Kontakt />} />
           <Route path="/datenschutz" element={<Datenschutz />} />
         </Route>

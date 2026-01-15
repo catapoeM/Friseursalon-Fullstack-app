@@ -35,6 +35,10 @@ router.post(
     .withMessage("Name must be between 2 and 50 characters")
     .matches(/^[a-zA-ZäöüÄÖÜß\s'-]+$/)
     .withMessage("Name contains invalid characters"),
+  body("bio")
+    .trim()
+    .isLength({min: 10, max: 250})
+    .withMessage("Biography must be between 10 and 250 characters"),
   checkToken, createStylist);
 
 router.patch("/stylist/:id",
