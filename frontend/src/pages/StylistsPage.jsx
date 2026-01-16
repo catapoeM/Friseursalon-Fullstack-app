@@ -7,14 +7,28 @@ const StylistsPage = () => {
   const [stylists, setStylists] = useState([]);
   const navigate = useNavigate();
 
+  // Initialisieren (läuft einmal)
   useEffect(() => {
-    axios.get("http://localhost:5000/api/stylists")
-      .then(res => setStylists(res.data))
-      .catch(err => console.error("Fehler beim Laden der Stylisten", err))
+    const stored = sessionStorage.getItem("stylists");
+    if (stored) {
+      setStylists(JSON.parse(stored));
+    }else {
+      axios.get("http://localhost:5000/api/stylists")
+        .then(res => setStylists(res.data))
+        .catch(err => console.error("Fehler beim Laden der Stylisten", err))
+    }
   }, []);
 
-  const handleClick = (stylistId) => {
-    navigate(`/booking/${stylistId}`);
+  // Speichern (läuft bei Änderungen)
+  useEffect(() => {
+    if (stylists.length > 0) {
+      sessionStorage.setItem('stylists', JSON.stringify(stylists))
+    }
+  }, [stylists])
+  
+
+  const goToStylistPageClick = (stylist) => {
+    navigate(`/stylists/${stylist._id}`)
   };
 
   return (
@@ -22,7 +36,7 @@ const StylistsPage = () => {
       {stylists.map(stylist => (
         <Grid item xs={12} sm={6} md={4} key={stylist._id}>
           <Card>
-            <CardActionArea onClick={() => handleClick(stylist._id)}>
+            <CardActionArea onClick={() => goToStylistPageClick(stylist)}>
               <CardContent>
                 <Typography variant="h6">{stylist.name}</Typography>
                 <Typography variant="body2">{stylist.bio}</Typography>
