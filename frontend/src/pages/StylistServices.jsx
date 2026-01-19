@@ -1,10 +1,20 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Checkbox,
+  Paper,
+  Typography,
+} from '@mui/material';
 import axios from "axios";
 
 const StylistServices = () => {
     const {stylistId} = useParams() 
     const [stylist, setStylist] = useState([]);
+    const [selectedServices, setSelectedServices] = useState([]);
 
     useEffect(() => {
         const stored = sessionStorage.getItem('stylists');
@@ -19,20 +29,46 @@ const StylistServices = () => {
             }
 
             // Fallback : Go to the previous page
-            navigate('/stylists');
+            console.log('FallBack muss implementiert werden!')
         }
     }, [stylistId])
 
-    if (!stylist) return <p>Lade Services...</p>;
+    const handleToggle = (serviceId) => {
+        setSelectedServices((prev) =>
+        prev.includes(serviceId)
+            ? prev.filter((id) => id !== serviceId)
+            : [...prev, serviceId]
+        );
+    };
 
     return (
-        <div>
-        <h2>{stylist.name}</h2>
-            <h3>Services</h3>
-            <h3>{stylist._id}</h3>
-                
-            
-        </div>
+        <Paper sx={{ maxWidth: 400 }}>
+            <Typography variant="h6" sx={{ p: 2 }}>
+                Services
+            </Typography>
+
+            <List>
+                {stylist?.services?.map((service) => (
+                <ListItem
+                    key={service.id}
+                    secondaryAction={
+                    <Checkbox
+                        edge="end"
+                        onChange={() => handleToggle(service.id)}
+                        checked={selectedServices.includes(service.id)}
+                    />
+                    }
+                    disablePadding
+                >
+                    <ListItemText
+                        sx={{ pl: 2 }}
+                        primary={service.serviceName}
+                        secondary={`€${service.price} • ${service.duration}`}
+                    />
+                </ListItem>
+                ))}
+            </List>
+        </Paper>
     );
 };
 
