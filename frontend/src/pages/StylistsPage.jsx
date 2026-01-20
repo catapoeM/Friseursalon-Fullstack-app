@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Grid, Card, CardContent, CardActionArea, Typography} from "@mui/material"
+import {Grid, Card, CardContent, CardActionArea, Typography, Box, CardMedia} from "@mui/material"
 import axios from 'axios'
 import {useNavigate} from 'react-router-dom';
 
@@ -32,25 +32,27 @@ const StylistsPage = () => {
   };
 
   return (
-    <Grid container spacing={2}>
-      {stylists.map(stylist => (
-        <Grid item xs={12} sm={6} md={4} key={stylist._id}>
-          <Card>
-            <CardActionArea onClick={() => goToStylistPageClick(stylist)}>
-              <CardContent>
-                <Typography variant="h6">{stylist.name}</Typography>
-                <Typography variant="body2">{stylist.bio}</Typography>
-                <Typography variant="subtitle2">Services:</Typography>
-                {stylist.services.map(service => (
-                    
-                  <Typography key={service._id}>{service.serviceName} - €{service.price}</Typography>
-                ))}
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+    <Box sx={{ maxWidth: 800, mx: 'auto', px: 2, py: 4 }}>
+      <Grid container spacing={3} justifyContent={"center"}>
+        {stylists.map(stylist => (
+          <Grid item xs={12} sm={6} md={4} key={stylist._id}>
+            <Card>
+              <CardActionArea onClick={() => goToStylistPageClick(stylist)}>
+                <CardContent>
+                  <Typography variant="h6" align="center">{stylist.name}</Typography>
+                  <Typography variant="body2">{stylist.bio}</Typography>
+                  <Typography variant="subtitle2">Services:</Typography>
+                  {stylist.services.map(service => (
+                    <Typography key={service._id}>{service.serviceName} - €{service.price}</Typography>
+                  ))}
+                  <CardMedia component="img"  height="120" image={stylist.image} />
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 }
 

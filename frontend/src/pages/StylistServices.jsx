@@ -4,12 +4,15 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
+  Box,
   Checkbox,
   Paper,
   Typography,
+  Grid,
+  CardMedia,
 } from '@mui/material';
 import axios from "axios";
+import BackButton from "../components/BackButton";
 
 const StylistServices = () => {
     const {stylistId} = useParams() 
@@ -41,34 +44,57 @@ const StylistServices = () => {
         );
     };
 
-    return (
-        <Paper sx={{ maxWidth: 400 }}>
-            <Typography variant="h6" sx={{ p: 2 }}>
-                Services
-            </Typography>
+    
 
-            <List>
-                {stylist?.services?.map((service) => (
-                <ListItem
-                    key={service.id}
-                    secondaryAction={
-                    <Checkbox
-                        edge="end"
-                        onChange={() => handleToggle(service.id)}
-                        checked={selectedServices.includes(service.id)}
-                    />
-                    }
-                    disablePadding
-                >
-                    <ListItemText
-                        sx={{ pl: 2 }}
-                        primary={service.serviceName}
-                        secondary={`€${service.price} • ${service.duration}`}
-                    />
-                </ListItem>
-                ))}
-            </List>
-        </Paper>
+
+    return (
+        <Box sx={{ maxWidth: 600, mx: 'auto', px: 2, py: 4 }}>
+            <Grid container justifyContent={"center"}>
+                <Grid item xs={12}>
+                    <Grid container justifyContent={"center"}>
+                        <Typography variant="h6">
+                            Gesamtpreis: € {"25"} • Gesamtzeit: {"60"} min
+                        </Typography>
+                    </Grid>
+                    <Paper elevation={10} sx={{ p: 7 }}>
+                        <BackButton
+                        label="Stylist auswählen"
+                        fallbackPath="/stylists"
+                        />  
+                        <Typography variant="h6" align="center" sx={{ p: 2 }}>
+                            Services
+                        </Typography>
+                        <List>
+                            {stylist?.services?.map((service, index) => (
+                            <ListItem
+                                key={index}
+                                secondaryAction={
+                                <Checkbox
+                                    edge="end"
+                                    onChange={() => handleToggle(index)}
+                                    checked={selectedServices.includes(index)}
+                                />
+                                }
+                                disablePadding
+                            >
+                                <ListItemText
+                                    sx={{ pl: 2 }}
+                                    primary={service.serviceName}
+                                    secondary={`€${service.price} • ${service.duration}`}
+                                />
+                            </ListItem>
+                            ))}
+                        </List>
+                            <CardMedia component="img" 
+                            image={stylist.name} sx={{
+                                width: '100%',     // take full width of parent
+                                height: 'auto',    // maintain aspect ratio
+                                objectFit: 'cover' // crop if needed
+                            }}/>
+                    </Paper>
+                </Grid>
+            </Grid>
+        </Box>
     );
 };
 
