@@ -36,25 +36,38 @@ const StylistServices = () => {
         }
     }, [stylistId])
 
-    const handleToggle = (serviceId) => {
+    const handleToggle = (index) => {
         setSelectedServices((prev) =>
-        prev.includes(serviceId)
-            ? prev.filter((id) => id !== serviceId)
-            : [...prev, serviceId]
+        prev.includes(index)
+            ? prev.filter((i) => i !== index)
+            : [...prev, index]
         );
     };
 
+    const selected = selectedServices.map((index) => 
+        stylist?.services?.[index]).filter(Boolean);
+
+    const totalPrice = selected.reduce(
+        (sum, s) => sum + s.price,
+        0
+    );
+
+    const totalDuration = selected.reduce(
+        (sum, s) => sum + s.duration,
+        0
+    );
+
     
-
-
     return (
         <Box sx={{ maxWidth: 600, mx: 'auto', px: 2, py: 4 }}>
             <Grid container justifyContent={"center"}>
                 <Grid item xs={12}>
                     <Grid container justifyContent={"center"}>
-                        <Typography variant="h6">
-                            Gesamtpreis: € {"25"} • Gesamtzeit: {"60"} min
-                        </Typography>
+                        <Paper elevation={2} sx={{ p: 3 }}>
+                            <Typography variant="h6">
+                                Gesamtpreis: € {totalPrice} • Gesamtzeit: {totalDuration} min
+                            </Typography>
+                        </Paper>
                     </Grid>
                     <Paper elevation={10} sx={{ p: 7 }}>
                         <BackButton
