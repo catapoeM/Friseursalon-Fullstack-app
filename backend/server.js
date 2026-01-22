@@ -26,6 +26,7 @@ app.use(cors());
 // Middleware to parse JSON
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 const expires = 15 * 60 * 1000;
 var sess = {

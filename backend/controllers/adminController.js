@@ -3,8 +3,15 @@ import Stylist from "../models/stylistModel.js";
 import {getHash, checkHash} from '../common/index.js';
 import {getToken} from '../common/middlewares.js';
 import dotenv from 'dotenv';
+import {v2 as cloudinary} from 'cloudinary';
 
 dotenv.config();
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+})
 
 const adminRegister = async (req, res) => {
     try {
@@ -57,17 +64,27 @@ const adminLogin = async (req, res) => {
 const createStylist = async (req, res) => {
     try {
         const {name, bio} = req.body;
-        if (!name) {
-            return res.status(400).json({ error: "Stylist name is required" });
-        }
-        let stylistData = {
-            name
-        }
-        if (bio) {
-            stylistData.bio = bio;
+        
+        let photoUrl = null;
+        
+        if (!name || !bio) {
+            return res.status(400).json({ error: "Stylist name and bio are required" });
         }
 
-    const stylist = await Stylist.create({ name: stylistData.name, bio: stylistData.bio });
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'stylists',
+                transformation: [{width: 600, crop: 'scale'}]
+            })
+            photoUrl = result.secure_url;
+        }
+
+    const stylist = await Stylist.create({
+        name,
+        bio,
+        photo: photoUrl,
+    });
+    
     res.status(201).json(stylist);
 
     }   catch (err) {

@@ -28,6 +28,9 @@ const StylistSchema = new mongoose.Schema({
     bio: {
         type: String
     },
+    photo: {
+        type: String
+    },
     services: [ServiceSchema],
     isActive: {
         type: Boolean,

@@ -2,6 +2,7 @@ import express from 'express';
 import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
 import { checkToken, checkValidation } from '../common/middlewares.js';
 import { body, check} from 'express-validator';
+import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -26,27 +27,31 @@ router.post(
 );
 
 router.post(
-  "/stylist",
+  "/stylist", checkToken, upload.single('photo'),
   body("name")
+    .trim()
     .exists().withMessage("Name is required")
     .isString().withMessage("Name must be a string")
-    .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage("Name must be between 2 and 50 characters")
     .matches(/^[a-zA-ZäöüÄÖÜß\s'-]+$/)
     .withMessage("Name contains invalid characters"),
   body("bio")
     .trim()
+    .notEmpty()
     .isLength({min: 10, max: 250})
     .withMessage("Biography must be between 10 and 250 characters"),
-  checkToken, createStylist);
+  body("photo")
+    .optional()
+    .isURL().withMessage('Photo must be valid URL'),
+  createStylist);
 
-router.patch("/stylist/:id",
+router.patch("/stylist/:id", checkToken,
   body("isActive")
     .isBoolean(),
-  checkToken, updateStylist)
+  updateStylist)
 
-router.post("/stylist/:id/services",
+router.post("/stylist/:id/services", checkToken, 
   body("serviceName")
     .exists()
     .isString()
@@ -64,9 +69,9 @@ router.post("/stylist/:id/services",
     .exists()
     .isIn(["Woman", "Man", "Child"])
     .withMessage("Invalid client type"),
-  checkToken, addServiceToStylist);
+  addServiceToStylist);
 
-router.put("/stylist/:stylistId/services/:serviceId",
+router.put("/stylist/:stylistId/services/:serviceId", checkToken, 
   body("serviceName")
     .optional()
     .isString()
@@ -81,7 +86,7 @@ router.put("/stylist/:stylistId/services/:serviceId",
   body("clientType")
     .optional()
     .isIn(["Woman", "Man", "Child"]),
-  checkToken, updateServiceToStylist)
+  updateServiceToStylist)
 
 router.delete("/stylist/:stylistId/services/:serviceId",
   checkToken, deleteServiceFromStylist);

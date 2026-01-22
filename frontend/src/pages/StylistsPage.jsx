@@ -4,7 +4,9 @@ import axios from 'axios'
 import {useNavigate} from 'react-router-dom';
 
 const StylistsPage = () => {
+  const LOCALURL = "http://localhost:5000";
   const [stylists, setStylists] = useState([]);
+  console.log(stylists)
   const navigate = useNavigate();
 
   // Initialisieren (läuft einmal)
@@ -32,27 +34,35 @@ const StylistsPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', px: 2, py: 4 }}>
-      <Grid container spacing={3} justifyContent={"center"}>
-        {stylists.map(stylist => (
-          <Grid item xs={12} sm={6} md={4} key={stylist._id}>
-            <Card>
+      <Grid container spacing={2} justifyContent={"center"} xs={12}>
+        {stylists?.map(stylist => (
+          <Grid item xs={12} sm={6} md={4} key={stylist?._id}>
+            <Card sx={{ maxWidth: 320, width: '100%' }}>
               <CardActionArea onClick={() => goToStylistPageClick(stylist)}>
-                <CardContent>
-                  <Typography variant="h6" align="center">{stylist.name}</Typography>
-                  <Typography variant="body2">{stylist.bio}</Typography>
-                  <Typography variant="subtitle2">Services:</Typography>
-                  {stylist.services.map(service => (
-                    <Typography key={service._id}>{service.serviceName} - €{service.price}</Typography>
+                <CardMedia 
+                  component="img"         // Höhe fixieren
+                  image={stylist?.photo}
+                  alt={stylist?.name}
+                  sx={{ 
+                    aspectRatio: '16/12',
+                    objectFit: 'cover' 
+                  }}
+                />
+                <CardContent >
+                  <Typography variant="h5" align="center">{stylist?.name}</Typography>
+                  <Typography variant="body2" align="center" sx={{mt:1}}>{stylist?.bio}</Typography>
+                  <Typography variant="h6" sx={{mt: 1}} align="center">Services:</Typography>
+                  {stylist?.services?.map(service => (
+                    <Typography key={service?._id} variant="body2" align="center">
+                      {service?.serviceName} - €{service?.price}
+                    </Typography>
                   ))}
-                  <CardMedia component="img"  height="120" image={stylist.image} />
                 </CardContent>
               </CardActionArea>
             </Card>
           </Grid>
         ))}
       </Grid>
-    </Box>
   );
 }
 
