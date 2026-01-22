@@ -31,10 +31,6 @@ const checkValidation = (req, res, next) => {
   next();
 }
 
-const getToken = (data, secret, expiresTime) => {
-    return jwt.sign(data, secret, { expiresIn: expiresTime });
-};
-
 const checkToken = async (req, res, next) => {
   // wenn ein Browser ein sog. "Preflight" (Anfrage, ob der Browser)
   // bestimmte Sachen machen darf) sendet, kommt dieser als HTTP-Methode
@@ -77,4 +73,4 @@ const checkPredefinedSecretKey = (req, res, next) => {
 }
 
 
-export {getToken, checkToken, checkValidation, createVisitorId, checkPredefinedSecretKey};
+export { checkToken, checkValidation, createVisitorId, checkPredefinedSecretKey};

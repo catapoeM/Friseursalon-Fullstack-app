@@ -2,7 +2,7 @@ import {Bookings, UserVerification} from "../models/bookingModel.js";
 import Stylist from "../models/stylistModel.js";
 import { createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, cryptTheCode,
      decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
-import {getToken} from "../common/middlewares.js";
+import {getToken} from "../common/index.js";
 import dotenv from 'dotenv';
 
 dotenv.config();

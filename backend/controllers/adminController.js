@@ -1,7 +1,7 @@
 import {Admin} from "../models/adminModel.js";
 import Stylist from "../models/stylistModel.js";
 import {getHash, checkHash} from '../common/index.js';
-import {getToken} from '../common/middlewares.js';
+import {getToken} from '../common/index.js';
 import dotenv from 'dotenv';
 import {v2 as cloudinary} from 'cloudinary';
 

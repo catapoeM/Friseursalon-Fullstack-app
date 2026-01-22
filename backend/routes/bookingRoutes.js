@@ -6,7 +6,7 @@ import { body, param, query } from 'express-validator';
 import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
     endWithinHours, endNotAfter19, durationValid,
      validatePhoneNumber } from '../validators/bookingValidation.js';
-import { checkValidation, createVisitorId } from '../common/middlewares.js';
+import { checkValidation, createVisitorId } from '../middlewares/middlewares.js';
 
 const router = express.Router();
 

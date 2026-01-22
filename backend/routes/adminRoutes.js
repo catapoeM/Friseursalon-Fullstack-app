@@ -1,8 +1,8 @@
 import express from 'express';
 import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
-import { checkToken, checkValidation } from '../common/middlewares.js';
+import { checkToken, checkValidation } from '../middlewares/middlewares.js';
 import { body, check} from 'express-validator';
-import upload from '../middleware/uploadMiddleware.js';
+import upload from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 

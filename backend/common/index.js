@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 import CryptoJS from 'crypto-js';
 import random from 'random';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -38,7 +39,9 @@ const decryptObject = (encryptedObj) => {
     return JSON.parse(decryptedString);
 }
 
-
+const getToken = (data, secret, expiresTime) => {
+    return jwt.sign(data, secret, { expiresIn: expiresTime });
+};
 
 const createEmailAndSend = async (emailContent) => {
     try {
@@ -96,4 +99,4 @@ const calculateTheDifferenceTimeInHours = (firstDate, secondDate) => {
 }
 */
 
-export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC};
+export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC, getToken};
