@@ -45,7 +45,8 @@ const StylistsPage = () => {
                   alt={stylist?.name}
                   sx={{ 
                     aspectRatio: '16/12',
-                    objectFit: 'cover' 
+                    objectFit: 'cover', 
+                    borderRadius: 2,
                   }}
                 />
                 <CardContent >

@@ -10,9 +10,13 @@ import {
   Typography,
   Grid,
   CardMedia,
+  Card,
 } from '@mui/material';
 import axios from "axios";
 import BackButton from "../components/BackButton";
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import EuroIcon from '@mui/icons-material/Euro';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
 
 const StylistServices = () => {
     const {stylistId} = useParams() 
@@ -59,51 +63,102 @@ const StylistServices = () => {
 
     
     return (
-        <Box sx={{ maxWidth: 600, mx: 'auto', px: 2, py: 4 }}>
+        <Box sx={{ px: 2, py: 4 }}>
             <Grid container justifyContent={"center"}>
-                <Grid item xs={12}>
-                    <Grid container justifyContent={"center"}>
-                        <Paper elevation={2} sx={{ p: 3 }}>
-                            <Typography variant="h6">
-                                Gesamtpreis: € {totalPrice} • Gesamtzeit: {totalDuration} min
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                    <Paper elevation={10} sx={{ p: 7 }}>
-                        <BackButton
-                        label="Stylist auswählen"
-                        fallbackPath="/stylists"
-                        />  
-                        <Typography variant="h6" align="center" sx={{ p: 2 }}>
-                            Services
-                        </Typography>
-                        <List>
-                            {stylist?.services?.map((service, index) => (
-                            <ListItem
-                                key={index}
-                                secondaryAction={
-                                <Checkbox
-                                    edge="end"
-                                    onChange={() => handleToggle(index)}
-                                    checked={selectedServices.includes(index)}
-                                />
-                                }
-                                disablePadding
+                <Grid item xs={12} md={8} lg={6} sx={{display: 'flex'}} justifyContent={"center"}>
+                    <Paper elevation={4} sx={{
+                                width: '50%',
+                                minHeight: {xs: 'auto', md: 600},
+                                p: { xs: 2, sm: 3 },
+                                gap: 2,
+                            }}
+                        >
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                            <Box  
+                                sx={{
+                                    position: 'relative',
+                                    width: '50%',
+                                    maxWidth: 700,
+                                }}
                             >
-                                <ListItemText
-                                    sx={{ pl: 2 }}
-                                    primary={service.serviceName}
-                                    secondary={`€${service.price} • ${service.duration}`}
+                            <Box 
+                                sx={{
+                                    position: 'absolute',
+                                    left: 16,               // Abstand vom linken Rand IN der Box
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: 2,
+                                }}
+                            >
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                                <BackButton
+                                    label="Stylist auswählen"
+                                    fallbackPath="/stylists"
                                 />
-                            </ListItem>
-                            ))}
-                        </List>
-                            <CardMedia component="img" 
-                            image={stylist.name} sx={{
-                                width: '100%',     // take full width of parent
-                                height: 'auto',    // maintain aspect ratio
-                                objectFit: 'cover' // crop if needed
-                            }}/>
+                            </Box>
+                            <Box
+                                component="img"
+                                src={stylist?.photo}
+                                alt={stylist.name}
+                                justifyContent={"center"}
+                                sx={{
+                                    width: '100%',
+                                    aspectRatio: '16 / 12',
+                                    objectFit: 'cover',
+                                    borderRadius: 2,
+                                }}
+                            />
+                            </Box>
+                        </Box>
+                        <Typography variant="h5" align="center">
+                            {stylist?.name}
+                        </Typography>
+                            {/* Bio */}
+                        <Typography
+                        variant="body1"
+                        sx={{
+                            textAlign: 'center',
+                            color: 'text.secondary',
+                            mb: 1
+                        }}
+                        >
+                        {stylist.bio}
+                        </Typography>
+                        <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+                                <Typography variant="h5">
+                                    Gesamtpreis: <EuroIcon fontSize="small"/> {totalPrice} 
+                                    <br/> 
+                                    Gesamtzeit: <AccessAlarmIcon fontSize="small"/> {totalDuration} min
+                                </Typography>
+                            <Typography variant="h5" sx={{ mb: 1 }}>
+                                Services <ContentCutIcon/>
+                            </Typography>
+                            <List>
+                                {stylist?.services?.map((service, index) => (
+                                <ListItem 
+                                    key={index}
+                                    secondaryAction={
+                                    <Checkbox
+                                        edge="end"
+                                        onChange={() => handleToggle(index)}
+                                        checked={selectedServices.includes(index)}
+                                    />
+                                    }
+                                    disablePadding
+                                >
+                                    <ListItemText
+                                        sx={{ pl: 2 }}
+                                        primary={service.serviceName}
+                                        secondary={
+                                        <Typography variant="h6">
+                                            <EuroIcon fontSize="small"/> {service.price} • Zeit: <AccessAlarmIcon fontSize="small"/>{service.duration} min
+                                        </Typography>}
+                                    />
+                                </ListItem>
+                                ))}
+                            </List>
+                        </Box>
                     </Paper>
                 </Grid>
             </Grid>
