@@ -17,6 +17,9 @@ import BackButton from "../components/BackButton";
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import EuroIcon from '@mui/icons-material/Euro';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
+import FaceIconMan from '@mui/icons-material/Face';
+import FaceIconWoman from '@mui/icons-material/Face3';
+import ChildIcon from '@mui/icons-material/ChildCare';
 
 const StylistServices = () => {
     const {stylistId} = useParams() 
@@ -99,7 +102,7 @@ const StylistServices = () => {
                             </Box>
                             <Box
                                 component="img"
-                                src={stylist?.photo}
+                                src={stylist.photo}
                                 alt={stylist.name}
                                 justifyContent={"center"}
                                 sx={{
@@ -112,7 +115,7 @@ const StylistServices = () => {
                             </Box>
                         </Box>
                         <Typography variant="h5" align="center">
-                            {stylist?.name}
+                            {stylist.name}
                         </Typography>
                             {/* Bio */}
                         <Typography
@@ -148,11 +151,31 @@ const StylistServices = () => {
                                     disablePadding
                                 >
                                     <ListItemText
+                                    
                                         sx={{ pl: 2 }}
-                                        primary={service.serviceName}
+                                        primary={<Typography>
+                                            {service.clientType === 'Man' ? (
+                                                <>
+                                                    <FaceIconMan fontSize="small"/>
+                                                </>
+                                            ) : service.clientType === 'Woman' ? (
+                                                <>
+                                                    <FaceIconWoman fontSize="small"/>
+                                                    
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <ChildIcon fontSize="small"/>
+                                                </>
+                                            )}
+                                            {service.serviceName}
+                                        </Typography>
+                                        }
                                         secondary={
                                         <Typography variant="h6">
-                                            <EuroIcon fontSize="small"/> {service.price} • Zeit: <AccessAlarmIcon fontSize="small"/>{service.duration} min
+                                            
+                                            {service.price}<EuroIcon fontSize="small"/>- 
+                                            <AccessAlarmIcon fontSize="small"/>{service.duration} min
                                         </Typography>}
                                     />
                                 </ListItem>
