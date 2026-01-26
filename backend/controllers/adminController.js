@@ -15,9 +15,9 @@ cloudinary.config({
 
 const adminRegister = async (req, res) => {
     try {
-        const {email, password, predefinedSecretKey} = req.matchedData;
+        const {email, password, adminSecret} = req.matchedData;
     
-        if (predefinedSecretKey !== process.env.ADMIN_SECRET_KEY) {
+        if (adminSecret !== process.env.ADMIN_SECRET_KEY) {
             return res.status(403).json({ error: "Invalid admin secret" });
         }
     
@@ -34,7 +34,6 @@ const adminRegister = async (req, res) => {
     }   catch (err) {
             res.status(500).json({ error: "Failed to register admin " + err });
     }
-    
 }
 
 const adminLogin = async (req, res) => {
