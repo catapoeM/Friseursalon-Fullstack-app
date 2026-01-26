@@ -68,9 +68,4 @@ const checkToken = async (req, res, next) => {
   next();
 };
 
-const checkPredefinedSecretKey = (req, res, next) => {
-  
-}
-
-
-export { checkToken, checkValidation, createVisitorId, checkPredefinedSecretKey};
+export { checkToken, checkValidation, createVisitorId};

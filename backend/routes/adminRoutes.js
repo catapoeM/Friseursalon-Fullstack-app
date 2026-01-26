@@ -1,6 +1,7 @@
 import express from 'express';
 import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
 import { checkToken, checkValidation } from '../middlewares/middlewares.js';
+import { adminRegisterLimiter, loginLimiter } from '../middlewares/rateLimit.js';
 import { body, check} from 'express-validator';
 import upload from '../middlewares/uploadMiddleware.js';
 
@@ -12,7 +13,8 @@ router.post(
   body('password').notEmpty().isString().isLength({min: 8, max: 50})
     .withMessage("Password must be between 8 and 50 characters")
     .trim(),
-  body('predefinedSecretKey').notEmpty(),
+  body('adminSecret').notEmpty(),
+  adminRegisterLimiter,
   checkValidation,
   adminRegister
 )
@@ -22,6 +24,7 @@ router.post(
   '/login',
   body('email').isEmail(),
   body('password').isString().isLength({ min: 8, max: 50 }),
+  loginLimiter,
   checkValidation,
   adminLogin
 );
