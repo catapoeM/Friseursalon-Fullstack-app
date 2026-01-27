@@ -6,12 +6,10 @@ import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
 
-const AdminRegisterPage = () => {
+const AdminLoginPage = () => {
     const [form, setForm] = useState({
         email: '',
-        password: '',
-        repeatPassword: '',
-        adminSecret: '',
+        password: ''
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -19,10 +17,6 @@ const AdminRegisterPage = () => {
         type: '',
         message: '',
     })
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
 
     useEffect(() => {
         if (!alert.message) {
@@ -35,27 +29,29 @@ const AdminRegisterPage = () => {
         return () => clearTimeout(timer)
     },[alert.message])
 
-    const handleSubmit = async (e) => {
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmitLogin = async (e) => {
         e.preventDefault();
-        if (!form.email || !form.password || !form.adminSecret) {
+        if (!form.email || !form.password) {
             setError('All fields are required');
-            return;
-        }else if (form.password !== form.confirmPassword) {
-            setError('Password and Confirm Password must be the same');
             return;
         }
 
         try {
-            const res = await axios.post('http://localhost:5000/api/admin/register', form);
+            const res = await axios.post('http://localhost:5000/api/admin/login', form);
             setSuccess(res.data.message);
-            setAlert({
-                type: 'success', message: 'Admin created successfully!'})
+            setAlert({type: 'success', message: 'Admin logged-in successfully!'})
             setError('');
-            return true// optional: redirect after success
+            localStorage.setItem('token', res.data);
+            console.log(res.data)
+            return true
         } catch (err) {
-            setError(err.response?.data?.message || 'Register failed');
+            setError(err.response?.data?.message || 'Login failed');
             setAlert({
-                type: 'error', message: err.response?.data?.message || 'Register failed!'
+                type: 'error', message: err.response?.data?.message || 'Login failed!'
             })
             setSuccess('');
         }
@@ -70,12 +66,14 @@ const AdminRegisterPage = () => {
             />
             <AuthLayout>
                 <Typography variant="h4" align="center" mb={3}>
-                    Admin Registration
+                    Admin Login
                 </Typography>
-                <form onSubmit={handleSubmit}>
+
+                <form onSubmit={handleSubmitLogin}>
                     <Stack spacing={3}>
                     {error && <Alert severity="error">{error}</Alert>}
                     {success && <Alert severity="success">{success}</Alert>}
+
                     <TextField
                         label="Email"
                         name="email"
@@ -94,29 +92,11 @@ const AdminRegisterPage = () => {
                         onChange={handleChange}
                     />
 
-                    <TextField
-                        label="Confirm Password"
-                        name="confirmPassword"
-                        type="password"
-                        fullWidth
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                    />
-
-                    <TextField
-                        label="Admin Secret Key"
-                        name="adminSecret"
-                        type="password"
-                        fullWidth
-                        value={form.adminSecret}
-                        onChange={handleChange}
-                        helperText="Required to create an admin account"
-                    />
                     <Button type="submit" variant="contained" size="large">
-                        Register
-                    </Button>
-                    <MuiLink component={Link} to="/login" color="inherit" sx={{ ml: 1 }}>
                         Login
+                    </Button>
+                    <MuiLink component={Link} to="/register" color="inherit" sx={{ ml: 1 }}>
+                        Register
                     </MuiLink>
                     </Stack>
                 </form>
@@ -125,4 +105,4 @@ const AdminRegisterPage = () => {
     );
 }
 
-export default AdminRegisterPage;
+export default AdminLoginPage;

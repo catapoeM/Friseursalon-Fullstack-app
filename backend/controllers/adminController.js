@@ -15,7 +15,7 @@ cloudinary.config({
 
 const adminRegister = async (req, res) => {
     try {
-        const {email, password, adminSecret} = req.matchedData;
+        const {email, password, confirmPassword, adminSecret} = req.matchedData;
     
         if (adminSecret !== process.env.ADMIN_SECRET_KEY) {
             return res.status(403).json({ error: "Invalid admin secret" });
@@ -25,11 +25,14 @@ const adminRegister = async (req, res) => {
         if (existing) {
             return res.status(409).json({error: "Admin already exists"});
         }
-    
-        const passwordHash = getHash(password);
-        const admin = await Admin.create({email, password: passwordHash })
-    
-        res.json({success: true, id: admin._id})
+        if (password === confirmPassword) {
+            const passwordHash = getHash(password);
+            const admin = await Admin.create({email, password: passwordHash })
+        
+            res.json({success: true, id: admin._id})
+        } else {
+            return res.status(403).json({error: "Password and Confirm Password must be the same"});
+        }
 
     }   catch (err) {
             res.status(500).json({ error: "Failed to register admin " + err });

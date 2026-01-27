@@ -13,6 +13,9 @@ router.post(
   body('password').notEmpty().isString().isLength({min: 8, max: 50})
     .withMessage("Password must be between 8 and 50 characters")
     .trim(),
+  body('confirmPassword').notEmpty().isString().isLength({min: 8, max: 50})
+    .withMessage("Password must be the same on both sections: 'Password and Repeat Password' ")
+    .trim(),
   body('adminSecret').notEmpty(),
   adminRegisterLimiter,
   checkValidation,

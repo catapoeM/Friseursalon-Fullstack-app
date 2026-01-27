@@ -7,6 +7,7 @@ import StylistsPage from "./pages/StylistsPage.jsx";
 import StylistServices from './pages/StylistServices.jsx'
 import Kontakt from "./pages/Kontakt.jsx";
 import Datenschutz from "./pages/Datenschutz.jsx";
+import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import AdminRegisterPage from "./pages/AdminRegisterPage.jsx";
 
 import DefaultLayout from './layouts/MainLayout.jsx'
@@ -24,7 +25,8 @@ const App = () => {
           <Route path="/stylists/:stylistId" element={<StylistServices />} />
           <Route path="/kontakt" element={<Kontakt />} />
           <Route path="/datenschutz" element={<Datenschutz />} />
-          <Route path="/admin" element={<AdminRegisterPage />} />
+          <Route path="/login" element={<AdminLoginPage />} />
+          <Route path="/register" element={<AdminRegisterPage />} />
         </Route>
       </Routes>
     </Router>

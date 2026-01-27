@@ -23,7 +23,7 @@ const Footer = () => {
         </MuiLink>
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        <MuiLink component={Link} to="/admin" color="inherit" sx={{ ml: 1 }}>
+        <MuiLink component={Link} to="/login" color="inherit" sx={{ ml: 1 }}>
           Admin
         </MuiLink>
       </Typography>
