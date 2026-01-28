@@ -10,7 +10,7 @@ const adminRegisterLimiter = rateLimit ({
 
 const loginLimiter = rateLimit ({
     windowMs: 15 * 60 * 1000, // 15 Minuten
-    max: 10, // max. 10 Versuche
+    max: 100, // max. 100 Versuche
     standardHeaders: true,
     legacyHeaders: false,
     message: {error: "Too many attempts, try again later!"}
