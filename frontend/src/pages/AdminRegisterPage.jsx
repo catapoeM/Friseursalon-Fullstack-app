@@ -5,25 +5,24 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
+import { useForm } from 'react-hook-form';
+import { confirmPasswordRule, registerRules } from '../utils/form-rules';
 
 const AdminRegisterPage = () => {
-    const [form, setForm] = useState({
-        email: '',
-        password: '',
-        repeatPassword: '',
-        adminSecret: '',
-    });
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [alert, setAlert] = useState({
         type: '',
         message: '',
     })
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        formState: {errors}
+    } = useForm({
+            mode: 'onChange'
+    })
+    
     useEffect(() => {
         if (!alert.message) {
             return
@@ -35,29 +34,15 @@ const AdminRegisterPage = () => {
         return () => clearTimeout(timer)
     },[alert.message])
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!form.email || !form.password || !form.adminSecret) {
-            setError('All fields are required');
-            return;
-        }else if (form.password !== form.confirmPassword) {
-            setError('Password and Confirm Password must be the same');
-            return;
-        }
-
+    const onSubmit = async (formData) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/admin/register', form);
-            setSuccess(res.data.message);
-            setAlert({
-                type: 'success', message: 'Admin created successfully!'})
-            setError('');
+            const res = await axios.post('http://localhost:5000/api/admin/register', formData);
+            setAlert({type: 'success', message: 'Admin created successfully!'})
             return true// optional: redirect after success
         } catch (err) {
-            setError(err.response?.data?.message || 'Register failed');
             setAlert({
-                type: 'error', message: err.response?.data?.message || 'Register failed!'
+                type: 'error', message: err?.response?.data?.error || 'Register failed!'
             })
-            setSuccess('');
         }
     };
 
@@ -72,45 +57,46 @@ const AdminRegisterPage = () => {
                 <Typography variant="h4" align="center" mb={3}>
                     Admin Registration
                 </Typography>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
-                    {error && <Alert severity="error">{error}</Alert>}
-                    {success && <Alert severity="success">{success}</Alert>}
                     <TextField
                         label="Email"
+                        {...register('email', registerRules.email)}
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
                         name="email"
                         type="email"
                         fullWidth
-                        value={form.email}
-                        onChange={handleChange}
                     />
 
                     <TextField
                         label="Password"
+                        {...register('password', registerRules.password)}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
                         name="password"
                         type="password"
                         fullWidth
-                        value={form.password}
-                        onChange={handleChange}
                     />
 
                     <TextField
                         label="Confirm Password"
+                        {...register('confirmPassword', confirmPasswordRule(getValues))}
+                        error={!!errors.confirmPassword}
+                        helperText={errors.confirmPassword?.message}
                         name="confirmPassword"
                         type="password"
                         fullWidth
-                        value={form.confirmPassword}
-                        onChange={handleChange}
                     />
 
                     <TextField
                         label="Admin Secret Key"
+                        {...register('adminSecret', registerRules.adminSecret)}
+                        error={!!errors.adminSecret}
+                        helperText={errors.adminSecret?.message}
                         name="adminSecret"
                         type="password"
                         fullWidth
-                        value={form.adminSecret}
-                        onChange={handleChange}
-                        helperText="Required to create an admin account"
                     />
                     <Button type="submit" variant="contained" size="large">
                         Register
