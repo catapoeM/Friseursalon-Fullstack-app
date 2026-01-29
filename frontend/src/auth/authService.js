@@ -9,8 +9,11 @@ const login = async(credentials) => {
         const token = response.data;
         
         localStorage.setItem("token", token)
-    
-        return token;
+        if (response) {
+            return true;
+        }else {
+            return false;
+        }
 
     }   catch(err) {
         return err;
