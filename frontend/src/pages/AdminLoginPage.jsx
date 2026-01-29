@@ -7,7 +7,12 @@ import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
 import {useForm} from 'react-hook-form';
 import { loginRules } from '../utils/form-rules';
+import { login } from '../auth/authService';
 
+const TEST_CREDENTIALS = {
+  email: "cata@adm.com",
+  password: "12345678"
+};
 const AdminLoginPage = () => {
     const [alert, setAlert] = useState({
         type: '',
@@ -32,19 +37,19 @@ const AdminLoginPage = () => {
 
         return () => clearTimeout(timer)
     },[alert.message])
-
+    
     const onSubmit = async (formData) => {
-        try {
-            const res = await axios.post('http://localhost:5000/api/admin/login', formData);
-            const token = res.data.token;
-            localStorage.setItem('token', token);
+        setAlert("")
+        console.log(formData)
+        const resLogin = login(formData)
+        console.log(resLogin, 'res log')
+        if (resLogin) {
             setAlert({type: 'success', message: 'Admin logged-in successfully!'})
             return true
-        } catch (err) {
+        }else {
             setAlert({
                 type: 'error', message: err?.response?.data?.error || 'Login failed!'
             })
-
         }
     };
 
@@ -62,8 +67,9 @@ const AdminLoginPage = () => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
                         <TextField
-                            label="Email"
-                            {...register('email', loginRules.email)}
+                            defaultValue={TEST_CREDENTIALS.email}
+                            //label="Email"
+                            {...register("email", loginRules.email)}
                             error={!!errors.email}
                             helperText={errors.email?.message}
                             name="email"
@@ -72,8 +78,9 @@ const AdminLoginPage = () => {
                         />
 
                         <TextField
-                            label="Password"
-                            {...register('password', loginRules.password)}
+                            defaultValue={TEST_CREDENTIALS.password}
+                            //label="Password"
+                            {...register("password", loginRules.password)}
                             error={!!errors.password}
                             helperText={errors.password?.message}
                             name="password"
