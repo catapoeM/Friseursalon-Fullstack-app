@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
+<<<<<<< Updated upstream
 
 const AdminLoginPage = () => {
     const [form, setForm] = useState({
@@ -13,6 +14,22 @@ const AdminLoginPage = () => {
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+=======
+import {useForm} from 'react-hook-form';
+import { loginRules } from '../utils/form-rules';
+import {useNavigate} from 'react-router-dom';
+import { login } from '../auth/authService';
+
+const TEST_CREDENTIALS = {
+  email: "cata@adm.com",
+  password: "12345678"
+};
+
+
+const AdminLoginPage = () => {
+    
+    const navigate = useNavigate();
+>>>>>>> Stashed changes
     const [alert, setAlert] = useState({
         type: '',
         message: '',
@@ -29,6 +46,7 @@ const AdminLoginPage = () => {
         return () => clearTimeout(timer)
     },[alert.message])
 
+<<<<<<< Updated upstream
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -48,12 +66,22 @@ const AdminLoginPage = () => {
             localStorage.setItem('token', res.data);
             console.log(res.data)
             return true
+=======
+    const onSubmit = (formData) => {
+        try {
+            const credentials = formData;
+            login(credentials);
+            setAlert({type: 'success', message: 'Admin logged-in successfully!'})
+>>>>>>> Stashed changes
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
             setAlert({
                 type: 'error', message: err.response?.data?.message || 'Login failed!'
             })
+<<<<<<< Updated upstream
             setSuccess('');
+=======
+>>>>>>> Stashed changes
         }
     };
 
@@ -71,6 +99,7 @@ const AdminLoginPage = () => {
 
                 <form onSubmit={handleSubmitLogin}>
                     <Stack spacing={3}>
+<<<<<<< Updated upstream
                     {error && <Alert severity="error">{error}</Alert>}
                     {success && <Alert severity="success">{success}</Alert>}
 
@@ -82,6 +111,29 @@ const AdminLoginPage = () => {
                         value={form.email}
                         onChange={handleChange}
                     />
+=======
+                        <TextField
+                            //label="Email"
+                            defaultValue={TEST_CREDENTIALS.email}
+                            {...register("email", loginRules.email)}
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                            name="email"
+                            type="email"
+                            fullWidth
+                        />
+
+                        <TextField
+                            //label="Password"
+                            defaultValue={TEST_CREDENTIALS.password}
+                            {...register("password", loginRules.password)}
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
+                            name="password"
+                            type="password"
+                            fullWidth
+                        />
+>>>>>>> Stashed changes
 
                     <TextField
                         label="Password"

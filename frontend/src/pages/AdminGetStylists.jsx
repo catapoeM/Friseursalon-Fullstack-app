@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import {Grid, Card, CardContent, CardActionArea, Typography, Box, CardMedia, CircularProgress} from "@mui/material"
 import axios from 'axios'
-import {useNavigate} from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 
 const StylistsPage = () => {
   const [stylists, setStylists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   console.log(stylists)
-  const navigate = useNavigate();
+
+  const logOut = () => {
+    localStorage.removeItem("token");
+    Navigate("http://localhost:5000/admin/api/login")
+  }
 
   // Initialisieren (läuft einmal)
   useEffect(() => {
       const fetchStylists = async () => {
         try{
-          const res = await axios.get("http://localhost:5000/api/stylists")
+          const res = await axios.get("http://localhost:5000/admin/api/stylists")
+          console.log(res, ' res')
           setStylists(res.data)
         }catch(err) {
           setError('Could not load stylist', err)
@@ -56,9 +61,7 @@ const StylistsPage = () => {
     return null;
   }
 
-  const goToStylistPageClick = (stylist) => {
-    navigate(`/stylists/${stylist._id}`)
-  };
+  
 
   return (
       <Grid container spacing={2} justifyContent={"center"} xs={12}>
@@ -79,7 +82,7 @@ const StylistsPage = () => {
                 <CardContent >
                   <Typography variant="h5" align="center">{stylist.name}</Typography>
                   <Typography variant="body2" align="center" sx={{mt:1}}>{stylist.bio}</Typography>
-                  <Typography variant="h6" sx={{mt: 1}} align="center">Services:</Typography>
+                  <Typography variant="h6" sx={{mt: 1}} align="center">ADMIN ---Services:</Typography>
                   {stylist.services.map(service => (
                     <Typography key={service._id} variant="body2" align="center">
                       {service.serviceName} - €{service.price}
