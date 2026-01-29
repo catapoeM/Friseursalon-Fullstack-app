@@ -8,6 +8,7 @@ import AlertCard from '../components/AlertCard';
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 const AdminLoginPage = () => {
     const [form, setForm] = useState({
@@ -16,6 +17,22 @@ const AdminLoginPage = () => {
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+=======
+import {useForm} from 'react-hook-form';
+import { loginRules } from '../utils/form-rules';
+import {useNavigate} from 'react-router-dom';
+import { login } from '../auth/authService';
+
+const TEST_CREDENTIALS = {
+  email: "cata@adm.com",
+  password: "12345678"
+};
+
+
+const AdminLoginPage = () => {
+    
+    const navigate = useNavigate();
+>>>>>>> Stashed changes
 =======
 import {useForm} from 'react-hook-form';
 import { loginRules } from '../utils/form-rules';
@@ -83,6 +100,7 @@ const AdminLoginPage = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -129,11 +147,21 @@ const AdminLoginPage = () => {
             login(credentials);
             setAlert({type: 'success', message: 'Admin logged-in successfully!'})
 >>>>>>> Stashed changes
+=======
+    const onSubmit = (formData) => {
+        try {
+            const credentials = formData;
+            login(credentials);
+            setAlert({type: 'success', message: 'Admin logged-in successfully!'})
+>>>>>>> Stashed changes
         } catch (err) {
             setAlert({
                 type: 'error', message: err?.response?.data?.error || 'Login failed!'
             })
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
