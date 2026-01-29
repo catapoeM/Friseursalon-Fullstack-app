@@ -5,18 +5,22 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
+import {useForm} from 'react-hook-form';
+import { loginRules } from '../utils/form-rules';
 
 const AdminLoginPage = () => {
-    const [form, setForm] = useState({
-        email: '',
-        password: ''
-    });
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [alert, setAlert] = useState({
         type: '',
         message: '',
     })
+
+    const {
+        register,
+        handleSubmit,
+        formState: {errors}
+    } = useForm({
+        mode: 'onChange'
+    });
 
     useEffect(() => {
         if (!alert.message) {
@@ -29,31 +33,18 @@ const AdminLoginPage = () => {
         return () => clearTimeout(timer)
     },[alert.message])
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmitLogin = async (e) => {
-        e.preventDefault();
-        if (!form.email || !form.password) {
-            setError('All fields are required');
-            return;
-        }
-
+    const onSubmit = async (formData) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/admin/login', form);
-            setSuccess(res.data.message);
+            const res = await axios.post('http://localhost:5000/api/admin/login', formData);
+            const token = res.data.token;
+            localStorage.setItem('token', token);
             setAlert({type: 'success', message: 'Admin logged-in successfully!'})
-            setError('');
-            localStorage.setItem('token', res.data);
-            console.log(res.data)
             return true
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed');
             setAlert({
-                type: 'error', message: err.response?.data?.message || 'Login failed!'
+                type: 'error', message: err?.response?.data?.error || 'Login failed!'
             })
-            setSuccess('');
+
         }
     };
 
@@ -68,36 +59,34 @@ const AdminLoginPage = () => {
                 <Typography variant="h4" align="center" mb={3}>
                     Admin Login
                 </Typography>
-
-                <form onSubmit={handleSubmitLogin}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
-                    {error && <Alert severity="error">{error}</Alert>}
-                    {success && <Alert severity="success">{success}</Alert>}
+                        <TextField
+                            label="Email"
+                            {...register('email', loginRules.email)}
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                            name="email"
+                            type="email"
+                            fullWidth
+                        />
 
-                    <TextField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        fullWidth
-                        value={form.email}
-                        onChange={handleChange}
-                    />
+                        <TextField
+                            label="Password"
+                            {...register('password', loginRules.password)}
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
+                            name="password"
+                            type="password"
+                            fullWidth
+                        />
 
-                    <TextField
-                        label="Password"
-                        name="password"
-                        type="password"
-                        fullWidth
-                        value={form.password}
-                        onChange={handleChange}
-                    />
-
-                    <Button type="submit" variant="contained" size="large">
-                        Login
-                    </Button>
-                    <MuiLink component={Link} to="/register" color="inherit" sx={{ ml: 1 }}>
-                        Register
-                    </MuiLink>
+                        <Button type="submit" variant="contained" size="large">
+                            Login
+                        </Button>
+                        <MuiLink component={Link} to="/register" color="inherit" sx={{ ml: 1 }}>
+                            Register
+                        </MuiLink>
                     </Stack>
                 </form>
             </AuthLayout>
