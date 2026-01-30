@@ -1,7 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthContext.jsx";
-import ProtectedRoute from "./auth/ProtectedRoute.jsx";
-import AdminGetStylists from "./pages/AdminGetStylists.jsx";
 
 import Home from "./pages/Home.jsx";
 import Preise from "./pages/Preise.jsx";

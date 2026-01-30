@@ -90,7 +90,8 @@ const AdminRegisterPage = () => {
                     />
 
                     <TextField
-                        label="Admin Secret Key"
+                        defaultValue="f§0hV3&aYpAs%Bv74FJ7S3%/!@rz€"
+                        //label="Admin Secret Key"
                         {...register('adminSecret', registerRules.adminSecret)}
                         error={!!errors.adminSecret}
                         helperText={errors.adminSecret?.message}
