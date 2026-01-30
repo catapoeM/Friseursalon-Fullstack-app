@@ -5,14 +5,16 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
-import {useForm} from 'react-hook-form';
 import { loginRules } from '../utils/form-rules';
+import { useNavigate } from 'react-router-dom';
+
+import {useForm} from 'react-hook-form';
+import useStore from '../hooks/useStore';
 
 const AdminLoginPage = () => {
-    const [alert, setAlert] = useState({
-        type: '',
-        message: '',
-    })
+    
+    const {adminLogin, raiseAlert} = useStore((state) => state);
+    const navigate = useNavigate();
 
     const {
         register,
@@ -22,47 +24,39 @@ const AdminLoginPage = () => {
         mode: 'onChange'
     });
 
-    useEffect(() => {
-        if (!alert.message) {
-            return
-        }
-        const timer = setTimeout(() => {
-            setAlert({type: '', message: ''})
-        }, 4000);
-
-        return () => clearTimeout(timer)
-    },[alert.message])
-
-    const onSubmit = async (formData) => {
-        try {
-            const res = await axios.post('http://localhost:5000/api/admin/login', formData);
-            const token = res.data.token;
-            localStorage.setItem('token', token);
-            setAlert({type: 'success', message: 'Admin logged-in successfully!'})
-            return true
-        } catch (err) {
-            setAlert({
-                type: 'error', message: err?.response?.data?.error || 'Login failed!'
+    const handleLoginSubmit = async (formData) => {
+        // Daten an Methoden Zustand-store übergeben
+        const ok = await adminLogin(formData)
+        console.log(formData, ' form data')
+        console.log(ok, ' ok')
+        if (ok) {
+            // custom alert
+            raiseAlert({
+                title: 'Success!',
+                text: 'Admin logged-in successfully!'
             })
-
+            navigate('/admindashboard')
+        }else {
+            // custom alert
+            raiseAlert({
+                title: 'Fast geschafft...', 
+                text: 'Admin cannot be logged in!',
+                severity: 'warning'
+            })
         }
     };
 
     return (
         <>
-            <AlertCard
-                type={alert.type}
-                message={alert.message}
-                onClose={() => setAlert({type: '', message: ''})}
-            />
             <AuthLayout>
                 <Typography variant="h4" align="center" mb={3}>
                     Admin Login
                 </Typography>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(handleLoginSubmit)}>
                     <Stack spacing={3}>
                         <TextField
-                            label="Email"
+                            defaultValue="cata2@adm.com"
+                            //label="Email"
                             {...register('email', loginRules.email)}
                             error={!!errors.email}
                             helperText={errors.email?.message}
@@ -72,7 +66,8 @@ const AdminLoginPage = () => {
                         />
 
                         <TextField
-                            label="Password"
+                            defaultValue="123456789"
+                            //label="Password"
                             {...register('password', loginRules.password)}
                             error={!!errors.password}
                             helperText={errors.password?.message}
