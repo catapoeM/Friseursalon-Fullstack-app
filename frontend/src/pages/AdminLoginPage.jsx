@@ -11,6 +11,10 @@ import { useNavigate } from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import useStore from '../hooks/useStore';
 
+const TEST_CREDENTIALS = {
+  email: "cata@adm.com",
+  password: "12345678"
+};
 const AdminLoginPage = () => {
     
     const {adminLogin, raiseAlert} = useStore((state) => state);

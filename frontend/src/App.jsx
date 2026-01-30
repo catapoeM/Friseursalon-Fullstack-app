@@ -1,10 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./auth/AuthContext.jsx";
+import ProtectedRoute from "./auth/ProtectedRoute.jsx";
+import AdminGetStylists from "./pages/AdminGetStylists.jsx";
+
 import Home from "./pages/Home.jsx";
 import Preise from "./pages/Preise.jsx";
 import Produkte from "./pages/Produkte.jsx";
 import BookingPage from "./pages/BookingPage.jsx";
 import StylistsPage from "./pages/StylistsPage.jsx";
-import StylistServices from './pages/StylistServices.jsx'
+import StylistServices from "./pages/StylistServices.jsx"
 import Kontakt from "./pages/Kontakt.jsx";
 import Datenschutz from "./pages/Datenschutz.jsx";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
