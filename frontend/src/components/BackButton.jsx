@@ -2,10 +2,8 @@ import {Typography, Box, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
-export default function BackButton({
-  label = 'Zurück',
-  fallbackPath = '/'
-}) {
+const BackButton = () => {
+  const label = 'Zurück', fallbackPath = '/';
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -31,3 +29,5 @@ export default function BackButton({
     </Button>
   );
 }
+
+export default BackButton

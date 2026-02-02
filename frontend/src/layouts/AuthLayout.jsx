@@ -1,12 +1,17 @@
-import { Box, Paper } from '@mui/material';
+import { Paper, Grid} from '@mui/material';
 
 const AuthLayout = ({children}) => {
     return (
-        <Box sx={{ bgcolor: 'grey.100', display: 'flex', justifyContent: 'center', alignItems: 'center', p: 1 }}>
+        <Grid container spacing={2} justifyContent={"center"} 
+            sx={{
+                height: "100%",
+                width: "100%"
+            }} 
+        >
             <Paper sx={{ p: 6, width: '100%', maxWidth: 500 }}>
                 {children}
             </Paper>
-        </Box>
+        </Grid>
     )
 }
 

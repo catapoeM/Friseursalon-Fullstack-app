@@ -10,7 +10,7 @@ import Kontakt from "./pages/Kontakt.jsx";
 import Datenschutz from "./pages/Datenschutz.jsx";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import AdminRegisterPage from "./pages/AdminRegisterPage.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx"
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import CustomAlert from "./components/common/CustomAlert.jsx";
 
