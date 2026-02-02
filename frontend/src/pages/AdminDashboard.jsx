@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Grid, Card, CardContent, CardActionArea, Typography, Box, CardMedia, CircularProgress, Alert} from "@mui/material"
+import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia} from "@mui/material"
 
 const AdminDashboard = () => {
   const [stylists, setStylists] = useState([]);
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
   };
 
   return (
-      <Grid container spacing={2} justifyContent={"center"} xs={12}>
+      <>
         {stylists?.map(stylist => (
           <Grid item xs={12} sm={6} md={4} key={stylist?._id}>
             <Card sx={{ maxWidth: 320, width: '100%' }}>
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
             </Card>
           </Grid>
         ))}
-      </Grid>
+      </>
   );
 }
 
