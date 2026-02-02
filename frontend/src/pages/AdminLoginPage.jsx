@@ -26,8 +26,6 @@ const AdminLoginPage = () => {
     const handleLoginSubmit = async (formData) => {
         // Daten an Methoden Zustand-store übergeben
         const ok = await adminLogin(formData)
-        console.log(formData, ' form data')
-        console.log(ok, ' ok')
         if (ok) {
             // custom alert
             raiseAlert({
