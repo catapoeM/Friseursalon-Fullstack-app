@@ -1,10 +1,9 @@
 import {create} from 'zustand';
 import axios from "axios";
 import {jwtDecode} from 'jwt-decode';
-import envApi from "../api/axios";
 
 const APIURL = 'http://localhost:5000/api'
-const STORAGEKEY = envApi.STORAGEKEY
+const STORAGEKEY = import.meta.env.VITE_STORAGEKEY
 
 const initialState = {
     loggedinAdmin: null,
@@ -29,14 +28,19 @@ const useStore = create((set, get) => ({
                 // Snackbar-ALert ausgeben
                 return false    
             }
-            console.log('was ist token', token)
             // token decodieren
             const decodedToken = jwtDecode(token)
-            set({token, decodedToken, loggedinAdmin: true})
-
-            // Daten in sessionStore speichern
-            console.log(STORAGEKEY, ' was ist storage key')
-            sessionStorage.setItem(STORAGEKEY, JSON.stringify({token, decodedToken}))
+            //const {id} = decodedToken;
+            //console.log(id, ' id')
+            
+            // stammdaten des angemeldeten admin holen
+            const config = {headers: {Authorization: 'Bearer ' + token}}
+            response = await axios(APIURL + '/admin/stylists', config)
+            const loggedinAdmin = response.data;
+            set({token, decodedToken, loggedinAdmin})
+            
+            sessionStorage.setItem(STORAGEKEY, JSON.stringify({token, decodedToken, loggedinAdmin}))
+            
             return true;
         } catch (error) {
             // TODO: Snackbar/Alert ausgeben

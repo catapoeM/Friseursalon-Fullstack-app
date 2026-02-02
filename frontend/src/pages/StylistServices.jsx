@@ -37,9 +37,6 @@ const StylistServices = () => {
                 setStylist(found);
                 return;
             }
-
-            // Fallback : Go to the previous page
-            console.log('FallBack muss implementiert werden!')
         }
     }, [stylistId])
 
