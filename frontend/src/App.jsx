@@ -14,10 +14,9 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import CustomAlert from "./components/common/CustomAlert.jsx";
 
-import DefaultLayout from './layouts/MainLayout.jsx'
-
 import useStore from "./hooks/useStore.jsx";
 import { useEffect } from "react";
+import MainLayout from "./layouts/MainLayout.jsx";
 
 const App = () => {
   const {loggedinAdmin, adminCheckLogin} = useStore((state) => state);
@@ -28,7 +27,7 @@ const App = () => {
 
   const loggedinRoute = (
     <Routes>
-      <Route element={<DefaultLayout />}>
+      <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/preise" element={<Preise />} />
@@ -47,7 +46,7 @@ const App = () => {
 
   const defaultRouter = (
     <Routes>
-      <Route element={<DefaultLayout />}>
+      <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/preise" element={<Preise />} />
         <Route path="/produkte" element={<Produkte />} />

@@ -206,7 +206,10 @@ const deleteServiceFromStylist = async (req, res) => {
 
 const getStylists = async (req, res) => {
     try {
-        const stylists = await Stylist.find();
+        const stylists = await Stylist.find().sort({
+                isActive: -1, // true zuerst
+                createdAt: -1 // neueste zuerst
+            });
         res.json(stylists);
     }   catch (err) {
         res.status(500).json({ error: "Failed to fetch stylists" + err });

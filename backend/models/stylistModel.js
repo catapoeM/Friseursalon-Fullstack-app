@@ -18,7 +18,7 @@ const ServiceSchema = new mongoose.Schema({
         enum: ["Woman", "Man", "Child"],
         required: true
     }
-})
+},{timestamps: true})
 
 const StylistSchema = new mongoose.Schema({
     name: {
@@ -36,7 +36,7 @@ const StylistSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     }
-})
+},{timestamps: true})
 
 
 const Stylist = mongoose.model("StylistSchema", StylistSchema)

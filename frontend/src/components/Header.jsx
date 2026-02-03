@@ -12,8 +12,10 @@ import {
   Box
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import useStore from '../hooks/useStore'
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -23,12 +25,17 @@ const navItems = [
   { label: "Kontakt", path: "/kontakt" }
 ];
 
+
+
 const Header = () => {
+  const {loggedinAdmin} = useStore((state) => state);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleDrawer = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  
 
   return (
     <>
@@ -43,6 +50,10 @@ const Header = () => {
           >
             <MenuIcon />
           </IconButton>
+          {loggedinAdmin && 
+          (<>
+            <AdminPanelSettingsIcon fontSize="large"/>
+          </>)}
 
           {/* Logo / Title */}
           <Typography variant="h6"
