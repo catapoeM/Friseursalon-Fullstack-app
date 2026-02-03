@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia} from "@mui/material"
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+import PersonIcon from '@mui/icons-material/Person';
 
 const AdminDashboard = () => {
   const [stylists, setStylists] = useState([]);
@@ -19,6 +21,19 @@ const AdminDashboard = () => {
         }
   }, []);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+
+  return `Created At: ${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
+
+
   // ⛔ Safety Guard (falls kein Stylist)
   if (!stylists) {
     console.log(stylists, ' no stylists')
@@ -33,8 +48,10 @@ const AdminDashboard = () => {
       <>
         {stylists?.map(stylist => (
           <Grid item xs={12} sm={6} md={4} key={stylist?._id}>
-            <Card sx={{ maxWidth: 320, width: '100%' }}>
-              <CardActionArea onClick={() => editStylist(stylist?._id)}>
+            <Card sx={{ maxWidth: 320, width: '100%'}}>
+              <CardActionArea
+                disabled={!stylist?.isActive}
+                onClick={() => editStylist(stylist?._id)}>
                 <CardMedia 
                   component="img"         // Höhe fixieren
                   image={stylist?.photo}
@@ -42,18 +59,23 @@ const AdminDashboard = () => {
                   sx={{ 
                     aspectRatio: '16/12',
                     objectFit: 'cover', 
-                    borderRadius: 2,
+                    borderRadius: 2
                   }}
                 />
                 <CardContent >
                   <Typography variant="h5" align="center">{stylist?.name}</Typography>
                   <Typography variant="body2" align="center" sx={{mt:1}}>{stylist?.bio}</Typography>
-                  <Typography variant="h6" sx={{mt: 1}} align="center">Services:</Typography>
+                  <Typography variant="h6" sx={{mt: 1}} align="center">Services</Typography>
                   {stylist?.services?.map(service => (
                     <Typography key={service?._id} variant="body2" align="center">
                       {service?.serviceName} - €{service?.price}
                     </Typography>
                   ))}
+                  {stylist?.isActive ? <PersonIcon/> : <PersonOffIcon/>}
+                  <Typography variant="body2">
+                    {formatDate(stylist.createdAt)}
+                  </Typography>
+
                 </CardContent>
               </CardActionArea>
             </Card>

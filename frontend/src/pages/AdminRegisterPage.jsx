@@ -7,8 +7,10 @@ import AuthLayout from '../layouts/AuthLayout';
 import AlertCard from '../components/AlertCard';
 import { useForm } from 'react-hook-form';
 import { confirmPasswordRule, registerRules } from '../utils/form-rules';
+import { useNavigate } from 'react-router-dom';
 
 const AdminRegisterPage = () => {
+    const navigate = useNavigate();
     const [alert, setAlert] = useState({
         type: '',
         message: '',
@@ -38,7 +40,7 @@ const AdminRegisterPage = () => {
         try {
             const res = await axios.post('http://localhost:5000/api/admin/register', formData);
             setAlert({type: 'success', message: 'Admin created successfully!'})
-            return true// optional: redirect after success
+            navigate('/login')
         } catch (err) {
             setAlert({
                 type: 'error', message: err?.response?.data?.error || 'Register failed!'
@@ -60,7 +62,8 @@ const AdminRegisterPage = () => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
                     <TextField
-                        label="Email"
+                    defaultValue="cata2@adm.com"
+                        //label="Email"
                         {...register('email', registerRules.email)}
                         error={!!errors.email}
                         helperText={errors.email?.message}
@@ -70,7 +73,8 @@ const AdminRegisterPage = () => {
                     />
 
                     <TextField
-                        label="Password"
+                        defaultValue="12345678"
+                        //label="Password"
                         {...register('password', registerRules.password)}
                         error={!!errors.password}
                         helperText={errors.password?.message}
@@ -80,7 +84,8 @@ const AdminRegisterPage = () => {
                     />
 
                     <TextField
-                        label="Confirm Password"
+                        defaultValue="12345678"
+                        //label="Confirm Password"
                         {...register('confirmPassword', confirmPasswordRule(getValues))}
                         error={!!errors.confirmPassword}
                         helperText={errors.confirmPassword?.message}

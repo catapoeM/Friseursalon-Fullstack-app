@@ -63,7 +63,7 @@ const AdminLoginPage = () => {
                         />
 
                         <TextField
-                            defaultValue="123456789"
+                            defaultValue="12345678"
                             //label="Password"
                             {...register('password', loginRules.password)}
                             error={!!errors.password}
