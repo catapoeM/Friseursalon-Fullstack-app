@@ -11,6 +11,8 @@ import Datenschutz from "./pages/Datenschutz.jsx";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import AdminRegisterPage from "./pages/AdminRegisterPage.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminCreateStylist from "./pages/admin/AdminCreateStylist.jsx";
+import AdminEditStylist from "./pages/admin/AdminEditStylist.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import CustomAlert from "./components/common/CustomAlert.jsx";
 
@@ -29,6 +31,9 @@ const App = () => {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/createstylist" element={<AdminCreateStylist />} />
+        <Route path="/editstylist/:stylistId" element={<AdminEditStylist />} />
+        <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/preise" element={<Preise />} />
         <Route path="/produkte" element={<Produkte />} />
@@ -39,6 +44,7 @@ const App = () => {
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/login" element={<AdminLoginPage />} />
         <Route path="/register" element={<AdminRegisterPage />} />
+        
         <Route path="/*" element={<NotFound />} />
       </Route>
     </Routes>

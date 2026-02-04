@@ -8,7 +8,6 @@ const AlertCard = ({type, message, onClose}) => {
             sx={{
                 position: 'fixed',
                 top: 80,
-                right: 24,
                 zIndex: 1300,
                 width: {xs: '90%', sm: 360},
                 right: { xs: '50%', sm: 24 },

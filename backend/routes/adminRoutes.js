@@ -48,7 +48,7 @@ router.post(
     .isLength({min: 10, max: 250})
     .withMessage("Biography must be between 10 and 250 characters"),
   body("photo")
-    .optional()
+    .exists().withMessage("Photo is required")
     .isURL().withMessage('Photo must be valid URL'),
   createStylist);
 
