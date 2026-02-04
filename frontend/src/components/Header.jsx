@@ -16,6 +16,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import useStore from '../hooks/useStore'
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -56,12 +57,26 @@ const Header = () => {
           </>)}
 
           {/* Logo / Title */}
-          <Typography variant="h6"
-            component={Link}
-            to="/" sx={{ flexGrow: 1,  textDecoration: "none", color: "inherit" }}
-          >
-            Friseur Salon
-          </Typography>
+          <Box sx={{flexGrow: 1}}>
+            <Typography variant="h6"
+              component={Link}
+              to="/" sx={{ flexGrow: 1,  textDecoration: "none", color: "inherit", display: "inline-block" }}
+            >
+              Friseur Salon
+            </Typography>
+          </Box>
+          
+          {loggedinAdmin &&
+          (
+            <Button
+              component={Link}
+              variant="contained"
+              startIcon={<PersonAddIcon/>}
+              to='/createstylist'
+            >
+              Create Stylist
+            </Button>
+          )}
 
           {/* Desktop Navigation */}
           <Box sx={{ display: { xs: "none", md: "block" } }}>

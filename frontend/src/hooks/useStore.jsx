@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import axios from "axios";
 import {jwtDecode} from 'jwt-decode';
 
-const APIURL = 'http://localhost:5000/api'
+const APIURL = import.meta.env.VITE_BASE_URL
 const STORAGEKEY = import.meta.env.VITE_STORAGEKEY
 
 const initialState = {
