@@ -95,6 +95,21 @@ const useStore = create((set, get) => ({
         // SessionStorage updaten
         sessionStorage.setItem(STORAGEKEY, JSON.stringify({token: get().token, decodedToken: get().decodedToken, loggedinAdmin}))
     },
+    createStylist: async(data) => {
+        try {
+            // check the token and 
+            const config = {headers: {Authorization: 'Bearer ' + get().token}}
+            const response = await axios.post(APIURL + '/admin/stylist', data, config)
+            console.log(response, ' res')
+            if (!response) {
+                return false;
+            }
+            return true;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
+        }
+    },
     raiseAlert: (newProps) => {
         // mindestens Property text muss über die props angeliefert werden!
         // Zusätzlich ist noch Property title möglich

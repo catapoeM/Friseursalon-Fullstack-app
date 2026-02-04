@@ -8,17 +8,43 @@ import {
 } from '@mui/material';
 
 import {useForm} from 'react-hook-form';
-import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
+import { createStylistRules } from '../../utils/form-rules';
+import { photoRules } from '../../utils/form-rules';
+
+import useStore from '../../hooks/useStore';
+import { useState } from 'react';
 
 const CreateStylist = () => {
-    const APIURL = import.meta.env.VITE_BASE_URL
-    const {register, handleSubmit} = useForm();
+    const {createStylist, raiseAlert} = useStore((state) => state);
+    const [preview, setPreview] = useState('');
     const navigate = useNavigate();
-
+    const {
+        register,
+        handleSubmit,
+        formState: {errors}
+    } = useForm({
+        mode: 'onChange'
+    });
     const onSubmit = async (data) => {
-        await axios.post(APIURL + '/admin/stylist', data)
-        navigate('/admindashboard')
+
+        console.log(data, ' data')
+        const ok = await createStylist(data)
+        if (ok) {
+            // custom alert
+            raiseAlert({
+                title: 'Success!',
+                text: 'Stylist created successfully!'
+            })
+            navigate('/admindashboard')
+        }else {
+            // custom alert
+            raiseAlert({
+                title: 'Fast geschafft...', 
+                text: 'Stylist cannot be created!',
+                severity: 'warning'
+            })
+        }
     }
     return (
         <Box maxWidth={600} mx="auto">
@@ -31,31 +57,53 @@ const CreateStylist = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <TextField
                             label="Name"
+                            {...register('name', createStylistRules.name)}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
+                            name="name"
+                            type="text"
                             fullWidth
                             margin='normal'
-                            {...register('name', {required: true})}
                         />
 
                         <TextField
                             label="Bio"
-                            multiline
-                            rows={4}
+                            {...register('bio', createStylistRules.bio)}
+                            error={!!errors.bio}
+                            helperText={errors.bio?.message}
+                            name="bio"
+                            type="text"
                             fullWidth
                             margin='normal'
-                            {...register('name')}
                         />
 
                         <Box sx={{mt:2}}>
                             <Button variant='outlined' component="label">
                                 Upload Photo
                                 <input 
-                                    type="file" 
+                                    type="file"
+                                    {...register('photo', photoRules)}
                                     hidden
                                     accept="image/*"
-                                    {...register('photo', {required: true})} 
+                                    onChange={(e) => {
+                                        register('photo').onChange(e);
+                                        const file = e.target.files[0]
+                                        if (file) {
+                                            setPreview(URL.createObjectURL(file));
+                                        }
+                                    }}
                                 />
                             </Button>
                         </Box>
+                        {preview && (
+                            <Box mt={2}>
+                                <img 
+                                    src={preview}
+                                    alt='Preview'
+                                    style={{width: '100%', maxHeight: 200, objectFit: 'cover'}}
+                                />
+                            </Box>
+                        )}
                         
                         <Button
                             type='submit'
