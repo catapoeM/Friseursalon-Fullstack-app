@@ -72,13 +72,15 @@ const createStylist = async (req, res) => {
         if (!name || !bio) {
             return res.status(400).json({ error: "Stylist name and bio are required" });
         }
-
+        
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file.path, {
                 folder: 'stylists',
                 transformation: [{width: 600, crop: 'scale'}]
             })
             photoUrl = result.secure_url;
+            console.log(req.file, ' req file')
+            console.log(photoUrl, ' photoUrl')
         }
 
     const stylist = await Stylist.create({

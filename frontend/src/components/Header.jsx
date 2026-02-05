@@ -51,33 +51,36 @@ const Header = () => {
           >
             <MenuIcon />
           </IconButton>
-          {loggedinAdmin && 
-          (<>
+                    {/* Logo / Title */}
+          {loggedinAdmin ?
+            <>
             <AdminPanelSettingsIcon fontSize="large"/>
-          </>)}
-
-          {/* Logo / Title */}
-          <Box sx={{flexGrow: 1}}>
-            <Typography variant="h6"
-              component={Link}
-              to="/" sx={{ flexGrow: 1,  textDecoration: "none", color: "inherit", display: "inline-block" }}
-            >
-              Friseur Salon
-            </Typography>
-          </Box>
-          
-          {loggedinAdmin &&
-          (
-            <Button
-              component={Link}
-              variant="contained"
-              startIcon={<PersonAddIcon/>}
-              to='/createstylist'
-            >
-              Create Stylist
-            </Button>
-          )}
-
+              <Box sx={{flexGrow: 1}}>
+                <Typography variant="h6"
+                  component={Link}
+                  to="/admindashboard" sx={{ flexGrow: 1,  textDecoration: "none", color: "inherit", display: "inline-block" }}
+                >
+                  Friseur Salon
+                </Typography>
+              </Box>
+              <Button
+                component={Link}
+                variant="contained"
+                startIcon={<PersonAddIcon/>}
+                to='/createstylist'
+              >
+                Create Stylist
+              </Button>
+            </>
+          : <Box sx={{flexGrow: 1}}>
+              <Typography variant="h6"
+                component={Link}
+                to="/" sx={{ flexGrow: 1,  textDecoration: "none", color: "inherit", display: "inline-block" }}
+              >
+                Friseur Salon
+              </Typography>
+            </Box>
+          }
           {/* Desktop Navigation */}
           <Box sx={{ display: { xs: "none", md: "block" } }}>
             {navItems.map((item) => (

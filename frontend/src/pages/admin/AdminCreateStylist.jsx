@@ -27,9 +27,14 @@ const CreateStylist = () => {
         mode: 'onChange'
     });
     const onSubmit = async (data) => {
+        const formData = new FormData();
 
-        console.log(data, ' data')
-        const ok = await createStylist(data)
+        formData.append("photo", data.photo[0]);
+        formData.append("name", data.name);
+        formData.append("bio", data.bio);
+
+        console.log(formData, ' data')
+        const ok = await createStylist(formData)
         if (ok) {
             // custom alert
             raiseAlert({
@@ -89,6 +94,7 @@ const CreateStylist = () => {
                                         register('photo').onChange(e);
                                         const file = e.target.files[0]
                                         if (file) {
+                                            console.log(file, ' file')
                                             setPreview(URL.createObjectURL(file));
                                         }
                                     }}
