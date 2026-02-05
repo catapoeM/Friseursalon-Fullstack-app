@@ -9,7 +9,8 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Box
+  Box,
+  Stack
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -17,6 +18,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import useStore from '../hooks/useStore'
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -26,10 +28,8 @@ const navItems = [
   { label: "Kontakt", path: "/kontakt" }
 ];
 
-
-
 const Header = () => {
-  const {loggedinAdmin} = useStore((state) => state);
+  const {loggedinAdmin, adminLogout} = useStore((state) => state);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleDrawer = () => {
@@ -54,7 +54,7 @@ const Header = () => {
                     {/* Logo / Title */}
           {loggedinAdmin ?
             <>
-            <AdminPanelSettingsIcon fontSize="large"/>
+              <AdminPanelSettingsIcon fontSize="large"/>
               <Box sx={{flexGrow: 1}}>
                 <Typography variant="h6"
                   component={Link}
@@ -63,14 +63,20 @@ const Header = () => {
                   Friseur Salon
                 </Typography>
               </Box>
-              <Button
-                component={Link}
-                variant="contained"
-                startIcon={<PersonAddIcon/>}
-                to='/createstylist'
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                alignItems="center"
               >
-                Create Stylist
-              </Button>
+                <Button
+                  component={Link}
+                  color="inherit"
+                  startIcon={<PersonAddIcon/>}
+                  to='/createstylist'
+                >
+                  Create Stylist
+                </Button>
+              </Stack>
             </>
           : <Box sx={{flexGrow: 1}}>
               <Typography variant="h6"
@@ -93,6 +99,16 @@ const Header = () => {
                 {item.label}
               </Button>
             ))}
+            {loggedinAdmin && (
+              <Button
+                component={Link}
+                color="inherit"
+                startIcon={<LogoutIcon/>}
+                onClick={() => {adminLogout()}}
+              >
+                Logout
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -113,6 +129,16 @@ const Header = () => {
                 </ListItemButton>
               </ListItem>
             ))}
+            {loggedinAdmin && (
+              <Button
+                component={Link}
+                color="inherit"
+                startIcon={<LogoutIcon/>}
+                onClick={() => {adminLogout()}}
+              >
+                Logout
+              </Button>
+            )}
           </List>
         </Box>
       </Drawer>
