@@ -98,6 +98,7 @@ const useStore = create((set, get) => ({
     createStylist: async(data) => {
         try {
             // check the token and 
+            console.log(get().token, ' get token')
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
             const response = await axios.post(APIURL + '/admin/stylist', data, config)
             console.log(response, ' res')

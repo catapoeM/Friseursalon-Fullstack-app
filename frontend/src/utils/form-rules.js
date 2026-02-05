@@ -79,10 +79,10 @@ export const photoRules = {
 
         fileType: (files) => {
             if (!files?.length) return true;
-            const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+            const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
             return (
                 allowed.includes(files[0].type) ||
-                'Only JPG, PNG or WEBP images are allowed'
+                'Only JPG, PNG or JPEG images are allowed'
             );
         },
 
