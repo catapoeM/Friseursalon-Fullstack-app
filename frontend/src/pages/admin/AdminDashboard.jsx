@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia} from "@mui/material"
+import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia, Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack} from "@mui/material"
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import PersonIcon from '@mui/icons-material/Person';
+import StylistActionDialog from "../../components/StylistActionDialog";
 
 const AdminDashboard = () => {
   const [stylists, setStylists] = useState([]);
@@ -40,9 +41,22 @@ const AdminDashboard = () => {
     return null;
   }
 
-  const editStylist = (stylist) => {
-    console.log(stylist, ' edit stylist')
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedStylist, setSelectedStylist] = useState(null);
+
+  const handleOpenDialog = (stylist) => {
+    console.log(stylist, ' stylist')
+    setSelectedStylist(stylist);
+    setDialogOpen(true);
   };
+
+  const handleCloseDialog = () => {
+    setSelectedStylist(null);
+    setDialogOpen(false);
+  };
+
+ 
+  
 
   return (
       <>
@@ -50,8 +64,9 @@ const AdminDashboard = () => {
           <Grid item xs={12} sm={6} md={4} key={stylist?._id}>
             <Card sx={{ maxWidth: 320, width: '100%'}}>
               <CardActionArea
-                disabled={!stylist?.isActive}
-                onClick={() => editStylist(stylist?._id)}>
+                // if I want later to make inactive the cards that are inactive in DB
+                //disabled={!stylist?.isActive}
+                onClick={() => handleOpenDialog(stylist)}>
                 <CardMedia 
                   component="img"         // Höhe fixieren
                   image={stylist?.photo}
@@ -71,16 +86,30 @@ const AdminDashboard = () => {
                       {service?.serviceName} - €{service?.price}
                     </Typography>
                   ))}
-                  {stylist?.isActive ? <PersonIcon/> : <PersonOffIcon/>}
-                  <Typography variant="body2">
-                    {formatDate(stylist.createdAt)}
-                  </Typography>
-
+                  <Card sx={{mt: 1}}>
+                    <Typography variant="body2">
+                      {formatDate(stylist.createdAt)}
+                    </Typography>
+                      {stylist?.isActive ? 
+                        <PersonIcon/>
+                        : 
+                        <PersonOffIcon/>
+                      }
+                  </Card>
                 </CardContent>
               </CardActionArea>
             </Card>
           </Grid>
         ))}
+        {/* Dialog nur einmal laden */}
+        <StylistActionDialog
+          open={dialogOpen}
+          stylist={selectedStylist}
+          onClose={handleCloseDialog}
+          onEdit={() => console.log('Edit', selectedStylist?._id)}
+          onDeactivate={() => console.log('Deactivate', selectedStylist?._id)}
+          onAddService={() => console.log('Add Service', selectedStylist?._id)}
+        />
       </>
   );
 }
