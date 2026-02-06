@@ -3,10 +3,10 @@ import { useEffect } from 'react';
 import { Typography, TextField, Button, Stack, Alert, Link as MuiLink } from '@mui/material';
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import AuthLayout from '../layouts/AuthLayout';
-import AlertCard from '../components/AlertCard';
+import AuthLayout from '../../layouts/AuthLayout';
+import AlertCard from '../../components/AlertCard';
 import { useForm } from 'react-hook-form';
-import { confirmPasswordRule, registerRules } from '../utils/form-rules';
+import { confirmPasswordRule, registerRules } from '../../utils/form-rules';
 import { useNavigate } from 'react-router-dom';
 
 const AdminRegisterPage = () => {

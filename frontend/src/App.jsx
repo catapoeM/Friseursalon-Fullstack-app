@@ -8,9 +8,9 @@ import StylistsPage from "./pages/StylistsPage.jsx";
 import StylistServices from "./pages/StylistServices.jsx"
 import Kontakt from "./pages/Kontakt.jsx";
 import Datenschutz from "./pages/Datenschutz.jsx";
-import AdminLoginPage from "./pages/AdminLoginPage.jsx";
-import AdminRegisterPage from "./pages/AdminRegisterPage.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminLoginPage from "./pages/admin/AdminLoginPage.jsx";
+import AdminRegisterPage from "./pages/admin/AdminRegisterPage.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminCreateStylist from "./pages/admin/AdminCreateStylist.jsx";
 import AdminEditStylist from "./pages/admin/AdminEditStylist.jsx";
 import NotFound from "./pages/NotFound.jsx";

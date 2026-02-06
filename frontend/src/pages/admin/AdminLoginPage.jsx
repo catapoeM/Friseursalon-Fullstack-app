@@ -2,13 +2,13 @@
 import { Typography, TextField, Button, Stack, Alert, Link as MuiLink } from '@mui/material';
 import { Link } from "react-router-dom";
 
-import AuthLayout from '../layouts/AuthLayout';
+import AuthLayout from '../../layouts/AuthLayout';
 
-import { loginRules } from '../utils/form-rules';
+import { loginRules } from '../../utils/form-rules';
 import { useNavigate } from 'react-router-dom';
 
 import {useForm} from 'react-hook-form';
-import useStore from '../hooks/useStore';
+import useStore from '../../hooks/useStore';
 
 
 const AdminLoginPage = () => {
