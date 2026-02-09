@@ -108,12 +108,12 @@ const updateStylist = async (req, res) => {
         }
 
         stylist.isActive = isActive;
-        await stylist.save();
+        const status = await stylist.save();
+        if (!status) {
+            return res.status(404).json({error: "Status could not be changed!"})
+        }
 
-        res.json({
-            message: "Stylist updated",
-            isActive: stylist.isActive
-        });
+        res.status(200).json(status);
 
     }   catch (err) {
             res.status(500).json({ error: "Failed to Deactivate stylist " + err});
