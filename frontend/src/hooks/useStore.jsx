@@ -31,7 +31,6 @@ const useStore = create((set, get) => ({
             // token decodieren
             const decodedToken = jwtDecode(token)
             //const {id} = decodedToken;
-            //console.log(id, ' id')
             
             // stammdaten des angemeldeten admin holen
             const config = {headers: {Authorization: 'Bearer ' + token}}
@@ -86,7 +85,7 @@ const useStore = create((set, get) => ({
         // Daten von angemeldeten Admin holen
         // stammdaten des angemeldeten admins holen
         const config = {headers: {Authorization: 'Bearer ' + get().token}}
-        const response = await axios(APIURL + '/admins/' + get().loggedinAdmin._id, config);
+        const response = await axios(APIURL + '/admin/stylists', config);
         const loggedinAdmin = response.data;
 
         // Store updaten
@@ -97,15 +96,34 @@ const useStore = create((set, get) => ({
     },
     createStylist: async(data) => {
         try {
-            // check the token and 
-            console.log(get().token, ' get token')
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
             const response = await axios.post(APIURL + '/admin/stylist', data, config)
-            console.log(response, ' res')
             if (!response) {
                 return false;
             }
             return true;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
+        }
+    },
+    changeStatusStylist: async(stylist) => {
+        try {
+            const config = {headers: {Authorization: 'Bearer ' + get().token}}
+            const stylistStatus = {
+                "isActive": null
+            }
+            if (stylist.isActive) {
+                stylistStatus.isActive = false;
+            }else if (!stylistStatus.isActive) {
+                stylistStatus.isActive = true;
+            }
+            const response = await axios.patch(APIURL + '/admin/stylist/' + stylist._id, stylistStatus, config)
+            if (!response) {
+                return false;
+            }
+            await get().adminRefreshMe();
+            return true
         } catch (error) {
             // TODO: Snackbar/Alert ausgeben
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})

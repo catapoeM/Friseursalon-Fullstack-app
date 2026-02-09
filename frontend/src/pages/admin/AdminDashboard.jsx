@@ -3,49 +3,28 @@ import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia, Dialog, 
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import PersonIcon from '@mui/icons-material/Person';
 import StylistActionDialog from "../../components/StylistActionDialog";
+import useStore from "../../hooks/useStore";
+import { formatDate } from "../../utils/dateFormatter";
 
 const AdminDashboard = () => {
+  const {loggedinAdmin} = useStore((state) => state);
   const [stylists, setStylists] = useState([]);
-
-  // Initialisieren (läuft einmal)
+  // Initialisieren (läuft wenn loggedinAdmin data in useStore is changed)
   useEffect(() => {
-    const getAdminData = sessionStorage.getItem('friseursalon')
-    const objAdminData = JSON.parse(getAdminData)
-    console.log(objAdminData, ' objAdminData')
-    if (objAdminData.loggedinAdmin.length > 0) {
-            const stylists = objAdminData.loggedinAdmin;
-            if (stylists) {
-              console.log(stylists)
-                setStylists(stylists);
-                return;
-            }
-        }
-  }, []);
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const hh = String(date.getHours()).padStart(2, '0');
-    const min = String(date.getMinutes()).padStart(2, '0');
-
-  return `Created At: ${yyyy}-${mm}-${dd} ${hh}:${min}`;
-}
-
+    setStylists(loggedinAdmin)
+  }, [loggedinAdmin]);
 
   // ⛔ Safety Guard (falls kein Stylist)
   if (!stylists) {
-    console.log(stylists, ' no stylists')
     return null;
   }
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStylist, setSelectedStylist] = useState(null);
+  const [statusStylist, setStatusStylist] = useState(null)
 
   const handleOpenDialog = (stylist) => {
-    console.log(stylist, ' stylist')
+    setStatusStylist(stylist.isActive)
     setSelectedStylist(stylist);
     setDialogOpen(true);
   };
@@ -54,9 +33,6 @@ const AdminDashboard = () => {
     setSelectedStylist(null);
     setDialogOpen(false);
   };
-
- 
-  
 
   return (
       <>
@@ -88,7 +64,10 @@ const AdminDashboard = () => {
                   ))}
                   <Card sx={{mt: 1}}>
                     <Typography variant="body2">
-                      {formatDate(stylist.createdAt)}
+                      {formatDate(stylist.createdAt, 'Created')}
+                    </Typography>
+                    <Typography variant="body2">
+                      {formatDate(stylist.updatedAt, 'Updated')}
                     </Typography>
                       {stylist?.isActive ? 
                         <PersonIcon/>
@@ -105,10 +84,8 @@ const AdminDashboard = () => {
         <StylistActionDialog
           open={dialogOpen}
           stylist={selectedStylist}
+          status={statusStylist}
           onClose={handleCloseDialog}
-          onEdit={() => console.log('Edit', selectedStylist?._id)}
-          onDeactivate={() => console.log('Deactivate', selectedStylist?._id)}
-          onAddService={() => console.log('Add Service', selectedStylist?._id)}
         />
       </>
   );
