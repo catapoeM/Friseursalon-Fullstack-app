@@ -33,7 +33,8 @@ const StylistActionDialog = ({
     }
 
     const onEdit = (stylist) => {
-      console.log(' edit stylist ')
+      sessionStorage.setItem('stylistEdit', JSON.stringify(stylist))
+      navigate('/editstylist/' + stylist._id)
     }
     const onAddService = (stylist) => {
       console.log(' edit stylist ')
