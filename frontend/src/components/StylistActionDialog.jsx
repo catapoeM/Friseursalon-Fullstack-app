@@ -53,7 +53,7 @@ const StylistActionDialog = ({
       <DialogActions>
         <Stack spacing={1} width="100%">
           <Button variant="contained" onClick={() => onEdit(stylist)}>
-            Edit
+            Edit Service to Stylist
           </Button>
           {status ? 
             <Button variant="outlined" color="warning" onClick={() => onChangeStatus(stylist)}>
@@ -64,7 +64,7 @@ const StylistActionDialog = ({
             </Button>
           }
           <Button variant="text" onClick={() => onAddService(stylist)}>
-            Add Service
+            Add Service To Stylist
           </Button>
         </Stack>
       </DialogActions>

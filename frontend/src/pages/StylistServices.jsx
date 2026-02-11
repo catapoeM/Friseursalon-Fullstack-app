@@ -126,11 +126,11 @@ const StylistServices = () => {
                         {stylist.bio}
                         </Typography>
                         <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                                <Typography variant="h5">
-                                    Gesamtpreis: <EuroIcon fontSize="small"/> {totalPrice} 
-                                    <br/> 
-                                    Gesamtzeit: <AccessAlarmIcon fontSize="small"/> {totalDuration} min
-                                </Typography>
+                            <Typography variant="h5">
+                                Gesamtpreis: <EuroIcon fontSize="small"/> {totalPrice} 
+                                <br/> 
+                                Gesamtzeit: <AccessAlarmIcon fontSize="small"/> {totalDuration} min
+                            </Typography>
                             <Typography variant="h5" sx={{ mb: 1 }}>
                                 Services <ContentCutIcon/>
                             </Typography>

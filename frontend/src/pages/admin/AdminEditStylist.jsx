@@ -6,36 +6,65 @@ import {
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
+import useStore from "../../hooks/useStore";
 
 const StylistServices = () => {
+    const {editStylistServices, raiseAlert} = useStore((state) => state)
     const [editingId, setEditingId] = useState(null);
-    const [stylist, setStylist] = useState([]);
+    const [stylistId, setStylistId] = useState()
 
     const [rows, setRows] = useState(() => {
         const stored = sessionStorage.getItem('stylistEdit');
         if (stored) {
             const parsedData = JSON.parse(stored);
+            setStylistId(parsedData._id);
             const services = parsedData.services;
             return services ? services : 'No services available'
         }
     });
     
     // Zustand für den aktuellen Wert im Formular
-    const [editFormData, setEditFormData] = useState({ serviceName: '', duration: '', price: '', clientType: '' });
+    const [editFormData, setEditFormData] = useState({ serviceName: '', duration: null, price: null, clientType: '' });
     
+    useEffect(() => {
+        console.log(editFormData, ' editFormData')
+    }, [editFormData])
+
     const handleEditClick = (row) => {
-        console.log(row)
         setEditingId(row._id);
-        setEditFormData({ name: row.serviceName, duration: row.duration, price: row.price, client: row.clientType });
+        setEditFormData({ serviceName: row.serviceName, duration: row.duration, price: row.price, clientType: row.clientType });
     };
         
-    const handleSaveClick = (id) => {
+    const handleSaveClick = async (id) => {
+        console.log(id, ' id')
         setRows(rows.map(row => (row._id === id ? { ...row, ...editFormData } : row)));
         setEditingId(null);
+        console.log(rows, ' save click')
+        console.log(editFormData, id, ' editFormData')
+        const ok = await editStylistServices(editFormData, id, stylistId)
+        if (ok) {
+            // custom alert
+            raiseAlert({
+                title: 'Success!',
+                text: 'The Service of the stylist has been successfully updated!'
+            })
+        }else {
+            // custom alert
+            raiseAlert({
+                title: 'Fast geschafft...', 
+                text: 'The Service of the stylist cannot be updated!',
+                severity: 'warning'
+            })
+        }
     }
 
-    const handleInputChange = () => {
-        console.log("handle input change")
+    // This function is very important for changing the input values of the rows (serviceName, duration, price, clientType)
+    const handleInputChange = (event) => {
+        const {name, value} = event.target
+        setEditFormData({
+            ...editFormData,
+            [name]: value,
+        })
     }
     
     return (
@@ -44,20 +73,20 @@ const StylistServices = () => {
                 <TableHead>
                 <TableRow>
                     <TableCell>ID</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Preis</TableCell>
-                    <TableCell>Duration</TableCell>
-                    <TableCell>Client Type</TableCell>
+                    {Object.keys(editFormData).map((key) => (
+                        <TableCell key={key}>{key}</TableCell>
+                    ))}
                 </TableRow>
                 </TableHead>
                 <TableBody>
                 {rows.map((row) => (
                     <TableRow key={row._id}>
                     <TableCell>{row._id}</TableCell>
+                    
                     <TableCell>
                         {editingId === row._id ? (
                         <TextField
-                            name="name"
+                            name="serviceName"
                             value={editFormData.serviceName}
                             onChange={handleInputChange}
                             size="small"
@@ -70,6 +99,7 @@ const StylistServices = () => {
                         {editingId === row._id ? (
                         <TextField
                             name="duration"
+                            type="number"
                             value={editFormData.duration}
                             onChange={handleInputChange}
                             size="small"
@@ -95,7 +125,6 @@ const StylistServices = () => {
                         {editingId === row._id ? (
                         <TextField
                             name="clientType"
-                            type="number"
                             value={editFormData.clientType}
                             onChange={handleInputChange}
                             size="small"
