@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
-import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia, Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack} from "@mui/material"
+import {Grid, Card, CardContent, CardActionArea, Typography, CardMedia, Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, List, ListItem, ListItemText} from "@mui/material"
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import PersonIcon from '@mui/icons-material/Person';
 import StylistActionDialog from "../../components/StylistActionDialog";
 import useStore from "../../hooks/useStore";
 import { formatDate } from "../../utils/dateFormatter";
+
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import EuroIcon from '@mui/icons-material/Euro';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
+import FaceIconMan from '@mui/icons-material/Face';
+import FaceIconWoman from '@mui/icons-material/Face3';
+import ChildIcon from '@mui/icons-material/ChildCare';
 
 const AdminDashboard = () => {
   const {loggedinAdmin} = useStore((state) => state);
@@ -57,10 +64,36 @@ const AdminDashboard = () => {
                   <Typography variant="h5" align="center">{stylist?.name}</Typography>
                   <Typography variant="body2" align="center" sx={{mt:1}}>{stylist?.bio}</Typography>
                   <Typography variant="h6" sx={{mt: 1}} align="center">Services</Typography>
-                  {stylist?.services?.map(service => (
-                    <Typography key={service?._id} variant="body2" align="center">
-                      {service?.serviceName} - €{service?.price}
-                    </Typography>
+                  {stylist?.services?.map((service) => (
+                  <ListItem>
+                    <ListItemText
+                        key={service?._id} align="center"
+                        primary={<Typography>
+                            {service.clientType === 'Man' ? (
+                                <>
+                                    <FaceIconMan fontSize="small"/>
+                                </>
+                            ) : service.clientType === 'Woman' ? (
+                                <>
+                                    <FaceIconWoman fontSize="small"/>
+                                    
+                                </>
+                            ) : (
+                                <>
+                                    <ChildIcon fontSize="small"/>
+                                </>
+                            )}
+                            {service.serviceName}
+                        </Typography>
+                        }
+                        secondary={
+                        <Typography variant="h6">
+                            
+                            {service.price}<EuroIcon fontSize="small"/>- 
+                            <AccessAlarmIcon fontSize="small"/>{service.duration} min
+                        </Typography>}
+                    />
+                  </ListItem>
                   ))}
                   <Card sx={{mt: 1}}>
                     <Typography variant="body2">
