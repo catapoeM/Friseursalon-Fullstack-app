@@ -56,39 +56,48 @@ router.patch("/stylist/:id", checkToken,
 
 router.post("/stylist/:id/services", checkToken, 
   body("serviceName")
-    .exists()
+    .exists().withMessage("Service Name is required")
     .isString()
     .trim()
-    .isLength({ min: 2, max: 100 }),
+    .isLength({ min: 3, max: 40 })
+    .withMessage("Service Name must be between 3 and 40 Characters"),
   body("duration")
-    .exists()
-    .isInt({ min: 1, max: 5 })
-    .withMessage("Duration must be between 1 and 5 Hours"),
+    .exists().withMessage("Duration is required")
+    .isInt({ min: 15, max: 240 })
+    .withMessage("Duration must be between 15 and 240 Minutes"),
   body("price")
-    .exists()
-    .isFloat({ min: 0 })
-    .withMessage("Price must be a positive number"),
+    .exists().withMessage("Price is required")
+    .isInt({ min: 10})
+    .withMessage("Price must be minimum of 10"),
   body("clientType")
-    .exists()
+    .exists().withMessage("Client type is required")
+    .isString()
+    .trim()
     .isIn(["Woman", "Man", "Child"])
-    .withMessage("Invalid client type"),
+    .withMessage("Invalid client type. Must be either (Woman / Man / Child"),
   addServiceToStylist);
 
 router.put("/stylist/:stylistId/services/:serviceId", checkToken, 
   body("serviceName")
-    .optional()
+    .exists().withMessage("Service Name is required")
     .isString()
     .trim()
-    .isLength({ min: 2, max: 100 }),
+    .isLength({ min: 3, max: 40 })
+    .withMessage("Service Name must be between 3 and 40 Characters"),
   body("duration")
-    .optional()
-    .isInt({ min: 1, max: 5 }),
+    .exists().withMessage("Duration is required")
+    .isInt({ min: 15, max: 240 })
+    .withMessage("Duration must be between 15 and 240 Minutes"),
   body("price")
-    .optional()
-    .isFloat({ min: 0 }),
+    .exists()
+    .isInt({ min: 10})
+    .withMessage("Price must be minimum of 10"),
   body("clientType")
-    .optional()
-    .isIn(["Woman", "Man", "Child"]),
+    .exists().withMessage("Client type is required")
+    .isString()
+    .trim()
+    .isIn(["Woman", "Man", "Child"])
+    .withMessage("Invalid client type. Must be either (Woman / Man / Child"),
   updateServiceToStylist)
 
 router.delete("/stylist/:stylistId/services/:serviceId",
