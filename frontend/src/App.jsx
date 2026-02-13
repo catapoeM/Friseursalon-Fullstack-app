@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Preise from "./pages/Preise.jsx";
 import Produkte from "./pages/Produkte.jsx";
-import BookingPage from "./pages/BookingPage.jsx";
+import TimelineCalendar from "./pages/TimelineCalendar.jsx";
 import StylistsPage from "./pages/StylistsPage.jsx";
 import StylistServices from "./pages/StylistServices.jsx"
 import Kontakt from "./pages/Kontakt.jsx";
@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/preise" element={<Preise />} />
         <Route path="/produkte" element={<Produkte />} />
-        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/calendar/:stylistId" element={<TimelineCalendar />} />
         <Route path="/stylists" element={<StylistsPage />} />
         <Route path="/stylists/:stylistId" element={<StylistServices />} />
         <Route path="/kontakt" element={<Kontakt />} />
@@ -57,7 +57,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/preise" element={<Preise />} />
         <Route path="/produkte" element={<Produkte />} />
-        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/calendar/:stylistId" element={<TimelineCalendar />} />
         <Route path="/stylists" element={<StylistsPage />} />
         <Route path="/stylists/:stylistId" element={<StylistServices />} />
         <Route path="/kontakt" element={<Kontakt />} />

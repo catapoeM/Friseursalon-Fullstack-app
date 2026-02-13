@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   List,
   ListItem,
@@ -11,6 +12,11 @@ import {
   Grid,
   CardMedia,
   Card,
+  Stack,
+  Button,
+  TableCell,
+  TableRow,
+  TableHead,
 } from '@mui/material';
 import axios from "axios";
 import BackButton from "../components/BackButton";
@@ -22,6 +28,7 @@ import FaceIconWoman from '@mui/icons-material/Face3';
 import ChildIcon from '@mui/icons-material/ChildCare';
 
 const StylistServices = () => {
+    const navigate = useNavigate()
     const {stylistId} = useParams() 
     const [stylist, setStylist] = useState([]);
     const [selectedServices, setSelectedServices] = useState([]);
@@ -60,6 +67,11 @@ const StylistServices = () => {
         (sum, s) => sum + s.duration,
         0
     );
+
+    const toCalendar = (services) => {
+        sessionStorage.setItem('stylistCalendarServices', JSON.stringify(services))
+        navigate('/calendar/' + stylistId)
+    }
 
     
     return (
@@ -148,7 +160,6 @@ const StylistServices = () => {
                                     disablePadding
                                 >
                                     <ListItemText
-                                    
                                         sx={{ pl: 2 }}
                                         primary={<Typography>
                                             {service.clientType === 'Man' ? (
@@ -177,6 +188,11 @@ const StylistServices = () => {
                                     />
                                 </ListItem>
                                 ))}
+                                <Stack spacing={1} width="100%">
+                                    <Button variant="outlined" onClick={() => {toCalendar(selectedServices)}}>
+                                        Go to calendar
+                                    </Button>
+                                </Stack>
                             </List>
                         </Box>
                     </Paper>
