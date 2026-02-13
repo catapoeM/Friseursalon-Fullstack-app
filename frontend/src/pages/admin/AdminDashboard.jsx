@@ -65,9 +65,9 @@ const AdminDashboard = () => {
                   <Typography variant="body2" align="center" sx={{mt:1}}>{stylist?.bio}</Typography>
                   <Typography variant="h6" sx={{mt: 1}} align="center">Services</Typography>
                   {stylist?.services?.map((service) => (
-                  <ListItem>
+                  <ListItem key={service?._id}>
                     <ListItemText
-                        key={service?._id} align="center"
+                        align="center"
                         primary={<Typography>
                             {service.clientType === 'Man' ? (
                                 <>

@@ -1,4 +1,4 @@
-import {  } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -7,39 +7,22 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import useStore from "../../hooks/useStore";
-import { editServicesRules } from "../../utils/form-rules";
+import { servicesRules } from "../../utils/form-rules";
 
-const validateField = (value, rules) => {
-    if (!rules) return null;
-
-    if (rules.required && !value) {
-        return rules.required;
-    }
-
-    if (rules.minLength && value.length < rules.minLength.value) {
-        return rules.minLength.message;
-    }
-
-    if (rules.min && Number(value) < rules.min.value) {
-        return rules.min.message;
-    }
-
-    return null;
-};
+import { validateField } from "../../utils/validateRules";
 
 const StylistServices = () => {
     const {editStylistServices, raiseAlert} = useStore((state) => state)
     const [editingId, setEditingId] = useState(null);
-    const [stylistId, setStylistId] = useState()
+    const {stylistId} = useParams();
     const [errors, setErrors] = useState({});
 
-    const [editFormData, setEditFormData] = useState({ serviceName: '', duration: null, price: null, clientType: '' });
+    const [editFormData, setEditFormData] = useState({ serviceName: '', duration: undefined, price: undefined, clientType: '' });
   
     const [rows, setRows] = useState(() => {
         const stored = sessionStorage.getItem('stylistEdit');
         if (stored) {
             const parsedData = JSON.parse(stored);
-            setStylistId(parsedData._id);
             const services = parsedData.services;
             return services ?? []
         }
@@ -51,9 +34,9 @@ const StylistServices = () => {
     };
         
     const handleSaveClick = async (id) => {
-         const newErrors = {};
-        Object.keys(editServicesRules).forEach((field) => {
-            const error = validateField(editFormData[field], editServicesRules[field]);
+        const newErrors = {};
+        Object.keys(servicesRules).forEach((field) => {
+            const error = validateField(editFormData[field], servicesRules[field]);
             if (error) newErrors[field] = error;
         });
 
@@ -86,7 +69,7 @@ const StylistServices = () => {
     const handleInputChange = (event) => {
         const {name, value} = event.target
         setEditFormData(prev => ({...prev, [name]: value, }))
-        const error = validateField(value, editServicesRules[name]);
+        const error = validateField(value, servicesRules[name]);
         setErrors(prev => ({ ...prev, [name]: error }));
     }
     
