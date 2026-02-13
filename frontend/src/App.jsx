@@ -13,6 +13,7 @@ import AdminRegisterPage from "./pages/admin/AdminRegisterPage.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminCreateStylist from "./pages/admin/AdminCreateStylist.jsx";
 import AdminEditStylist from "./pages/admin/AdminEditStylist.jsx";
+import AdminAddServicesStylist from "./pages/admin/AdminAddServiceStylist.jsx"
 import NotFound from "./pages/NotFound.jsx";
 import CustomAlert from "./components/common/CustomAlert.jsx";
 
@@ -32,7 +33,8 @@ const App = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/createstylist" element={<AdminCreateStylist />} />
-        <Route path="/editstylist/:stylistId" element={<AdminEditStylist />} />
+        <Route path="/editservices/:stylistId" element={<AdminEditStylist />} />
+        <Route path="/addservices/:stylistId" element={<AdminAddServicesStylist />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/preise" element={<Preise />} />
         <Route path="/produkte" element={<Produkte />} />

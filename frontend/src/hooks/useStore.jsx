@@ -121,6 +121,20 @@ const useStore = create((set, get) => ({
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
         }
     },
+    addServiceToStylist: async(formData, stylistId) => {
+        try {
+            const config = {headers: {Authorization: 'Bearer ' + get().token}}
+            const response = await axios.post(APIURL + `/admin/stylist/${stylistId}/services`, formData, config)
+            if (!response) {
+                return false;
+            }
+            await get().adminRefreshMe();
+            return true;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
+        }
+    },
     changeStatusStylist: async(stylist) => {
         try {
             const config = {headers: {Authorization: 'Bearer ' + get().token}}

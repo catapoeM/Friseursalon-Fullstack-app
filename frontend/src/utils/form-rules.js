@@ -74,7 +74,7 @@ export const createStylistRules = {
     }
 }
 
-export const editServicesRules = {
+export const servicesRules = {
     serviceName: {
         required: 'Service Name is required',
         minLength: {
