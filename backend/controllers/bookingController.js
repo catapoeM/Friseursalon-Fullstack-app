@@ -44,33 +44,36 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
         }
         // Phone und Email aus req.matchedData rausholen
-        const {stylistId, serviceId} = req.matchedData;
+        const {serviceId} = req.matchedData;
+        const {id} = req.params;
         // 1️ Basic validation
-        if (!stylistId || !serviceId) {
+        if (!id || !serviceId) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
         // 2️ Find stylist
-        const stylist = await Stylist.findById(stylistId);
+        const stylist = await Stylist.findById(id);
+        console.log(stylist, ' stylist')
         if (!stylist) {
             return res.status(404).json({ error: "Stylist not found" });
         }
         // 3️ Find service inside stylist
         const service = stylist.services.id(serviceId);
+        console.log(service, ' service')
         if (!service) {
             return res.status(404).json({ error: "Service not found for this stylist" });
         }
 
         // 4️ Optional: check if time slot is already booked
         const existingBooking = await Bookings.findOne({
-            stylistId,
-            date
+            id
         });
 
         if (existingBooking) {
             return res.status(409).json({ error: "Time slot already booked" });
         }
         const objData = req.matchedData;
+        objData.stylistId = id;
 
         // Wenn nicht gefunden, dann im Session speichern
         // Speichert in Session

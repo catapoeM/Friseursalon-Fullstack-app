@@ -11,7 +11,7 @@ import { checkValidation, createVisitorId } from '../middlewares/middlewares.js'
 const router = express.Router();
 
 // Create booking as visitor
-router.post('/create',
+router.post('/:id/create',
     body('firstName')
         .trim()
         .escape()
@@ -44,7 +44,6 @@ router.post('/create',
         .custom(durationValid)
         .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
     body('serviceId'),
-    body('stylistId'),
     body('clientType')
         .isIn(['Woman', 'Man', 'Child'])
         .withMessage('Ungültiger Client typ'),
