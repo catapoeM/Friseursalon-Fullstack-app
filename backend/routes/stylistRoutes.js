@@ -1,10 +1,10 @@
 import express from 'express';
-import { getStylistsWithServices, getAvailability } from '../controllers/stylistController.js';
+import { getStylistsWithServices, getStylistBookings } from '../controllers/stylistController.js';
 
 const router = express.Router();
 
 router.get('/', getStylistsWithServices);
 
-router.get('/:stylistId/availability', getAvailability)
+router.get('/:id', getStylistBookings)
 
 export default router;
