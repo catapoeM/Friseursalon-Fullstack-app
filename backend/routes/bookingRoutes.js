@@ -1,5 +1,5 @@
 import express from 'express';
-import {createBooking, editBookingPut, cancelBooking,
+import {createBooking, editBookingGet, editBookingPut, cancelBooking,
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body, param, query } from 'express-validator';
 
@@ -69,6 +69,10 @@ router.post('/:id/create',
     createVisitorId,
     createBooking
 );
+
+router.get('/:id/edit',
+    editBookingGet
+)
 
 // Change the booking
 router.put('/:id/edit',

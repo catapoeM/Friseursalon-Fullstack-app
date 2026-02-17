@@ -27,11 +27,12 @@ import FaceIconMan from '@mui/icons-material/Face';
 import FaceIconWoman from '@mui/icons-material/Face3';
 import ChildIcon from '@mui/icons-material/ChildCare';
 
+
 const StylistServices = () => {
     const navigate = useNavigate()
     const {stylistId} = useParams() 
     const [stylist, setStylist] = useState([]);
-    const [selectedServices, setSelectedServices] = useState([]);
+    const [selectedServicesIds, setselectedServicesIds] = useState([]);
 
     useEffect(() => {
         const stored = sessionStorage.getItem('stylists');
@@ -47,29 +48,38 @@ const StylistServices = () => {
         }
     }, [stylistId])
 
-    const handleToggle = (index) => {
-        setSelectedServices((prev) =>
-        prev.includes(index)
-            ? prev.filter((i) => i !== index)
-            : [...prev, index]
+    const handleToggle = (serviceId) => {
+        setselectedServicesIds((prev) => 
+        Array.isArray(prev)
+        ?   prev.includes(serviceId)
+                ? prev.filter((id) => id !== serviceId)
+                : [...prev, serviceId]
+                :[serviceId]
         );
     };
 
-    const selected = selectedServices.map((index) => 
-        stylist?.services?.[index]).filter(Boolean);
+    useEffect(() => {
+        console.log(selectedServicesIds, ' selectedServicesIds')
+    }, [selectedServicesIds])
 
-    const totalPrice = selected.reduce(
-        (sum, s) => sum + s.price,
-        0
-    );
+    const services = stylist?.services ?? [];
+
+    const selected = services.filter(service =>
+        selectedServicesIds.includes(service._id)
+    )
 
     const totalDuration = selected.reduce(
-        (sum, s) => sum + s.duration,
+        (sum, service) => sum + service.duration,
         0
     );
 
-    const toCalendar = (services) => {
-        sessionStorage.setItem('stylistCalendarServices', JSON.stringify(services))
+    const totalPrice = selected.reduce(
+        (sum, service) => sum + service.price,
+        0
+    );
+
+    const toCalendar = (selectedIds) => {
+        sessionStorage.setItem('stylistCalendarServices', JSON.stringify(selectedIds))
         navigate('/calendar/' + stylistId)
     }
 
@@ -147,14 +157,14 @@ const StylistServices = () => {
                                 Services <ContentCutIcon/>
                             </Typography>
                             <List>
-                                {stylist?.services?.map((service, index) => (
+                                {stylist?.services?.map((service) => (
                                 <ListItem 
-                                    key={index}
+                                    key={service._id}
                                     secondaryAction={
                                     <Checkbox
                                         edge="end"
-                                        onChange={() => handleToggle(index)}
-                                        checked={selectedServices.includes(index)}
+                                        onChange={() => handleToggle(service._id)}
+                                        checked={selectedServicesIds.includes(service._id)}
                                     />
                                     }
                                     disablePadding
@@ -189,7 +199,7 @@ const StylistServices = () => {
                                 </ListItem>
                                 ))}
                                 <Stack spacing={1} width="100%">
-                                    <Button variant="outlined" onClick={() => {toCalendar(selectedServices)}}>
+                                    <Button variant="outlined" onClick={() => {toCalendar(selectedServicesIds)}}>
                                         Go to calendar
                                     </Button>
                                 </Stack>
