@@ -10,8 +10,30 @@ const getStylistsWithServices = async (req, res) => {
     }
 } 
 
-const getAvailability = async (req, res) => {
-    
+const getStylistBookings = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const stylistActive = await Stylist.findOne({
+            _id: id,
+            isActive: true
+        })
+
+        if (!stylistActive) {
+            return res.status(500).json({ error: "Stylist inactive" });
+        }
+        const stylistBookings = await Bookings.find({ 
+            stylistId: id,
+            isCanceled: false
+        });
+        console.log( stylistBookings)
+        if (!stylistBookings) {
+            return res.status(500).json({ error: "Failed to fetch the services of the stylist" });
+        }
+        res.json(stylistBookings);
+    }   catch(error) {
+        res.status(500).json({ error: "Failed to fetch stylists" });
+    }
 }
 
-export {getStylistsWithServices, getAvailability}
+export {getStylistsWithServices, getStylistBookings}

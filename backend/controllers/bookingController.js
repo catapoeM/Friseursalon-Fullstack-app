@@ -39,10 +39,13 @@ const createBooking = async (req, res) => {
         const foundBookings = await Bookings.findOne({
             $or: [{phone}, {email}]
         })
+        const now = new Date();
         // Wenn true dann man muss die Buchung ändern
-        if (foundBookings || (foundBookings && !foundBookings.isCanceled)) {
+        
+        if (foundBookings && (!foundBookings.isCanceled || now < foundBookings.end)) {
             return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
         }
+        
         // Phone und Email aus req.matchedData rausholen
         const {serviceId} = req.matchedData;
         const {id} = req.params;
@@ -138,10 +141,13 @@ const editBookingPut = async (req, res) => {
             return res.status(403).send("Invalid code! PUT");
         }
 
+        const stylist = await Stylist.findById(booking.stylistId);
+        const service = stylist.services.find(booking.serviceId)
+
         booking.start = data.start;
         booking.end = data.end;
-        booking.service = data.service;
-        booking.stylist = data.stylist;
+        booking.serviceId = data.serviceId;
+        booking.stylistId = data.stylistId;
 
         const humanReadableDateAndTimeStart = formatDateTimeUTC(booking.start, 'de-DE');
         //const humanReadableDateAndTimeEnd = formatDateTimeUTC(booking.end, 'de-DE');
@@ -152,7 +158,7 @@ const editBookingPut = async (req, res) => {
             subject: "Booking EDITED!",
             html: `<p> ${booking.firstName} ${booking.lastName}, your booking has been edited successfully </p> 
                     <p> Your new booking details: You have a new booking: ${humanReadableDateAndTimeStart} which will take: "" hours.</p> 
-                    <p> For the service: ${booking.service}  with the stylist: ${booking.stylist} </p>
+                    <p> For the service: ${service.serviceName}  with the stylist: ${stylist.name} </p>
                 </p>`
         }
         // Anrufen die Funktion, um die Email an den Client zu schicken
