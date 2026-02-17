@@ -14,7 +14,7 @@ const bookingsSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       required: true
     },
-    clientTypeId: {type: String, required: true},
+    clientType: {type: String, required: true},
     phone: {type: String, required: true, unique: true},
     email: {type: String, required: true, unique: true},
     clientAdditionalNotes: {type: String},

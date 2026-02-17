@@ -13,7 +13,7 @@ const TimelineCalendar = () => {
 
     const handleValueChanged = (newValue) => {
         setValue(newValue);
-        console.log(newValue, ' new val')
+        console.log(newValue.toDate(), ' new val')
     }
 
     return (
