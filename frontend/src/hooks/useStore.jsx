@@ -10,7 +10,8 @@ const initialState = {
     token: null,
     decodedToken: null,
     alertProps: null,
-    confirmProps: null
+    confirmProps: null,
+    userBooking: null
 }
 
 const useStore = create((set, get) => ({
@@ -155,6 +156,19 @@ const useStore = create((set, get) => ({
         } catch (error) {
             // TODO: Snackbar/Alert ausgeben
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
+        }
+    },
+    getStylistBookings: async(stylistId) => {
+        try {
+            console.log(stylistId)
+            const response = await axios.get(APIURL + '/stylists/' + stylistId)
+            if (!response) {
+                return false;
+            }
+            return response;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Get stylist free slots not working', text: error.message})
         }
     },
     raiseAlert: (newProps) => {

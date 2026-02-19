@@ -30,7 +30,7 @@ const getStylistBookings = async (req, res) => {
         if (!stylistBookings) {
             return res.status(500).json({ error: "Failed to fetch the services of the stylist" });
         }
-        res.json(stylistBookings);
+        res.status(200).json(stylistBookings);
     }   catch(error) {
         res.status(500).json({ error: "Failed to fetch stylists" });
     }
