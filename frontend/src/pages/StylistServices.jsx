@@ -27,26 +27,28 @@ import FaceIconMan from '@mui/icons-material/Face';
 import FaceIconWoman from '@mui/icons-material/Face3';
 import ChildIcon from '@mui/icons-material/ChildCare';
 
+import { calculateTotals } from "../utils/booking";
+
 
 const StylistServices = () => {
     const navigate = useNavigate()
     const {stylistId} = useParams() 
-    const [stylist, setStylist] = useState([]);
     const [selectedServicesIds, setselectedServicesIds] = useState([]);
+    
+    const [stylist, setStylist] = useState(() => {
+        const saved = sessionStorage.getItem('stylists');
 
-    useEffect(() => {
-        const stored = sessionStorage.getItem('stylists');
+        const stylists = JSON.parse(saved)
+        
+        const foundStylist = stylists.find(s => s._id === stylistId)
+        
+        return foundStylist ? foundStylist : []
+    });
 
-        if (stored) {
-            const stylists = JSON.parse(stored);
-            const found = stylists.find(s => s._id === stylistId)
-
-            if (found) {
-                setStylist(found);
-                return;
-            }
-        }
-    }, [stylistId])
+    const {totalDuration, totalPrice } = calculateTotals(
+        stylist?.services ?? [],
+        selectedServicesIds
+    );
 
     const handleToggle = (serviceId) => {
         setselectedServicesIds((prev) => 
@@ -59,27 +61,16 @@ const StylistServices = () => {
     };
 
     useEffect(() => {
-        console.log(selectedServicesIds, ' selectedServicesIds')
+        console.log(selectedServicesIds)
+        sessionStorage.setItem('totalDuration', JSON.stringify(totalDuration))
+        sessionStorage.setItem('totalPrice', JSON.stringify(totalPrice))
+        sessionStorage.setItem('selectedServicesIds', JSON.stringify(selectedServicesIds))
     }, [selectedServicesIds])
 
-    const services = stylist?.services ?? [];
+    
+   
 
-    const selected = services.filter(service =>
-        selectedServicesIds.includes(service._id)
-    )
-
-    const totalDuration = selected.reduce(
-        (sum, service) => sum + service.duration,
-        0
-    );
-
-    const totalPrice = selected.reduce(
-        (sum, service) => sum + service.price,
-        0
-    );
-
-    const toCalendar = (selectedIds) => {
-        sessionStorage.setItem('stylistCalendarServices', JSON.stringify(selectedIds))
+    const toCalendar = () => {
         navigate('/calendar/' + stylistId)
     }
 
