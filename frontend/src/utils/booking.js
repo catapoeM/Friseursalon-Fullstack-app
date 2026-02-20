@@ -1,19 +1,4 @@
-const calculateTotals = (services, selectedServicesIds) => {
-    const selected = services.filter(service =>
-        selectedServicesIds.includes(service._id)
-    )
-    
-    const totalDuration = selected.reduce(
-        (sum, service) => sum + service.duration,
-        0
-    );
 
-    const totalPrice = selected.reduce(
-        (sum, service) => sum + service.price,
-        0
-    );
-    return {totalDuration, totalPrice}
-}
 
 const minutesToHours = (minutes) => {
     let hours = Math.floor(minutes / 60);
@@ -24,12 +9,14 @@ const minutesToHours = (minutes) => {
     return hours
 }
 
-const getHourOutOfFullyDate = (date) => {
-    const dateObj = new Date(date);
-
-    // Get HH (24h format)
-    const hh = dateObj.toISOString().split("T")[1].slice(0,2);
-    return hh;
+const extractHourFromDate = (array, key) => {
+    return array
+        .filter(obj => typeof obj[key] === "string")
+        .map(obj => {
+            const date = new Date(obj[key]);
+            return date.toISOString().slice(11, 13);
+        }).toSorted((a, b) => a - b)
+    
 }
 
 const getYearMonthDayOutOfFullyDate = (date) => {
@@ -40,4 +27,14 @@ const getYearMonthDayOutOfFullyDate = (date) => {
     return yyyyMmDd;
 }
 
-export {calculateTotals, minutesToHours, getHourOutOfFullyDate, getYearMonthDayOutOfFullyDate}
+const filterByDateKey = (array, key, targetDate) => {
+    return array.filter(obj => {
+        if (!obj[key]) {
+            return false;
+        }
+        const dateOnly = obj[key].split("T")[0];
+        return dateOnly === targetDate;
+    });
+}
+
+export { minutesToHours, extractHourFromDate, getYearMonthDayOutOfFullyDate, filterByDateKey}
