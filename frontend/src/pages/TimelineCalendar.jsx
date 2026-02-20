@@ -4,10 +4,12 @@ import { LocalizationProvider, DateCalendar } from '@mui/x-date-pickers';
 import { Box, Stack, Typography, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSessionStorageState } from '../hooks/useStorageState';
-import {minutesToHours, getHourOutOfFullyDate, getYearMonthDayOutOfFullyDate} from '../utils/booking'
-import { areNumbersConsecutive } from '../hooks/helperFunctions';
 import useStore from '../hooks/useStore';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import {minutesToHours, filterByDateKey, extractHourFromDate, getYearMonthDayOutOfFullyDate} from '../utils/booking'
+import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray } from '../hooks/helperFunctions';
+
 
 const TimelineCalendar = () => {
     const {getStylistBookings, raiseAlert} = useStore((state) => state)
@@ -22,35 +24,48 @@ const TimelineCalendar = () => {
     const [selectedServicesIds, setselectedServicesIds] = useSessionStorageState("selectedServicesIds", [])
     const [totalDuration, setTotalDuration] = useSessionStorageState("totalDuration", 0)
     const [totalPrice, setTotalPrice] = useSessionStorageState("totalPrice", 0)
+    const [keysAndValues, setKeysAndValues] = useState([])
+    
+    const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10)) 
+    const [dbData, setDbData] = useState(null)
 
-    const getAsyncData = async() => {
-        const response = await getStylistBookings(stylistId);
-        if (!response) {
-            // custom alert
-            return raiseAlert({
-                title: 'Fast geschafft...', 
-                text: 'The free slots of the stylist cannot updated',
-                severity: 'warning'
-            })
-        }
-        console.log(response.data, ' response')
-        const keysToGet = ["start", "end"]
+    
 
-        const extracted = response.data.map(obj => {
-            let result = {};
-            keysToGet.forEach(key => {
-                if (obj.hasOwnProperty(key)) {
-                result[key] = obj[key];
-                }
-            });
-            return result;
-        });
-        console.log(extracted, 'extracted')
-    }
     useEffect( () => {
+        const getAsyncData = async() => {
+            const response = await getStylistBookings(stylistId);
+            if (!response) {
+                // custom alert
+                raiseAlert({
+                    title: 'Fast geschafft...', 
+                    text: 'The free slots of the stylist cannot be updated',
+                    severity: 'warning'
+                })
+                return
+            }
+            setDbData(response.data);
+        }
+
+        getAsyncData()
+    }, [selectedDate, stylistId])
+
+    useEffect(() => {
+        if (!dbData) {
+            return
+        }
+        const keysToGet = ["start", "end"];
+        const todayAppointments = filterByDateKey(dbData, "start", selectedDate.format("YYYY-MM-DD"))
+        const startEnd = extractKeysValuesFromArrayOfObjects(keysToGet, todayAppointments)
+        // Its making the array shorter, because we will need only the start and the end for the next step
+        const startHours = extractHourFromDate(startEnd, "start")
+        const endHours = extractHourFromDate(startEnd, "end")
         
-        getAsyncData();
-    }, [selectedDate])
+        const initialHours = Array.from({length: 9}, (_, index) => index + 10)
+
+        const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
+        
+        setButtonHours(freeHours)
+    }, [dbData, selectedDate])
 
     useEffect(() => {
         const hours = minutesToHours(totalDuration)
@@ -70,8 +85,7 @@ const TimelineCalendar = () => {
                 : [...prev, hour]
         )
     }
-
-    const buttonHours = Array.from({length: 9}, (_, index) => index + 10)
+    
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -109,7 +123,7 @@ const TimelineCalendar = () => {
                         {   checkConsecutiveNumbers 
                         ?
                         <Typography variant='h6' color='black'>
-                            You have to choose a maximum of {countHoursLeft}h consecutive!
+                            For your service you need to choose a maximum of {countHoursLeft}h consecutive!
                         </Typography> 
                         :
                         <Typography variant='h6' color='red'>

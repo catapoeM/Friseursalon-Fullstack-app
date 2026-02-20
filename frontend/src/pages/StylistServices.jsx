@@ -27,7 +27,7 @@ import FaceIconMan from '@mui/icons-material/Face';
 import FaceIconWoman from '@mui/icons-material/Face3';
 import ChildIcon from '@mui/icons-material/ChildCare';
 
-import { calculateTotals } from "../utils/booking";
+import { calculateTotals } from "../hooks/helperFunctions";
 
 
 const StylistServices = () => {
