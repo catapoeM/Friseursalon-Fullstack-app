@@ -63,7 +63,7 @@ const TimelineCalendar = () => {
         const initialHours = Array.from({length: 9}, (_, index) => index + 10)
 
         const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
-        
+
         setButtonHours(freeHours)
     }, [dbData, selectedDate])
 

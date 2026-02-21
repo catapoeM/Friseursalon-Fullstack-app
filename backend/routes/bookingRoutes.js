@@ -25,24 +25,32 @@ router.post('/:id/create',
         .withMessage('Nachname darf nicht leer sein')
         .isLength({min: 2, max: 50})
         .withMessage('Nachname muss mindestens 2 und maximum 50 Zeichen lang sein'),
-    body('start')
+    body('date')
         .notEmpty()
-        .isISO8601()
-        .toDate()
-        .withMessage("Start must be a valid date.")
-        .custom(startAtLeastTwoHoursAhead)
-        .custom(startOnValidWeekday)
-        .custom(startWithinHours)
-        .withMessage("Start mind. +2 Stunden in Zukunft; Nur Dienstag–Freitag; Arbeitszeit 10–19 Uhr"),
-    body('end')
+        .matches(/^\d{4}-\d{2}-\d{2}$/)
+        .withMessage('Datum muss im Format YYYY-MM-DD sein')
+        .custom(value => {
+        const [y, m, d] = value.split('-').map(Number);
+        const date = new Date(Date.UTC(y, m - 1, d));
+        if (isNaN(date.getTime())) throw new Error('Ungültiges Datum');
+            return true;
+        }),
+    body('startHour')
         .notEmpty()
-        .isISO8601()
-        .toDate()
-        .withMessage("End must be a valid date.")
-        .custom(endWithinHours)
-        .custom(endNotAfter19)
-        .custom(durationValid)
-        .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
+        .isFloat({ min: 0, max: 23.5 })
+        .withMessage('startHour muss eine Zahl zwischen 0 und 23.5 sein')
+        .custom(value => value % 0.5 === 0)
+        .withMessage('startHour darf nur volle oder halbe Stunden sein'),
+    body('endHour')
+        .notEmpty()
+        .isFloat({ min: 0.5, max: 24 })
+        .withMessage('endHour muss eine Zahl zwischen 0.5 und 24 sein')
+        .custom(value => value % 0.5 === 0)
+        .withMessage('endHour darf nur volle oder halbe Stunden sein')
+        .custom((value, { req }) => {
+        if (value <= req.body.startHour) throw new Error('endHour muss größer als startHour sein');
+            return true;
+        }),
     body('serviceId'),
     body('clientType')
         .isIn(['Woman', 'Man', 'Child'])
@@ -65,6 +73,18 @@ router.post('/:id/create',
         .isString()
         .isLength({min:10, max: 100})
         .withMessage('Mindestens 10 Buchstaben, maximal 100'),
+    // Confirmed field
+    body('confirmed')
+        .optional() // not required
+        .isBoolean()
+        .withMessage('confirmed must be a boolean')
+        .toBoolean(), // converts "true"/"false" strings to boolean
+    // isCanceled field
+    body('isCanceled')
+        .optional()
+        .isBoolean()
+        .withMessage('isCanceled must be a boolean')
+        .toBoolean(),
     checkValidation,
     createVisitorId,
     createBooking
@@ -76,37 +96,33 @@ router.get('/:id/edit',
 
 // Change the booking
 router.put('/:id/edit',
-    body('start')
-        .isISO8601()
-        .toDate()
-        .withMessage("Start must be a valid date.")
-        .custom(startAtLeastTwoHoursAhead)
-        .custom(startOnValidWeekday)
-        .custom(startWithinHours)
-        .withMessage("Start mind. +2 Stunden in Zukunft; Nur Dienstag–Freitag; Arbeitszeit 10–19 Uhr"),
-    body('end')
-        .isISO8601()
-        .toDate()
-        .withMessage("End must be a valid date.")
-        .custom(endWithinHours)
-        .custom(endNotAfter19)
-        .custom(durationValid)
-        .withMessage("End max. +3 Stunden nach Start; Min. 1 Stunde Termin; Arbeitszeit 10–19 Uhr; End darf 19:00 nicht überschreiten"),
-    body('service')
-        .isIn(['Haarschnitt', 'Färben', 'Styling', 'Bartpflege'])
-        .withMessage('Ungültiger Service'),
-    body('stylist')
-        .isIn(['Catalina', 'Cristian'])
-        .withMessage('Ungültiger Stylist'),   
-    body('clientAdditionalNotes')
-        .optional()
-        .trim()
-        .escape()
-        .isString()
-        .isLength({min:10, max: 100})
-        .withMessage('Mindestens 10 Buchstaben, maximal 100'),
+    body('date')
+        .notEmpty()
+        .matches(/^\d{4}-\d{2}-\d{2}$/)
+        .withMessage('Datum muss im Format YYYY-MM-DD sein')
+        .custom(value => {
+        const [y, m, d] = value.split('-').map(Number);
+        const date = new Date(Date.UTC(y, m - 1, d));
+        if (isNaN(date.getTime())) throw new Error('Ungültiges Datum');
+            return true;
+        }),
+    body('startHour')
+        .notEmpty()
+        .isFloat({ min: 0, max: 23.5 })
+        .withMessage('startHour muss eine Zahl zwischen 0 und 23.5 sein')
+        .custom(value => value % 0.5 === 0)
+        .withMessage('startHour darf nur volle oder halbe Stunden sein'),
+    body('endHour')
+        .notEmpty()
+        .isFloat({ min: 0.5, max: 24 })
+        .withMessage('endHour muss eine Zahl zwischen 0.5 und 24 sein')
+        .custom(value => value % 0.5 === 0)
+        .withMessage('endHour darf nur volle oder halbe Stunden sein')
+        .custom((value, { req }) => {
+        if (value <= req.body.startHour) throw new Error('endHour muss größer als startHour sein');
+            return true;
+        }),
     checkValidation,
-    createVisitorId,
     editBookingPut
 );
 
@@ -134,7 +150,7 @@ router.post('/request-code',
         createVisitorId, requestCode);
 
 // Verify code for the visitor to its booking
-router.post('/verify-code',
+router.patch('/verify-code',
     body('verifyCode')
         .trim()
         .notEmpty()
