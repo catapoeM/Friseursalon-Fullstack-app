@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const bookingsSchema = new mongoose.Schema({
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
-    start: {type: Date, required: true},
-    end: {type: Date, required: true},
+    date: {type: Date, required: true},
+    startHour: {type: Number, required: true},
+    endHour: {type: Number, required: true},
     stylistId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Stylist',
@@ -18,9 +19,8 @@ const bookingsSchema = new mongoose.Schema({
     phone: {type: String, required: true},
     email: {type: String, required: true},
     clientAdditionalNotes: {type: String},
-    code: {type: String, required: true},
-    isCanceled: {type: Boolean, required: true},
-    expiresAt: {type: Date, required: true},
+    confirmed: {type: Boolean, default: false},
+    isCanceled: {type: Boolean, default: false},
 }, {timestamps: true});
 
 const UserVerificationSchema = new mongoose.Schema({
@@ -31,7 +31,9 @@ const UserVerificationSchema = new mongoose.Schema({
 
 // Automatisch löschen, wenn abgelaufen (MongoDB TTL index)
 UserVerificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-bookingsSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+bookingsSchema.index(
+  {createdAt: 1}, {expireAfterSeconds: 300, partialFilterExpression: {confirmed: false}}
+);
 
 const Bookings = mongoose.model("Bookings", bookingsSchema);
 const UserVerification = mongoose.model("Visitor", UserVerificationSchema);

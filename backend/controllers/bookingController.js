@@ -4,6 +4,7 @@ import { createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, cryp
      decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
 import {getToken} from "../common/index.js";
 import dotenv from 'dotenv';
+import { bookingExists } from "../services/booking.js";
 
 dotenv.config();
 
@@ -34,8 +35,12 @@ const getMyBookings = async (req, res) => {
 const createBooking = async (req, res) => {
     try {
         // Phone und Email aus req.matchedData rausholen
-        const {phone, email} = req.matchedData;
+        const {phone, email, date, startHour, endHour} = req.matchedData;
         // Suche in DB, ob es eine Buchung mit dem Phone oder Email gibt
+        // Phone und Email aus req.matchedData rausholen
+        const {serviceId} = req.matchedData;
+        const {id} = req.params;
+
         const foundBookings = await Bookings.findOne({
             $or: [{phone}, {email}]
         })
@@ -46,9 +51,6 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
         }
         
-        // Phone und Email aus req.matchedData rausholen
-        const {serviceId} = req.matchedData;
-        const {id} = req.params;
         // 1️ Basic validation
         if (!id || !serviceId) {
             return res.status(400).json({ error: "Missing required fields" });
@@ -56,23 +58,17 @@ const createBooking = async (req, res) => {
 
         // 2️ Find stylist
         const stylist = await Stylist.findById(id);
-        console.log(stylist, ' stylist')
         if (!stylist) {
             return res.status(404).json({ error: "Stylist not found" });
         }
         // 3️ Find service inside stylist
         const service = stylist.services.id(serviceId);
-        console.log(service, ' service')
         if (!service) {
             return res.status(404).json({ error: "Service not found for this stylist" });
         }
 
-        // 4️ Optional: check if time slot is already booked
-        const existingBooking = await Bookings.findOne({
-            id
-        });
-
-        if (existingBooking) {
+        const exists = await bookingExists(id, date, startHour, endHour)
+        if (exists) {
             return res.status(409).json({ error: "Time slot already booked" });
         }
         const objData = req.matchedData;
@@ -81,14 +77,17 @@ const createBooking = async (req, res) => {
         // Wenn nicht gefunden, dann im Session speichern
         // Speichert in Session
         // Vorher muss man nur encrypted objData in Session speichern
-        console.log(objData, ' objData')
-        const encryptedData = encryptObject(objData);
+        
+        const bookingSaved = await Bookings.create(objData);
+        console.log(bookingSaved, ' bookingSaved')
+        const encryptedData = encryptObject(bookingSaved);
         req.session.booking = encryptedData;
         console.log(req.session.booking, ' req.session.booking (Encrypted)')
-        console.log(req.baseUrl)
+        console.log(req.baseUrl) 
+        
         // Weiterleiten zur Code-Anfrage
         //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
-        res.send(req.session)
+        res.send(bookingSaved)
     } catch (error) {
         if (error.code === 11000) {
             const field = Object.keys(error.keyValue)[0];
@@ -141,15 +140,14 @@ const editBookingPut = async (req, res) => {
             return res.status(403).send("Invalid code! PUT");
         }
 
-        const stylist = await Stylist.findById(booking.stylistId);
-        const service = stylist.services.find(booking.serviceId)
+        const exists = await bookingExists(id, data.date, data.startHour, data.endHour)
+        if (exists) {
+            return res.status(409).json({ error: "Time slot already booked. Please pick another time" });
+        }
 
-        booking.start = data.start;
-        booking.end = data.end;
-        booking.serviceId = data.serviceId;
-        booking.stylistId = data.stylistId;
+        booking.start = data.startHour;
+        booking.end = data.endHour;
 
-        const humanReadableDateAndTimeStart = formatDateTimeUTC(booking.start, 'de-DE');
         //const humanReadableDateAndTimeEnd = formatDateTimeUTC(booking.end, 'de-DE');
         await booking.save();
         const emailContent = {
@@ -157,8 +155,7 @@ const editBookingPut = async (req, res) => {
             to: process.env.NODEMAILER_USER,
             subject: "Booking EDITED!",
             html: `<p> ${booking.firstName} ${booking.lastName}, your booking has been edited successfully </p> 
-                    <p> Your new booking details: You have a new booking: ${humanReadableDateAndTimeStart} which will take: "" hours.</p> 
-                    <p> For the service: ${service.serviceName}  with the stylist: ${stylist.name} </p>
+                    <p> Your new booking details: You have a new booking: ${data.date} which will be from ${data.startHour}  to ${data.endHour} .</p> 
                 </p>`
         }
         // Anrufen die Funktion, um die Email an den Client zu schicken
@@ -178,6 +175,7 @@ const cancelBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const { code } = req.query;
+        const {clientAdditionalNotes} = req.matchedData;
 
         const booking = await Bookings.findById(id);
         if (!booking || booking.isCanceled) {
@@ -189,6 +187,7 @@ const cancelBooking = async (req, res) => {
         }
 
         booking.isCanceled = true;
+        booking.clientAdditionalNotes = clientAdditionalNotes
         await booking.save();
         const emailContent = {
             from: '"Test" <test@example.com>',
@@ -216,7 +215,7 @@ const requestCode = async (req, res) => {
             const objData = decryptObject(req.session.booking);
             console.log(objData, ' obj data!!!');
             const email = objData.email;
-            console.log(email, ' email!!! from the obj data')
+            console.log(email, ' User email!!! from the obj data')
             const code = randomNumber();
             const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
 
@@ -226,7 +225,7 @@ const requestCode = async (req, res) => {
                 subject: "Your verification code",
                 text: `Code: ${code}. Valid for 5 minutes.`
             }
-            // Anrufen die Funktion, um die Email an den Client zu schicken
+            // Anrufen die Funktion, um die bookingId an den Client zu schicken
             const emailSent = await createEmailAndSend(emailContent);
             // bcrypt the code before saving in DB          
             if (emailSent) {
@@ -264,12 +263,9 @@ const verifyCode = async (req, res) => {
     try {
         if (req && req.session && req.session.booking) {
             const objData = decryptObject(req.session.booking);
-            console.log(objData, ' obj data+++')
             const email = objData.email;
+            const bookingId = objData._id;
             const userVerificationCode = await UserVerification.findOne({email});
-            console.log(userVerificationCode, ' userVerificationCode');
-            const expiresAt = fromStringToDatePlusExtraHours(objData.end, 24);
-            objData.expiresAt = expiresAt;
             // Token erzeugen mit ID des Members
             const token = getToken(objData, process.env.JWT_SECRET, '24h');
             if (userVerificationCode && token) {
@@ -280,33 +276,54 @@ const verifyCode = async (req, res) => {
                 const codeHashed = getHash(codeCrypted);
                 objData.code = codeHashed;
                 objData.isCanceled = false;
-                const bookingSaved = await Bookings.create(objData);
-                const bookingCancelLink = bookingEditLink + bookingSaved._id + "/cancel?code=" + codeCrypted;
-                bookingEditLink += bookingSaved._id + "/edit?code=" + codeCrypted;
-                //Löscht jeden Code der im DB befindet mit dem Email
-                await UserVerification.where(email).deleteMany();
-                delete req.session.booking;
-                const humanReadableDateAndTimeStart = formatDateTimeUTC(objData.start, 'de-DE');
-                //const humanReadableDateAndTimeEnd = formatDateTimeUTC(objData.end, 'de-DE');
-                const emailContent = {
-                    from: '"Test" <test@example.com>',
-                    to: process.env.NODEMAILER_USER,
-                    subject: "Booking confirmation!",
-                    html: `<p> ${objData.firstName} ${objData.lastName}, your booking has been created successfully </p> 
-                            <p> Your booking details:  You have a booking: ${humanReadableDateAndTimeStart} which will take: "" hours.</p> 
-                            <p> For the service: ${objData.service}  with the stylist: ${objData.stylist} </p> 
-                            <p>
-                                <strong>Edit your booking:</strong><br>
-                                <a href="${bookingEditLink}" target="_blank">${bookingEditLink}</a>
-                            </p>
-                            <p>
-                                <strong>Cancel your booking:</strong><br>
-                                <a href="${bookingCancelLink}" target="_blank">${bookingCancelLink}</a>
-                            </p>`
+
+                const booking = await Bookings.findById(bookingId);
+                if (!booking || booking.isCanceled) {
+                    return res.status(404).json({error: "Booking not found!"})
+                }else if (booking) {
+                    booking.confirmed = true;
+                    await booking.save();
+                    res.status(200).json("Booking has been confirmed! " + booking)
                 }
-                // Anrufen die Funktion, um die Email an den Client zu schicken
-                await createEmailAndSend(emailContent);
-                return res.json('Buchung wurde erfolgreich bestätigt! - ' + bookingSaved + ' Token - ' + token);
+
+                const stylist = await Stylist.findById(booking.stylistId)
+                if (stylist) {
+                    console.log(stylist, ' stylist')
+
+                    const service = stylist.services.find(service => service._id.toString() === booking.serviceId)
+                    const bookingCancelLink = bookingEditLink + bookingId + "/cancel?code=" + codeCrypted;
+                    console.log(service, ' service')
+                    const serviceName = service.serviceName || "Service Name"
+                    const stylistName = stylist.name || "Stylist Name"
+                    bookingEditLink += bookingId + "/edit?code=" + codeCrypted;
+                    //Löscht jeden Code der im DB befindet mit dem Email
+                    await UserVerification.where(email).deleteMany();
+                    delete req.session.booking;
+                    //const humanReadableDateAndTimeEnd = formatDateTimeUTC(objData.end, 'de-DE');
+                    const emailContent = {
+                        from: '"Test" <test@example.com>',
+                        to: process.env.NODEMAILER_USER,
+                        subject: "Booking confirmation!",
+                        html: `<p> ${objData.firstName} ${objData.lastName}, your booking has been created successfully </p> 
+                                <p> Your booking details:  You have a booking: ${objData.date} which will be from ${objData.startHour}  to ${objData.endHour} .</p> 
+                                <p> For the service: ${serviceName} by the stylist: ${stylistName} </p> 
+                                <p>
+                                    <strong>Edit your booking:</strong><br>
+                                    <a href="${bookingEditLink}" target="_blank">${bookingEditLink}</a>
+                                </p>
+                                <p>
+                                    <strong>Cancel your booking:</strong><br>
+                                    <a href="${bookingCancelLink}" target="_blank">${bookingCancelLink}</a>
+                                </p>`
+                    }
+                    // Anrufen die Funktion, um die Email an den Client zu schicken
+                    const isEmailSent = await createEmailAndSend(emailContent);
+                    if (isEmailSent) {
+                        return res.json('Buchung wurde erfolgreich bestätigt! - ' + booking + ' Token - ' + token);
+                    }return res.status(400).json('Buchung konnte nicht bestätigt werden! 1');
+                }
+                res.status(400).json('Buchung konnte nicht bestätigt werden! 2');
+                
     
             }else {
                 return res.json('Booking not found! or not token')

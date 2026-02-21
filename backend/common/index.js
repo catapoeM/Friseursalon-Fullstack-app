@@ -61,7 +61,9 @@ const createEmailAndSend = async (emailContent) => {
         const emailSent = await transporter.sendMail(emailContent);
         
         console.log(emailSent, ' emailContent sent');
-        return true;
+        if (emailSent) {
+            return true;
+        }return false;
     }catch (err) {
         return res.status(500).json({message: err.message});
     }
