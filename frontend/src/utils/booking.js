@@ -9,32 +9,24 @@ const minutesToHours = (minutes) => {
     return hours
 }
 
-const extractHourFromDate = (array, key) => {
+const extractStartEndHours = (array, key) => {
     return array
-        .filter(obj => typeof obj[key] === "string")
+        .filter(obj => typeof obj[key] === "number")
         .map(obj => {
-            const date = new Date(obj[key]);
-            return date.toISOString().slice(11, 13);
+            const number = obj[key];
+            return number
         }).toSorted((a, b) => a - b)
-    
 }
 
-const getYearMonthDayOutOfFullyDate = (date) => {
-    const dateObj = new Date(date);
-
-    // Get HH (YYYY-MM-DD)
-    const yyyyMmDd = dateObj.toISOString().split("T")[0];
-    return yyyyMmDd;
-}
 
 const filterByDateKey = (array, key, targetDate) => {
     return array.filter(obj => {
         if (!obj[key]) {
             return false;
         }
-        const dateOnly = obj[key].split("T")[0];
-        return dateOnly === targetDate;
+        const date = obj[key].split("T")[0];
+        return date === targetDate;
     });
 }
 
-export { minutesToHours, extractHourFromDate, getYearMonthDayOutOfFullyDate, filterByDateKey}
+export { minutesToHours, extractStartEndHours, filterByDateKey}
