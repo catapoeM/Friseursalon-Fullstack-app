@@ -7,7 +7,7 @@ import { useSessionStorageState } from '../hooks/useStorageState';
 import useStore from '../hooks/useStore';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import {minutesToHours, filterByDateKey, extractHourFromDate, getYearMonthDayOutOfFullyDate} from '../utils/booking'
+import {minutesToHours, filterByDateKey, extractStartEndHours} from '../utils/booking'
 import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray } from '../hooks/helperFunctions';
 
 
@@ -53,12 +53,13 @@ const TimelineCalendar = () => {
         if (!dbData) {
             return
         }
-        const keysToGet = ["start", "end"];
-        const todayAppointments = filterByDateKey(dbData, "start", selectedDate.format("YYYY-MM-DD"))
+        const keysToGet = ["startHour", "endHour"];
+        const todayAppointments = filterByDateKey(dbData, "date", selectedDate.format("YYYY-MM-DD"))
         const startEnd = extractKeysValuesFromArrayOfObjects(keysToGet, todayAppointments)
         // Its making the array shorter, because we will need only the start and the end for the next step
-        const startHours = extractHourFromDate(startEnd, "start")
-        const endHours = extractHourFromDate(startEnd, "end")
+        
+        const startHours = extractStartEndHours(startEnd, "startHour")
+        const endHours = extractStartEndHours(startEnd, "endHour")
         
         const initialHours = Array.from({length: 9}, (_, index) => index + 10)
 
