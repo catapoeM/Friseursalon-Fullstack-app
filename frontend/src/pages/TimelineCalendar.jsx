@@ -1,34 +1,40 @@
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DateCalendar } from '@mui/x-date-pickers';
-import { Box, Stack, Typography, Button } from '@mui/material';
+import { Box, Stack, Typography, Button, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSessionStorageState } from '../hooks/useStorageState';
 import useStore from '../hooks/useStore';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 
 import {minutesToHours, filterByDateKey, extractStartEndHours} from '../utils/booking'
-import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray } from '../hooks/helperFunctions';
-
+import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray, sort } from '../hooks/helperFunctions';
+import { emailRules, phoneRules, registerRules } from '../utils/form-rules';
 
 const TimelineCalendar = () => {
     const {getStylistBookings, raiseAlert} = useStore((state) => state)
-    const navigate = useNavigate();
     const {stylistId} = useParams();
+
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState(dayjs(today));
     const [choosenHours, setChoosenHours] = useState([])
-    const [countHoursLeft, setCountHoursLeft] = useState(1)
-    const [checkConsecutiveNumbers, setCheckConsecutiveNumbers] = useState(false)
 
     const [selectedServicesIds, setselectedServicesIds] = useSessionStorageState("selectedServicesIds", [])
     const [totalDuration, setTotalDuration] = useSessionStorageState("totalDuration", 0)
     const [totalPrice, setTotalPrice] = useSessionStorageState("totalPrice", 0)
-    const [keysAndValues, setKeysAndValues] = useState([])
+
     
     const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10)) 
     const [dbData, setDbData] = useState(null)
-
+    
+    const {
+        register,
+        handleSubmit,
+        formState: {errors}
+    } = useForm({
+        mode: 'onChange'
+    });
     
 
     useEffect( () => {
@@ -47,9 +53,6 @@ const TimelineCalendar = () => {
         }
 
         getAsyncData()
-    }, [selectedDate, stylistId])
-
-    useEffect(() => {
         if (!dbData) {
             return
         }
@@ -64,30 +67,33 @@ const TimelineCalendar = () => {
         const initialHours = Array.from({length: 9}, (_, index) => index + 10)
 
         const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
-
+        
         setButtonHours(freeHours)
-    }, [dbData, selectedDate])
-
-    useEffect(() => {
-        const hours = minutesToHours(totalDuration)
-        setCountHoursLeft(hours)
-    },[totalDuration])
-
-    useEffect(()=> {
-        console.log(choosenHours.length, ' choseen h')
-        const trueFalse = areNumbersConsecutive(choosenHours)
-        setCheckConsecutiveNumbers(trueFalse)
-    },[choosenHours])
+    }, [selectedDate, stylistId])
 
     const handleHourClick = (hour) => {
         setChoosenHours(prev => 
             prev.includes(hour)
-                ? prev.filter(h => h !== hour)
-                : [...prev, hour]
+            ? prev.filter(h => h !== hour)
+            : [...prev, hour]
         )
     }
-    
 
+    const totalDurationHours = minutesToHours(totalDuration)
+    const countHoursLeft = totalDurationHours;
+    const checkConsecutiveNumbers = areNumbersConsecutive(choosenHours);
+    const canShowForm = choosenHours.length === countHoursLeft && checkConsecutiveNumbers && countHoursLeft > 0
+
+    const handleCreateBooking = (formData) => {
+        console.log(formData, ' formData')
+        const startEndBookedHour = sort(choosenHours)
+        formData.start = startEndBookedHour[0]
+        formData.end = startEndBookedHour[startEndBookedHour.length - 1]
+        formData.date = selectedDate;
+        console.log(startEndBookedHour[0], ' start booked hour')
+        console.log(startEndBookedHour[startEndBookedHour.length - 1], ' end booked hour')
+    }
+    
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box components={['DateCalendar', 'DateCalendar']}>
@@ -105,7 +111,7 @@ const TimelineCalendar = () => {
                             Available hours for: "{selectedDate.format("YYYY-MM-DD")}"
                         </Typography>
 
-                        <Stack direction="row" spacing={1} flexWrap="wrap" mt={2}>
+                        <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
                             {buttonHours.map((hour) => {
                             const isSelected = choosenHours.includes(hour)
 
@@ -121,26 +127,91 @@ const TimelineCalendar = () => {
                             )
                             })}
                         </Stack>
+                        <Stack spacing={1} mt={1}>
                         {   checkConsecutiveNumbers 
-                        ?
-                        <Typography variant='h6' color='black'>
-                            For your service you need to choose a maximum of {countHoursLeft}h consecutive!
-                        </Typography> 
-                        :
-                        <Typography variant='h6' color='red'>
-                            Please choose consecutive Hours!
-                        </Typography>}
-                        {   choosenHours.length > countHoursLeft
-                        ?
-                        <Typography variant='h6' color='red'>
-                            Please deselect: {choosenHours.length - countHoursLeft}h
-                        </Typography>
-                        :   
-                        <Typography variant='h6' color='black'>
-                            Time choosen: {choosenHours.length}h
-                        </Typography>
+                            ?
+                            <Typography variant='h6' color='black'>
+                                For your service you need to choose a maximum of {countHoursLeft}h consecutive!
+                            </Typography> 
+                            :
+                            <Typography variant='h6' color='red'>
+                                Please choose consecutive Hours!
+                            </Typography>}
+                            {   choosenHours.length > countHoursLeft
+                            ?
+                            <Typography variant='h6' color='red'>
+                                Please deselect: {choosenHours.length - countHoursLeft}h
+                            </Typography>
+                            :   
+                            <Typography variant='h6' color='black'>
+                                Time choosen: {choosenHours.length}h
+                            </Typography>
                         }
+                        </Stack>
                     </Box>
+                )}
+                {    canShowForm &&
+                (
+                    <form onSubmit={handleSubmit(handleCreateBooking)}>
+                        <Stack spacing={1} mt={3}>
+                            <TextField
+                                //defaultValue="cata2@adm.com"
+                                label="Vorname"
+                                {...register('firstName', registerRules.firstName)}
+                                error={!!errors.firstName}
+                                helperText={errors.firstName?.message}
+                                name="firstName"
+                                type="text"
+                                fullWidth
+                            />
+                            <TextField
+                                //defaultValue="cata2@adm.com"
+                                label="Nachname"
+                                {...register('lastName', registerRules.lastName)}
+                                error={!!errors.lastName}
+                                helperText={errors.lastName?.message}
+                                name="lastName"
+                                type="text"
+                                fullWidth
+                            />
+
+                            <TextField
+                                //defaultValue="12345678"
+                                label="Telefonnummer"
+                                {...register('phone', phoneRules)}
+                                error={!!errors.phone}
+                                helperText={errors.phone?.message}
+                                name="phone"
+                                type="phone"
+                                fullWidth
+                            />
+
+                            <TextField
+                                //defaultValue="12345678"
+                                label="E-mail"
+                                {...register('email', emailRules)}
+                                error={!!errors.email}
+                                helperText={errors.email?.message}
+                                name="email"
+                                type="email"
+                                fullWidth
+                            />
+
+                            <TextField
+                                //defaultValue=""
+                                label="Zusätzliche Informationen"
+                                {...register('clientAdditionalNotes', registerRules.clientAdditionalNotes)}
+                                error={!!errors.clientAdditionalNotes}
+                                helperText={errors.clientAdditionalNotes?.message}
+                                name="clientAdditionalNotes"
+                                type="text"
+                                fullWidth
+                            />
+                            <Button type="submit" variant="contained" size="large">
+                                Buchen Sie Jetzt
+                            </Button>
+                        </Stack>
+                    </form>
                 )}
             </Box>
         </LocalizationProvider>

@@ -109,6 +109,79 @@ export const servicesRules = {
     }
 }
 
+export const createBookingRules = {
+    firstName: {
+        required: 'Vorname ist erforderlich',
+        minLength: {
+            value: 2,
+            message: 'Der Vorname muss mindestens 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Der Vorname darf maximal 50 Zeichen lang sein'
+        }
+    },
+    lastName: {
+        required: 'Nachname ist erforderlich',
+        minLength: {
+            value: 2,
+            message: 'Der Nachname muss mindestens 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Der Nachname darf maximal 50 Zeichen lang sein'
+        }
+    },
+    phone: {
+        required: 'Telefonnummer ist erforderlich',
+        minLength: {
+            value: 2,
+            message: 'Die Telefonnummer muss mindestens 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Die Telefonnummer darf maximal 50 Zeichen lang sein'
+        }
+    },
+    email: {
+        required: 'E-Mail-Adresse ist erforderlich',
+        minLength: {
+            value: 2,
+            message: 'Die E-Mail-Adresse muss mindestens 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Die E-Mail-Adresse darf maximal 50 Zeichen lang sein'
+        }
+    },
+    clientAdditionalNotes: {
+        minLength: {
+            value: 10,
+            message: 'Die Beschreibung muss mindestens 10 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 100,
+            message: 'Die Beschreibung darf maximal 100 Zeichen lang sein'
+        }
+    }
+}
+
+export const emailRules = {
+    required: "Email is required",
+    pattern: {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: "Please enter a valid email address",
+    },
+};
+
+export const phoneRules = {
+    required: "Phone number is required",
+    pattern: {
+        value: /^\+?[0-9\s\-()]{7,15}$/,
+        message: "Invalid phone number format",
+    },
+};
+
 export const photoRules = {
     validate: {
         required: (files) =>
