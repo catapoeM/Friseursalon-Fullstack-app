@@ -1,9 +1,14 @@
+const sort = (numbers) => {
+    const sorted = [...numbers].sort((a, b) => a - b);
+    return sorted;
+}
+
 const areNumbersConsecutive = (numbers) => {
     if (numbers.legth <= 1) {
         return true
     }
 
-    const sorted = [...numbers].sort((a, b) => a - b);
+    const sorted = sort(numbers)
 
     for (let i = 1; i < sorted.length; i++) {
         if (sorted[i] !== sorted[i - 1] + 1) {
@@ -59,4 +64,4 @@ return arrayValues.filter(value => {
 
 
 
-export {areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, calculateTotals, removeValuesInRangesFromArray}
+export {areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, calculateTotals, removeValuesInRangesFromArray, sort}
