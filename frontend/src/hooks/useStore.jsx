@@ -171,6 +171,19 @@ const useStore = create((set, get) => ({
             get().raiseAlert({severity: 'error', title: 'Get stylist free slots not working', text: error.message})
         }
     },
+    createBooking: async(stylistId, formData) => {
+        try {
+            console.log(stylistId)
+            const response = await axios.post(APIURL + '/booking/' + stylistId + "/create", formData)
+            if (!response) {
+                return false;
+            }
+            return response;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Booking creation', text: error.message})
+        }
+    },
     raiseAlert: (newProps) => {
         // mindestens Property text muss über die props angeliefert werden!
         // Zusätzlich ist noch Property title möglich
