@@ -37,23 +37,20 @@ router.post('/:id/create',
         }),
     body('startHour')
         .notEmpty()
-        .isFloat({ min: 0, max: 23.5 })
-        .withMessage('startHour muss eine Zahl zwischen 0 und 23.5 sein')
-        .custom(value => value % 0.5 === 0)
-        .withMessage('startHour darf nur volle oder halbe Stunden sein'),
+        .isNumeric({ min: 8, max: 23 })
+        .withMessage('startHour muss eine Zahl zwischen 8 und 23 sein'),
     body('endHour')
         .notEmpty()
-        .isFloat({ min: 0.5, max: 24 })
-        .withMessage('endHour muss eine Zahl zwischen 0.5 und 24 sein')
-        .custom(value => value % 0.5 === 0)
-        .withMessage('endHour darf nur volle oder halbe Stunden sein')
+        .isNumeric({ min: 8, max: 23 })
+        .withMessage('startHour muss eine Zahl zwischen 8 und 23 sein')
         .custom((value, { req }) => {
         if (value <= req.body.startHour) throw new Error('endHour muss größer als startHour sein');
             return true;
         }),
-    body('serviceId'),
+    body('serviceId')
+        .isArray({min: 1}),
     body('clientType')
-        .isIn(['Woman', 'Man', 'Child'])
+        .isIn(['Mann', 'Frau', 'Kinder'])
         .withMessage('Ungültiger Client typ'),
     body('phone')
         .isMobilePhone()
@@ -70,9 +67,7 @@ router.post('/:id/create',
         .optional()
         .trim()
         .escape()
-        .isString()
-        .isLength({min:10, max: 100})
-        .withMessage('Mindestens 10 Buchstaben, maximal 100'),
+        .isString(),
     // Confirmed field
     body('confirmed')
         .optional() // not required

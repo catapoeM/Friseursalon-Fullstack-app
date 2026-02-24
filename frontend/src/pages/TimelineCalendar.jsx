@@ -10,10 +10,10 @@ import { useForm } from 'react-hook-form';
 
 import {minutesToHours, filterByDateKey, extractStartEndHours} from '../utils/booking'
 import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray, sort } from '../hooks/helperFunctions';
-import { emailRules, phoneRules, registerRules } from '../utils/form-rules';
+import { emailRules, phoneRules, registerRules, clientTypeRules } from '../utils/form-rules';
 
 const TimelineCalendar = () => {
-    const {getStylistBookings, raiseAlert} = useStore((state) => state)
+    const {getStylistBookings, createBooking, raiseAlert} = useStore((state) => state)
     const {stylistId} = useParams();
 
     const today = new Date();
@@ -84,14 +84,28 @@ const TimelineCalendar = () => {
     const checkConsecutiveNumbers = areNumbersConsecutive(choosenHours);
     const canShowForm = choosenHours.length === countHoursLeft && checkConsecutiveNumbers && countHoursLeft > 0
 
-    const handleCreateBooking = (formData) => {
-        console.log(formData, ' formData')
+    const handleCreateBooking = async(formData) => {
         const startEndBookedHour = sort(choosenHours)
-        formData.start = startEndBookedHour[0]
-        formData.end = startEndBookedHour[startEndBookedHour.length - 1]
-        formData.date = selectedDate;
-        console.log(startEndBookedHour[0], ' start booked hour')
-        console.log(startEndBookedHour[startEndBookedHour.length - 1], ' end booked hour')
+        formData.startHour = startEndBookedHour[0]
+        formData.endHour = startEndBookedHour[startEndBookedHour.length - 1]
+        formData.date = selectedDate.format("YYYY-MM-DD");
+        formData.serviceId = selectedServicesIds;
+        console.log(formData, ' formaDAta')
+        const ok = await createBooking(stylistId, formData);
+            if (ok) {
+                // custom alert
+                raiseAlert({
+                    title: 'Success!',
+                    text: 'A confirmation code has been sent now to your email address! Please copy the code and confirm it below'
+                })
+            }else {
+                // custom alert
+                raiseAlert({
+                    title: 'Fast geschafft...', 
+                    text: 'The confirmation code could not be added! Please try again',
+                    severity: 'warning'
+                })
+            }
     }
     
     return (
@@ -171,6 +185,17 @@ const TimelineCalendar = () => {
                                 error={!!errors.lastName}
                                 helperText={errors.lastName?.message}
                                 name="lastName"
+                                type="text"
+                                fullWidth
+                            />
+
+                            <TextField
+                                //defaultValue="cata2@adm.com"
+                                label="Kundentyp [Mann/Frau/Kinder]"
+                                {...register('clientType', clientTypeRules)}
+                                error={!!errors.clientType}
+                                helperText={errors.clientType?.message}
+                                name="clientType"
                                 type="text"
                                 fullWidth
                             />

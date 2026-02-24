@@ -52,7 +52,7 @@ const createBooking = async (req, res) => {
         }
         
         // 1️ Basic validation
-        if (!id || !serviceId) {
+        if (!id || (!serviceId && serviceId.length > 0)) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
@@ -61,10 +61,18 @@ const createBooking = async (req, res) => {
         if (!stylist) {
             return res.status(404).json({ error: "Stylist not found" });
         }
+        let servicesAmount = 0;
+        let serviceFound = false;
+        console.log(serviceId, ' service id')
         // 3️ Find service inside stylist
-        const service = stylist.services.id(serviceId);
-        if (!service) {
-            return res.status(404).json({ error: "Service not found for this stylist" });
+        for (let i = 0; i < serviceId.length; ++i) {
+            if (stylist.services.id(serviceId[i])) {
+                servicesAmount++;
+                serviceFound = true;
+            }
+        }
+        if (servicesAmount !== serviceId.length && serviceFound) {
+            return res.status(404).json({ error: "Service/services not found for this stylist" });
         }
 
         const exists = await bookingExists(id, date, startHour, endHour)

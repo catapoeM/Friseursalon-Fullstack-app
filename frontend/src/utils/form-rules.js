@@ -166,6 +166,14 @@ export const createBookingRules = {
     }
 }
 
+export const clientTypeRules = {
+    required: "Client Type is required.",
+    pattern: {
+        value: /\b(Mann|Frau|Kinder)\b/,
+        message: "Please enter with capital letter at the beginning [Mann / Frau / Kinder].",
+    },
+};
+
 export const emailRules = {
     required: "Email is required",
     pattern: {
