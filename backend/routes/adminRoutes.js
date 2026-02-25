@@ -22,7 +22,7 @@ router.post(
   adminRegister
 )
 
-// Login as User or Admin
+// Login as Admin
 router.post(
   '/login',
   body('email').isEmail(),

@@ -173,8 +173,7 @@ const useStore = create((set, get) => ({
     },
     createBooking: async(stylistId, formData) => {
         try {
-            console.log(stylistId)
-            const response = await axios.post(APIURL + '/booking/' + stylistId + "/create", formData)
+            const response = await axios.post(APIURL + '/booking/' + stylistId + "/create", formData, {withCredentials: true})
             if (!response) {
                 return false;
             }
@@ -182,6 +181,30 @@ const useStore = create((set, get) => ({
         } catch (error) {
             // TODO: Snackbar/Alert ausgeben
             get().raiseAlert({severity: 'error', title: 'Booking creation', text: error.message})
+        }
+    },
+    requestCode: async() => {
+        try {
+            const response = await axios.post(APIURL + '/booking/request-code', {}, {withCredentials: true})
+            if (!response) {
+                return false;
+            }
+            return response;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Request code', text: error.message})
+        }
+    },
+    verifyCode: async(formDataCode) => {
+        try {
+            const response = await axios.patch(APIURL + '/booking/verify-code', formDataCode, {withCredentials: true})
+            if (!response) {
+                return false;
+            }
+            return response;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Verify code', text: error.message})
         }
     },
     raiseAlert: (newProps) => {
