@@ -63,7 +63,6 @@ const createBooking = async (req, res) => {
         }
         let servicesAmount = 0;
         let serviceFound = false;
-        console.log(serviceId, ' service id')
         // 3️ Find service inside stylist
         for (let i = 0; i < serviceId.length; ++i) {
             if (stylist.services.id(serviceId[i])) {
@@ -87,15 +86,21 @@ const createBooking = async (req, res) => {
         // Vorher muss man nur encrypted objData in Session speichern
         
         const bookingSaved = await Bookings.create(objData);
-        console.log(bookingSaved, ' bookingSaved')
-        const encryptedData = encryptObject(bookingSaved);
-        req.session.booking = encryptedData;
-        console.log(req.session.booking, ' req.session.booking (Encrypted)')
-        console.log(req.baseUrl) 
+        //const encryptedData = encryptObject(bookingSaved);
+        req.session.booking = {
+            id: bookingSaved._id.toString(),
+            firstName: bookingSaved.firstName,
+            lastName: bookingSaved.lastName,
+            email: bookingSaved.email,
+            startHour: bookingSaved.startHour,
+            endHour: bookingSaved.endHour,
+            date: bookingSaved.date
+        };
+        console.log(req.session.booking, ' req.session.booking ')
         
         // Weiterleiten zur Code-Anfrage
         //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
-        res.send(bookingSaved)
+        res.status(200).json({ok: true})
     } catch (error) {
         if (error.code === 11000) {
             const field = Object.keys(error.keyValue)[0];
@@ -219,11 +224,10 @@ const cancelBooking = async (req, res) => {
 
 const requestCode = async (req, res) => {
     try {
-        if (req && req.session && req.session.booking) {
-            const objData = decryptObject(req.session.booking);
-            console.log(objData, ' obj data!!!');
+            console.log(req.session.booking, ' request code booking 2')
+        if (req.session && req.session.booking?.id) {
+            const objData = req.session.booking;
             const email = objData.email;
-            console.log(email, ' User email!!! from the obj data')
             const code = randomNumber();
             const expiresAt = new Date(Date.now() + 10 * 60 * 500); // expires in 5 minutes
 
@@ -237,19 +241,14 @@ const requestCode = async (req, res) => {
             const emailSent = await createEmailAndSend(emailContent);
             // bcrypt the code before saving in DB          
             if (emailSent) {
-                console.log(objData, ' obj data 2222222')
-                const encryptedData = encryptObject(objData);
-                req.session.booking = encryptedData;
-                console.log(req.session.booking, ' session booking 333')
+                //const encryptedData = encryptObject(objData);
+                req.session.booking = objData;
                 try {
                     const verificationCodeUpdate = await UserVerification.create({
                         email,
                         code,
                         expiresAt
                     });
-            
-                    console.log(verificationCodeUpdate, ' verificationCodeUpdate');
-                    console.log(emailSent, ' sent');
                     // Weiterleitung zur Eingabemaske
                     //res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
                     return res.json("emailSent");
@@ -269,10 +268,10 @@ const requestCode = async (req, res) => {
 
 const verifyCode = async (req, res) => {
     try {
-        if (req && req.session && req.session.booking) {
-            const objData = decryptObject(req.session.booking);
+        if (req.session && req.session.booking?.id) {
+            const objData = req.session.booking;
             const email = objData.email;
-            const bookingId = objData._id;
+            const bookingId = req.session.booking.id;
             const userVerificationCode = await UserVerification.findOne({email});
             // Token erzeugen mit ID des Members
             const token = getToken(objData, process.env.JWT_SECRET, '24h');

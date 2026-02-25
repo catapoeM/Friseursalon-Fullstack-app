@@ -26,7 +26,6 @@ const getStylistBookings = async (req, res) => {
             stylistId: id,
             isCanceled: false
         });
-        console.log( stylistBookings)
         if (!stylistBookings) {
             return res.status(500).json({ error: "Failed to fetch the services of the stylist" });
         }

@@ -21,31 +21,32 @@ const app = express();
 //const MONGO_URI = process.env.MONGO_URI;
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_ORIGIN,
+    credentials: true
+  }
+));
 
 // Middleware to parse JSON
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-const expires = 15 * 60 * 1000;
+const expires = 5 * 60 * 1000;
 var sess = {
+  name: "booking_session",
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {maxAge: expires,
+  cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production"
-  } // 15 minutes
+    secure: process.env.NODE_ENV,
+    sameSite: "lax",
+    maxAge: expires
+  } // 5 minutes
 }
-  
-if (app.get('env') === 'production') {
-  app.set('trust proxy', 1) // trust first proxy
-  sess.cookie.secure = true // serve secure cookies
-}
+
 app.use(session(sess));
-
-
 
 // Use routes
 app.use('/api/home', homeRoutes);
@@ -55,33 +56,6 @@ app.use('/api/stylists', stylistRoutes);
 
 // HTTP + Socket.IO Server
 const server = http.createServer(app);
-const io = new Server(server, {cors:{origin: "*"} });
-
-// Socket.IO Events
-io.on("connection", async (socket) => {
-  console.log(`Client connected: ${socket.id}`);
-
-  // Alle bestehenden Buchungen senden
-  try {
-    const bookings = await import("./models/bookingModel.js").then(mod => mod.default.find());
-    socket.emit("loadBookings", bookings);
-  } catch (error) {
-    console.error(error);
-  }
-
-  socket.on("newBooking", async (data) => {
-    try {
-      const Booking = (await import("./models/bookingModel.js")).default;
-      const newBooking = new Booking(data);
-      await newBooking.save();
-      io.emit("bookingUpdated", newBooking);
-    } catch (error) {
-      console.error(error);
-    }
-  });
-
-  socket.on("disconnect", () => console.log(`Client disconnected: ${socket.id}`));
-});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

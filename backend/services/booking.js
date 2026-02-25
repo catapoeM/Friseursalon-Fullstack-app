@@ -13,7 +13,6 @@ const bookingExists = async(stylistId, date, startHour, endHour) => {
             { startHour: { $lte: startHour }, endHour: { $gte: endHour } }
         ]
     });
-    console.log(conflict, ' confl')
     if (conflict) {
         return true
     }return false;

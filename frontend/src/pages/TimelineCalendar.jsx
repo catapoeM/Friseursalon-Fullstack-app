@@ -10,14 +10,15 @@ import { useForm } from 'react-hook-form';
 
 import {minutesToHours, filterByDateKey, extractStartEndHours} from '../utils/booking'
 import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray, sort } from '../hooks/helperFunctions';
-import { emailRules, phoneRules, registerRules, clientTypeRules } from '../utils/form-rules';
+import { emailRules, phoneRules, registerRules, clientTypeRules, verifyCodeRules } from '../utils/form-rules';
 
 const TimelineCalendar = () => {
-    const {getStylistBookings, createBooking, raiseAlert} = useStore((state) => state)
+    const {getStylistBookings, createBooking, requestCode, verifyCode, raiseAlert} = useStore((state) => state)
     const {stylistId} = useParams();
 
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState(dayjs(today));
+    
     const [choosenHours, setChoosenHours] = useState([])
 
     const [selectedServicesIds, setselectedServicesIds] = useSessionStorageState("selectedServicesIds", [])
@@ -28,6 +29,10 @@ const TimelineCalendar = () => {
     const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10)) 
     const [dbData, setDbData] = useState(null)
     
+    const [step, setStep] = useState("RESERVE")
+    const [code, setCode] = useState("");
+    const [error, setError] = useState(null)
+    
     const {
         register,
         handleSubmit,
@@ -35,29 +40,24 @@ const TimelineCalendar = () => {
     } = useForm({
         mode: 'onChange'
     });
-    
 
-    useEffect( () => {
-        const getAsyncData = async() => {
-            const response = await getStylistBookings(stylistId);
-            if (!response) {
-                // custom alert
-                raiseAlert({
-                    title: 'Fast geschafft...', 
-                    text: 'The free slots of the stylist cannot be updated',
-                    severity: 'warning'
-                })
-                return
-            }
-            setDbData(response.data);
-        }
+    useEffect(() => {
+        getAsyncData(selectedDate)
+    }, [selectedDate])
 
-        getAsyncData()
-        if (!dbData) {
+    const getAsyncData = async(selectedDate) => {
+        const response = await getStylistBookings(stylistId);
+        if (!response) {
+            // custom alert
+            raiseAlert({
+                title: 'Fast geschafft...', 
+                text: 'The free slots of the stylist cannot be updated',
+                severity: 'warning'
+            })
             return
         }
         const keysToGet = ["startHour", "endHour"];
-        const todayAppointments = filterByDateKey(dbData, "date", selectedDate.format("YYYY-MM-DD"))
+        const todayAppointments = filterByDateKey(response.data, "date", selectedDate.format("YYYY-MM-DD"))
         const startEnd = extractKeysValuesFromArrayOfObjects(keysToGet, todayAppointments)
         // Its making the array shorter, because we will need only the start and the end for the next step
         
@@ -69,7 +69,8 @@ const TimelineCalendar = () => {
         const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
         
         setButtonHours(freeHours)
-    }, [selectedDate, stylistId])
+        console.log(selectedDate, ' selected data getAsync data') 
+    }
 
     const handleHourClick = (hour) => {
         setChoosenHours(prev => 
@@ -83,7 +84,7 @@ const TimelineCalendar = () => {
     const countHoursLeft = totalDurationHours;
     const checkConsecutiveNumbers = areNumbersConsecutive(choosenHours);
     const canShowForm = choosenHours.length === countHoursLeft && checkConsecutiveNumbers && countHoursLeft > 0
-
+    
     const handleCreateBooking = async(formData) => {
         const startEndBookedHour = sort(choosenHours)
         formData.startHour = startEndBookedHour[0]
@@ -91,21 +92,57 @@ const TimelineCalendar = () => {
         formData.date = selectedDate.format("YYYY-MM-DD");
         formData.serviceId = selectedServicesIds;
         console.log(formData, ' formaDAta')
-        const ok = await createBooking(stylistId, formData);
-            if (ok) {
-                // custom alert
-                raiseAlert({
-                    title: 'Success!',
-                    text: 'A confirmation code has been sent now to your email address! Please copy the code and confirm it below'
-                })
+        const responseCreateBooking = await createBooking(stylistId, formData);
+            if (responseCreateBooking) {
+                setStep("REQUEST_CODE")
+            raiseAlert({
+                title: 'Create booking!',
+                text: 'The create booking process has been now started!'
+            })
             }else {
                 // custom alert
                 raiseAlert({
                     title: 'Fast geschafft...', 
-                    text: 'The confirmation code could not be added! Please try again',
+                    text: 'The booking creation code could done!',
                     severity: 'warning'
                 })
             }
+    }
+
+    const handleRequesCode = async() => {
+        const responseRequestCode = await requestCode();
+        if (responseRequestCode) {
+            setStep("VERIFY_CODE")
+            raiseAlert({
+                title: 'Request code!',
+                text: 'The requested code has been sent to your email-address successfully!'
+            })
+        }else {
+            // custom alert
+            raiseAlert({
+                title: 'Fast geschafft...', 
+                text: 'The confirmation code could not be sent!',
+                severity: 'warning'
+            })
+        }
+    }
+
+    const handleVerifyCode = async(formData) => {
+        const responseVerifyCode = await verifyCode(formData);
+        if (responseVerifyCode) {
+            setStep("DONE")
+            raiseAlert({
+                title: 'Verify code!',
+                text: 'The requested code has been successfully verified and your reservation is now completely finished!'
+            })
+        }else {
+            // custom alert
+            raiseAlert({
+                title: 'Fast geschafft...', 
+                text: 'You could not be verified',
+                severity: 'warning'
+            })
+        }
     }
     
     return (
@@ -164,12 +201,12 @@ const TimelineCalendar = () => {
                         </Stack>
                     </Box>
                 )}
-                {    canShowForm &&
+                {    canShowForm && step === "RESERVE" &&
                 (
                     <form onSubmit={handleSubmit(handleCreateBooking)}>
                         <Stack spacing={1} mt={3}>
                             <TextField
-                                //defaultValue="cata2@adm.com"
+                                defaultValue="catalin"
                                 label="Vorname"
                                 {...register('firstName', registerRules.firstName)}
                                 error={!!errors.firstName}
@@ -179,7 +216,7 @@ const TimelineCalendar = () => {
                                 fullWidth
                             />
                             <TextField
-                                //defaultValue="cata2@adm.com"
+                                defaultValue="Poenaru"
                                 label="Nachname"
                                 {...register('lastName', registerRules.lastName)}
                                 error={!!errors.lastName}
@@ -190,7 +227,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                //defaultValue="cata2@adm.com"
+                                defaultValue="Mann"
                                 label="Kundentyp [Mann/Frau/Kinder]"
                                 {...register('clientType', clientTypeRules)}
                                 error={!!errors.clientType}
@@ -201,7 +238,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                //defaultValue="12345678"
+                                defaultValue="067765039456"
                                 label="Telefonnummer"
                                 {...register('phone', phoneRules)}
                                 error={!!errors.phone}
@@ -212,7 +249,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                //defaultValue="12345678"
+                                defaultValue="brianne.bogisich@ethereal.email"
                                 label="E-mail"
                                 {...register('email', emailRules)}
                                 error={!!errors.email}
@@ -238,6 +275,54 @@ const TimelineCalendar = () => {
                         </Stack>
                     </form>
                 )}
+                {
+                    step === "REQUEST_CODE" &&
+                    (
+                    <Stack spacing={1} mt={3}>
+                        <Typography variant='h6' color='black'>
+                            You have to send code to your email address to be verified
+                        </Typography>
+                        <form onSubmit={handleSubmit(handleRequesCode)}>
+                            <Stack spacing={1} mt={3}>
+                                <Button type="submit" variant="contained" size="large">
+                                        Send Code
+                                </Button>
+                            </Stack>
+                        </form>
+                    </Stack>
+                    )
+                }
+                {
+                    step === "VERIFY_CODE" &&
+                (
+                    <form onSubmit={handleSubmit(handleVerifyCode)}>
+                        <Stack spacing={1} mt={3}>
+                            <TextField
+                                    //defaultValue="cata2@adm.com"
+                                    label="Verifizierungscode eingeben"
+                                    {...register('verifyCode', verifyCodeRules)}
+                                    error={!!errors.verifyCodeRules}
+                                    helperText={errors.verifyCodeRules?.message}
+                                    name="verifyCode"
+                                    type="text"
+                                    fullWidth
+                                />
+                            <Button type="submit" variant="contained" size="large">
+                                Verifizieren Sie sich
+                            </Button>
+                        </Stack>
+                    </form>
+                )}
+                {
+                    step === "DONE" &&
+                    (
+                    <Stack spacing={1} mt={3}>
+                        <Typography variant='h6' color='green'>
+                            Congratulations! You have now a reservation and the confirmation will be also sent to your email-address!
+                        </Typography>
+                    </Stack>
+                    )
+                }
             </Box>
         </LocalizationProvider>
     )

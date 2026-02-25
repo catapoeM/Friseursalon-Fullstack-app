@@ -166,6 +166,21 @@ export const createBookingRules = {
     }
 }
 
+export const verifyCodeRules = {
+    
+    verifyCode: {
+        required: 'Verifizierungscode is erforderlich',
+        minLength: {
+            value: 6,
+            message: 'Der Code muss mindestens 6 Zahlen lang sein'
+        },
+        maxLength: {
+            value: 6,
+            message: 'Der Code darf Maximal 6 Zahlen lang sein'
+        }
+    },
+}
+
 export const clientTypeRules = {
     required: "Client Type is required.",
     pattern: {
