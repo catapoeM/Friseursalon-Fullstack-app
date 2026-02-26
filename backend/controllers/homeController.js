@@ -1,7 +1,6 @@
 
 
 const getHome = (req, res) => {
-    res.json(req.session);
 };
 
 const postHome = (req, res) => {

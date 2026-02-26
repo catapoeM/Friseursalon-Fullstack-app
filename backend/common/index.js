@@ -60,7 +60,7 @@ const createEmailAndSend = async (emailContent) => {
     
         const emailSent = await transporter.sendMail(emailContent);
         
-        console.log(emailSent, ' emailContent sent');
+        console.log(emailSent, ' email Content sent');
         if (emailSent) {
             return true;
         }return false;
@@ -77,6 +77,15 @@ const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
     // zurück zu ISO-String
     const newDateWithExtraHours = date.toISOString();
     return newDateWithExtraHours;
+}
+
+const getServiceNamesByIds = (ids, services) => {
+    const idSet = new Set(ids.map(id => id.toString()));
+
+    const matchedServices = services
+    .filter(service => idSet.has(service._id.toString()))
+    .map(service => service.serviceName)
+    return matchedServices;
 }
 
 const formatDateTimeUTC = (isoString, locale) => {
@@ -101,4 +110,4 @@ const calculateTheDifferenceTimeInHours = (firstDate, secondDate) => {
 }
 */
 
-export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC, getToken};
+export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC, getToken, getServiceNamesByIds};

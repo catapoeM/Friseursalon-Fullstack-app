@@ -10,6 +10,7 @@ import bookingRoutes from './routes/bookingRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import stylistRoutes from './routes/stylistRoutes.js';
 import session from 'express-session';
+import MongoStore from 'connect-mongo'
 
 // Load environment Variables
 dotenv.config();
@@ -27,26 +28,25 @@ app.use(cors({
   }
 ));
 
+const expires = 5 * 60 * 1000;
+app.use(session({
+  name: 'sid',
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({mongoUrl: process.env.MONGO_URI}),
+  cookie: {
+    httpOnly: true,
+    secure: false, // true if production
+    sameSite: "lax",
+    maxAge: expires
+  }
+}));
+
 // Middleware to parse JSON
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
-
-const expires = 5 * 60 * 1000;
-var sess = {
-  name: "booking_session",
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV,
-    sameSite: "lax",
-    maxAge: expires
-  } // 5 minutes
-}
-
-app.use(session(sess));
 
 // Use routes
 app.use('/api/home', homeRoutes);
