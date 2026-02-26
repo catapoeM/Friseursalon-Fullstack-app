@@ -7,13 +7,6 @@ import crypto from 'crypto';
 
 dotenv.config();
 
-const createVisitorId = (req, res, next) => {
-  if (!req.session.visitorId) {
-        req.session.visitorId = crypto.randomUUID();
-  }
-  return next();
-}
-
 // check the req.body for errors;
 const checkValidation = (req, res, next) => {
     // Validieren der Parameter
@@ -68,4 +61,4 @@ const checkToken = async (req, res, next) => {
   next();
 };
 
-export { checkToken, checkValidation, createVisitorId};
+export { checkToken, checkValidation};

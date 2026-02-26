@@ -1,9 +1,8 @@
 import express from 'express';
 import { getHome, postHome, notFound } from '../controllers/homeController.js';
-import { createVisitorId } from '../middlewares/middlewares.js';
 const router = express.Router();
 
-router.get('/', createVisitorId, getHome);
+router.get('/', getHome);
 
 router.post('/', postHome);
 

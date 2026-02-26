@@ -1,12 +1,12 @@
 import express from 'express';
-import {createBooking, editBookingGet, editBookingPut, cancelBooking,
+import {createBooking, cancelBooking,
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body, param, query } from 'express-validator';
 
 import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
     endWithinHours, endNotAfter19, durationValid,
      validatePhoneNumber } from '../validators/bookingValidation.js';
-import { checkValidation, createVisitorId } from '../middlewares/middlewares.js';
+import { checkValidation } from '../middlewares/middlewares.js';
 
 const router = express.Router();
 
@@ -44,7 +44,9 @@ router.post('/:id/create',
         .isNumeric({ min: 8, max: 23 })
         .withMessage('startHour muss eine Zahl zwischen 8 und 23 sein')
         .custom((value, { req }) => {
-        if (value <= req.body.startHour) throw new Error('endHour muss größer als startHour sein');
+        if (value < req.body.startHour) {
+                throw new Error('endHour muss gleich oder größer als startHour sein');
+        }
             return true;
         }),
     body('serviceId')
@@ -81,44 +83,7 @@ router.post('/:id/create',
         .withMessage('isCanceled must be a boolean')
         .toBoolean(),
     checkValidation,
-    createVisitorId,
     createBooking
-);
-
-router.get('/:id/edit',
-    editBookingGet
-)
-
-// Change the booking
-router.put('/:id/edit',
-    body('date')
-        .notEmpty()
-        .matches(/^\d{4}-\d{2}-\d{2}$/)
-        .withMessage('Datum muss im Format YYYY-MM-DD sein')
-        .custom(value => {
-        const [y, m, d] = value.split('-').map(Number);
-        const date = new Date(Date.UTC(y, m - 1, d));
-        if (isNaN(date.getTime())) throw new Error('Ungültiges Datum');
-            return true;
-        }),
-    body('startHour')
-        .notEmpty()
-        .isFloat({ min: 0, max: 23.5 })
-        .withMessage('startHour muss eine Zahl zwischen 0 und 23.5 sein')
-        .custom(value => value % 0.5 === 0)
-        .withMessage('startHour darf nur volle oder halbe Stunden sein'),
-    body('endHour')
-        .notEmpty()
-        .isFloat({ min: 0.5, max: 24 })
-        .withMessage('endHour muss eine Zahl zwischen 0.5 und 24 sein')
-        .custom(value => value % 0.5 === 0)
-        .withMessage('endHour darf nur volle oder halbe Stunden sein')
-        .custom((value, { req }) => {
-        if (value <= req.body.startHour) throw new Error('endHour muss größer als startHour sein');
-            return true;
-        }),
-    checkValidation,
-    editBookingPut
 );
 
 // Cancel the booking
@@ -136,13 +101,12 @@ router.patch('/:id/cancel',
         .isLength({min:10, max: 100})
         .withMessage('Mindestens 10 Buchstaben, maximal 100'),
     checkValidation,
-    createVisitorId,
     cancelBooking
 );
 
 // Request code for the visitor to its booking
 router.post('/request-code',
-        createVisitorId, requestCode);
+        requestCode);
 
 // Verify code for the visitor to its booking
 router.patch('/verify-code',
@@ -151,7 +115,7 @@ router.patch('/verify-code',
         .notEmpty()
         .isLength({min: 6, max: 6})
         .withMessage('Invalid code. Too large or too small number'),
-     checkValidation, createVisitorId, verifyCode);
+     checkValidation, verifyCode);
 
 router.use('', notFound);
 

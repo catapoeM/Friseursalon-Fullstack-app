@@ -26,12 +26,9 @@ const TimelineCalendar = () => {
     const [totalPrice, setTotalPrice] = useSessionStorageState("totalPrice", 0)
 
     
-    const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10)) 
-    const [dbData, setDbData] = useState(null)
+    const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10))
     
     const [step, setStep] = useState("RESERVE")
-    const [code, setCode] = useState("");
-    const [error, setError] = useState(null)
     
     const {
         register,
@@ -60,7 +57,6 @@ const TimelineCalendar = () => {
         const todayAppointments = filterByDateKey(response.data, "date", selectedDate.format("YYYY-MM-DD"))
         const startEnd = extractKeysValuesFromArrayOfObjects(keysToGet, todayAppointments)
         // Its making the array shorter, because we will need only the start and the end for the next step
-        
         const startHours = extractStartEndHours(startEnd, "startHour")
         const endHours = extractStartEndHours(startEnd, "endHour")
         
@@ -69,7 +65,6 @@ const TimelineCalendar = () => {
         const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
         
         setButtonHours(freeHours)
-        console.log(selectedDate, ' selected data getAsync data') 
     }
 
     const handleHourClick = (hour) => {
@@ -91,7 +86,6 @@ const TimelineCalendar = () => {
         formData.endHour = startEndBookedHour[startEndBookedHour.length - 1]
         formData.date = selectedDate.format("YYYY-MM-DD");
         formData.serviceId = selectedServicesIds;
-        console.log(formData, ' formaDAta')
         const responseCreateBooking = await createBooking(stylistId, formData);
             if (responseCreateBooking) {
                 setStep("REQUEST_CODE")
@@ -249,7 +243,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                defaultValue="brianne.bogisich@ethereal.email"
+                                defaultValue="ken.goodwin@ethereal.email"
                                 label="E-mail"
                                 {...register('email', emailRules)}
                                 error={!!errors.email}

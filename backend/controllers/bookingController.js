@@ -2,35 +2,11 @@ import {Bookings, UserVerification} from "../models/bookingModel.js";
 import Stylist from "../models/stylistModel.js";
 import { createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, cryptTheCode,
      decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
-import {getToken} from "../common/index.js";
+import {getToken, getServiceNamesByIds} from "../common/index.js";
 import dotenv from 'dotenv';
 import { bookingExists } from "../services/booking.js";
 
 dotenv.config();
-
-// Rufe Meine Buchungen von der Buchungsliste auf
-// Damin man seine Buchungen bekommt, muss man als visitor: entweder authentifizieren (email -> code -> verify)
-// oder Wenn man schon authentifiziert wurde un mit token (Wenn token noch gültig ist)
-const getMyBookings = async (req, res) => {
-    try {
-        if (req.session && req.session.booking && req.session.booking.email) {
-            // Member suchen über Email-Adresse
-            const foundBookings = await Bookings.find({email}).sort({start: 1, time: 1});
-            if (foundBookings) {
-                return res.status(200).send(foundBookings, ' Bookings found!');
-            }
-            else {
-                return res.status(404).send('Buchung wurde nicht gefunden...')
-            }
-        }else {
-            //res.redirect('http://localhost:5000' + req.baseUrl + '/visitor/request-code')
-            return res.status(404).send('To find your booking please go to the "request-code" page and verify it! (Authenticate)' )
-        }
-    } catch (error) {
-        console.log(error, 'Error found on *getMyBookings!');
-    }
-}
-
 
 const createBooking = async (req, res) => {
     try {
@@ -86,9 +62,8 @@ const createBooking = async (req, res) => {
         // Vorher muss man nur encrypted objData in Session speichern
         
         const bookingSaved = await Bookings.create(objData);
-        //const encryptedData = encryptObject(bookingSaved);
-        req.session.booking = {
-            id: bookingSaved._id.toString(),
+        const bookingObj = {
+            id : bookingSaved._id.toString(),
             firstName: bookingSaved.firstName,
             lastName: bookingSaved.lastName,
             email: bookingSaved.email,
@@ -96,91 +71,15 @@ const createBooking = async (req, res) => {
             endHour: bookingSaved.endHour,
             date: bookingSaved.date
         };
-        console.log(req.session.booking, ' req.session.booking ')
-        
-        // Weiterleiten zur Code-Anfrage
-        //res.redirect('http://localhost:5000' + req.baseUrl + '/request-code')
-        res.status(200).json({ok: true})
+        //const encryptedData = encryptObject(bookingSaved);
+        req.session.booking = bookingObj
+        res.status(200).send('ok')
     } catch (error) {
         if (error.code === 11000) {
             const field = Object.keys(error.keyValue)[0];
             return res.status(400).json({message: `${field} ist bereits vergeben.`})
         }
         res.status(500).json({ message: error.message });
-    }
-};
-
-const editBookingGet = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { code } = req.query;
-        const booking = await Bookings.findById(id);
-        if (booking.isCanceled) {
-            return res.status(404).json({error: "Booking not found!"})
-        }
-
-        if (!booking) {
-            return res.status(404).send("Booking not found!");
-        }
-        const isValid = checkHash(code, booking.code);
-        console.log(code + " " +  booking.code)
-        if (!isValid) {
-            return res.status(403).send("Invalid code!!Get");
-        }
-
-        res.json(booking);
-    } catch (error) {
-        if (error.code === 11000) {
-            const field = Object.keys(error.keyValue)[0];
-            return res.status(400).json({message: `${field} ist bereits vergeben.`})
-        }
-        res.status(500).json({ message: error.message + ' error'});
-    }
-};
-
-const editBookingPut = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const data = req.matchedData;
-        const { code } = req.query;
-
-        const booking = await Bookings.findById(id);
-        if (!booking || booking.isCanceled) {
-            return res.status(404).json({error: "Booking not found!"})
-        }
-        const isValid = checkHash(code, booking.code);
-        if (!isValid) { 
-            return res.status(403).send("Invalid code! PUT");
-        }
-
-        const exists = await bookingExists(id, data.date, data.startHour, data.endHour)
-        if (exists) {
-            return res.status(409).json({ error: "Time slot already booked. Please pick another time" });
-        }
-
-        booking.start = data.startHour;
-        booking.end = data.endHour;
-
-        //const humanReadableDateAndTimeEnd = formatDateTimeUTC(booking.end, 'de-DE');
-        await booking.save();
-        const emailContent = {
-            from: '"Test" <test@example.com>',
-            to: process.env.NODEMAILER_USER,
-            subject: "Booking EDITED!",
-            html: `<p> ${booking.firstName} ${booking.lastName}, your booking has been edited successfully </p> 
-                    <p> Your new booking details: You have a new booking: ${data.date} which will be from ${data.startHour}  to ${data.endHour} .</p> 
-                </p>`
-        }
-        // Anrufen die Funktion, um die Email an den Client zu schicken
-        await createEmailAndSend(emailContent);
-        res.json({message: "Booking updated - ", booking})
-
-    } catch (error) {
-        if (error.code === 11000) {
-            const field = Object.keys(error.keyValue)[0];
-            return res.status(400).json({message: `${field} ist bereits vergeben.`})
-        }
-        res.status(500).json({ message: error.message + ' error' });
     }
 };
 
@@ -225,7 +124,8 @@ const cancelBooking = async (req, res) => {
 const requestCode = async (req, res) => {
     try {
             console.log(req.session.booking, ' request code booking 2')
-        if (req.session && req.session.booking?.id) {
+            console.log(req.sessionID, ' req.session.id')
+        if (req.sessionID) {
             const objData = req.session.booking;
             const email = objData.email;
             const code = randomNumber();
@@ -249,9 +149,9 @@ const requestCode = async (req, res) => {
                         code,
                         expiresAt
                     });
-                    // Weiterleitung zur Eingabemaske
-                    //res.redirect('http://localhost:5000' + req.baseUrl + '/verify-code');
-                    return res.json("emailSent");
+                    if (verificationCodeUpdate) {
+                        return res.json("emailSent");
+                    }
                 }   catch(error) {
                         return res.status(500).json({message: error.message});
                 }
@@ -268,21 +168,17 @@ const requestCode = async (req, res) => {
 
 const verifyCode = async (req, res) => {
     try {
-        if (req.session && req.session.booking?.id) {
+        if (req.sessionID) {
             const objData = req.session.booking;
             const email = objData.email;
             const bookingId = req.session.booking.id;
             const userVerificationCode = await UserVerification.findOne({email});
-            // Token erzeugen mit ID des Members
-            const token = getToken(objData, process.env.JWT_SECRET, '24h');
-            if (userVerificationCode && token) {
+            if (userVerificationCode) {
                 let bookingEditLink = 'http://localhost:5000' + req.baseUrl + '/';
-                console.log(objData);
 
                 const codeCrypted = cryptTheCode(userVerificationCode.code);
                 const codeHashed = getHash(codeCrypted);
                 objData.code = codeHashed;
-                objData.isCanceled = false;
 
                 const booking = await Bookings.findById(bookingId);
                 if (!booking || booking.isCanceled) {
@@ -295,29 +191,30 @@ const verifyCode = async (req, res) => {
 
                 const stylist = await Stylist.findById(booking.stylistId)
                 if (stylist) {
-                    console.log(stylist, ' stylist')
+                    const matchedServices = getServiceNamesByIds(booking.serviceId, stylist.services)
+                    console.log(matchedServices, ' services')
+                    console.log(booking.serviceId, ' booking.serviceId')
+                    console.log(stylist.services, ' stylist.services')
 
-                    const service = stylist.services.find(service => service._id.toString() === booking.serviceId)
                     const bookingCancelLink = bookingEditLink + bookingId + "/cancel?code=" + codeCrypted;
-                    console.log(service, ' service')
-                    const serviceName = service.serviceName || "Service Name"
+
+                    const isoDate = objData.date;
+                    const onlyDate = isoDate.split("T")[0];
+                    
+                    const serviceName = matchedServices.join(',') || "services Name"
                     const stylistName = stylist.name || "Stylist Name"
                     bookingEditLink += bookingId + "/edit?code=" + codeCrypted;
                     //Löscht jeden Code der im DB befindet mit dem Email
                     await UserVerification.where(email).deleteMany();
-                    delete req.session.booking;
+                    
                     //const humanReadableDateAndTimeEnd = formatDateTimeUTC(objData.end, 'de-DE');
                     const emailContent = {
                         from: '"Test" <test@example.com>',
                         to: process.env.NODEMAILER_USER,
                         subject: "Booking confirmation!",
                         html: `<p> ${objData.firstName} ${objData.lastName}, your booking has been created successfully </p> 
-                                <p> Your booking details:  You have a booking: ${objData.date} which will be from ${objData.startHour}  to ${objData.endHour} .</p> 
-                                <p> For the service: ${serviceName} by the stylist: ${stylistName} </p> 
-                                <p>
-                                    <strong>Edit your booking:</strong><br>
-                                    <a href="${bookingEditLink}" target="_blank">${bookingEditLink}</a>
-                                </p>
+                                <p> Your booking details:  You have a booking: ${onlyDate} which will be from ${objData.startHour}  to ${objData.endHour} .</p> 
+                                <p> For the services: ${serviceName} by the stylist: ${stylistName} </p> 
                                 <p>
                                     <strong>Cancel your booking:</strong><br>
                                     <a href="${bookingCancelLink}" target="_blank">${bookingCancelLink}</a>
@@ -326,14 +223,11 @@ const verifyCode = async (req, res) => {
                     // Anrufen die Funktion, um die Email an den Client zu schicken
                     const isEmailSent = await createEmailAndSend(emailContent);
                     if (isEmailSent) {
-                        return res.json('Buchung wurde erfolgreich bestätigt! - ' + booking + ' Token - ' + token);
-                    }return res.status(400).json('Buchung konnte nicht bestätigt werden! 1');
+                        return res.json('Buchung wurde erfolgreich bestätigt! - ' + booking);
+                    }
+                    return res.status(400).json('Buchung konnte nicht bestätigt werden! 1');
                 }
                 res.status(400).json('Buchung konnte nicht bestätigt werden! 2');
-                
-    
-            }else {
-                return res.json('Booking not found! or not token')
             }
         }else {
             res.status(500).json({ message: 'Session error!' });
@@ -347,5 +241,5 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {createBooking, editBookingGet, editBookingPut, cancelBooking, getMyBookings,
+export {createBooking, cancelBooking,
     requestCode, verifyCode, notFound}
