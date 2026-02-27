@@ -166,7 +166,7 @@ const TimelineCalendar = () => {
                     }}
                 />
                 {/* Show hours only if a date is selected */}
-                {selectedDate && (
+                {selectedDate && step !== "DONE" &&(
                     <Box sx={{mt: "3"}}>
                         <Typography variant='h6'>
                             The total price is: {totalPrice}€
@@ -219,7 +219,7 @@ const TimelineCalendar = () => {
                     <form onSubmit={handleSubmit(handleCreateBooking)}>
                         <Stack spacing={1} mt={3}>
                             <TextField
-                                defaultValue="catalin"
+                                defaultValue="Madalin"
                                 label="Vorname"
                                 {...register('firstName', registerRules.firstName)}
                                 error={!!errors.firstName}
@@ -262,7 +262,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                defaultValue="kayley.spinka@ethereal.email"
+                                defaultValue="garth51@ethereal.email"
                                 label="E-mail"
                                 {...register('email', emailRules)}
                                 error={!!errors.email}

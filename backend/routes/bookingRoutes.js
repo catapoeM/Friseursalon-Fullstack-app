@@ -111,6 +111,7 @@ router.post('/request-code',
 // Verify code for the visitor to its booking
 router.patch('/verify-code',
     body('verifyCode')
+        .isString()
         .trim()
         .notEmpty()
         .isLength({min: 6, max: 6})
