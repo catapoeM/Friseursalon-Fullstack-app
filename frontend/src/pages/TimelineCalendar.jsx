@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DateCalendar } from '@mui/x-date-pickers';
-import { Box, Stack, Typography, Button, TextField } from '@mui/material';
+import {Dialog, DialogTitle, DialogContent, Box, Stack, Typography, Button, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSessionStorageState } from '../hooks/useStorageState';
 import useStore from '../hooks/useStore';
@@ -29,6 +29,7 @@ const TimelineCalendar = () => {
     const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10))
     
     const [step, setStep] = useState("RESERVE")
+    const [openDialog, setOpenDialog] = useState(true)
     
     const {
         register,
@@ -124,7 +125,7 @@ const TimelineCalendar = () => {
     const handleVerifyCode = async(formData) => {
         const responseVerifyCode = await verifyCode(formData);
         if (responseVerifyCode) {
-            setStep("DONE")
+            setStep("CONGRATULATIONS")
             raiseAlert({
                 title: 'Verify code!',
                 text: 'The requested code has been successfully verified and your reservation is now completely finished!'
@@ -138,11 +139,26 @@ const TimelineCalendar = () => {
             })
         }
     }
+
+    const closeDialog = () => {
+        // Close the dialog after 2 seconds when it is clicked
+        setTimeout(() => {
+            setOpenDialog(false);
+            setStep("DONE");
+        }, 2000);
+    }
+
+    const disableWeekends = (date) => {
+        const day = date.day(); // 0 = Sonntag, 1 = Montag und 6 = Samstag
+        return day === 0 || day === 1 || day === 6
+    }
     
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box components={['DateCalendar', 'DateCalendar']}>
                 <DateCalendar 
+                    disablePast
+                    shouldDisableDate={disableWeekends}
                     label="Select a date"
                     value={selectedDate}
                     onChange={(newDate) => {
@@ -152,6 +168,9 @@ const TimelineCalendar = () => {
                 {/* Show hours only if a date is selected */}
                 {selectedDate && (
                     <Box sx={{mt: "3"}}>
+                        <Typography variant='h6'>
+                            The total price is: {totalPrice}€
+                        </Typography>
                         <Typography variant='h6'>
                             Available hours for: "{selectedDate.format("YYYY-MM-DD")}"
                         </Typography>
@@ -232,7 +251,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                defaultValue="067765039456"
+                                defaultValue="067765039451"
                                 label="Telefonnummer"
                                 {...register('phone', phoneRules)}
                                 error={!!errors.phone}
@@ -243,7 +262,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                defaultValue="ken.goodwin@ethereal.email"
+                                defaultValue="kayley.spinka@ethereal.email"
                                 label="E-mail"
                                 {...register('email', emailRules)}
                                 error={!!errors.email}
@@ -308,13 +327,17 @@ const TimelineCalendar = () => {
                     </form>
                 )}
                 {
-                    step === "DONE" &&
+                    step === "CONGRATULATIONS" &&
                     (
-                    <Stack spacing={1} mt={3}>
-                        <Typography variant='h6' color='green'>
-                            Congratulations! You have now a reservation and the confirmation will be also sent to your email-address!
-                        </Typography>
-                    </Stack>
+                    <Dialog fullWidth maxWidth="md" open={openDialog} onClose={closeDialog}>
+                        <DialogTitle>Herzlichen Glückwunsch!</DialogTitle>
+                        <DialogContent>
+                            <Typography variant="body2" color="textPrimary">
+                            Sie habe Ihre Buchung bestätigt!
+                            Bitte prüfen Sie Ihre E-Mails auf weitere Informationen zu Ihrer Buchung!
+                            </Typography>
+                        </DialogContent>
+                    </Dialog>
                     )
                 }
             </Box>
