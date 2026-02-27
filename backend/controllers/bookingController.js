@@ -213,7 +213,7 @@ const verifyCode = async (req, res) => {
                         to: process.env.NODEMAILER_USER,
                         subject: "Booking confirmation!",
                         html: `<p> ${objData.firstName} ${objData.lastName}, your booking has been created successfully </p> 
-                                <p> Your booking details:  You have a booking: ${onlyDate} which will be from ${objData.startHour}  to ${objData.endHour} .</p> 
+                                <p> Your booking details:  You have a booking: ${onlyDate} which will be from ${objData.startHour}  to ${objData.endHour + 1} .</p> 
                                 <p> For the services: ${serviceName} by the stylist: ${stylistName} </p> 
                                 <p>
                                     <strong>Cancel your booking:</strong><br>
