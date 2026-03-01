@@ -16,8 +16,25 @@ const TimelineCalendar = () => {
     const {getStylistBookings, createBooking, requestCode, verifyCode, raiseAlert} = useStore((state) => state)
     const {stylistId} = useParams();
 
+    const disabledDays = [0, 1, 6]
+
+    const isDateDisabled = (date) => {
+        return disabledDays.includes(date.day())
+    }
+
+    const getNextValidDate = (date) => {
+        let newDate = date;
+
+        while (disabledDays.includes(newDate.day())) {
+            newDate = newDate.add(1, "day")
+        }
+
+        return newDate;
+    }
+
+
     const today = new Date();
-    const [selectedDate, setSelectedDate] = useState(dayjs(today));
+    const [selectedDate, setSelectedDate] = useState(getNextValidDate(dayjs()));
     
     const [choosenHours, setChoosenHours] = useState([])
 
@@ -148,21 +165,19 @@ const TimelineCalendar = () => {
         }, 2000);
     }
 
-    const disableWeekends = (date) => {
-        const day = date.day(); // 0 = Sonntag, 1 = Montag und 6 = Samstag
-        return day === 0 || day === 1 || day === 6
-    }
-    
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box components={['DateCalendar', 'DateCalendar']}>
+            <Box components={['DateCalendar']}>
                 <DateCalendar 
                     disablePast
-                    shouldDisableDate={disableWeekends}
+                    shouldDisableDate={isDateDisabled}
                     label="Select a date"
                     value={selectedDate}
-                    onChange={(newDate) => {
-                        setSelectedDate(newDate);
+                    onChange={(newValue) => {
+                        if (!newValue) {
+                            return
+                        }
+                        setSelectedDate(getNextValidDate(newValue))
                     }}
                 />
                 {/* Show hours only if a date is selected */}
