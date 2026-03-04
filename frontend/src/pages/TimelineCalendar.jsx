@@ -7,6 +7,7 @@ import { useSessionStorageState } from '../hooks/useStorageState';
 import useStore from '../hooks/useStore';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { isTodayAndSelectedDateEqual } from '../utils/dateFormatter';
 
 import {minutesToHours, filterByDateKey, extractStartEndHours} from '../utils/booking'
 import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray, sort } from '../hooks/helperFunctions';
@@ -33,7 +34,7 @@ const TimelineCalendar = () => {
     }
 
 
-    const today = new Date();
+    
     const [selectedDate, setSelectedDate] = useState(getNextValidDate(dayjs()));
     
     const [choosenHours, setChoosenHours] = useState([])
@@ -42,8 +43,16 @@ const TimelineCalendar = () => {
     const [totalDuration, setTotalDuration] = useSessionStorageState("totalDuration", 0)
     const [totalPrice, setTotalPrice] = useSessionStorageState("totalPrice", 0)
 
-    
-    const [buttonHours, setButtonHours] = useState(Array.from({length: 9}, (_, index) => index + 10))
+    let today = new Date();
+    let hours = 10;
+    let hoursLeft = 9
+    const isEqual = isTodayAndSelectedDateEqual(today, selectedDate);
+    if (isEqual) {
+        hours = today.getHours() + 1;
+        hoursLeft = 18 - hours + 1
+    }
+
+    const [buttonHours, setButtonHours] = useState(Array.from({length: hoursLeft}, (_, index) => hours + index))
     
     const [step, setStep] = useState("RESERVE")
     const [openDialog, setOpenDialog] = useState(true)
@@ -71,6 +80,9 @@ const TimelineCalendar = () => {
             })
             return
         }
+
+        
+
         const keysToGet = ["startHour", "endHour"];
         const todayAppointments = filterByDateKey(response.data, "date", selectedDate.format("YYYY-MM-DD"))
         const startEnd = extractKeysValuesFromArrayOfObjects(keysToGet, todayAppointments)
@@ -78,10 +90,9 @@ const TimelineCalendar = () => {
         const startHours = extractStartEndHours(startEnd, "startHour")
         const endHours = extractStartEndHours(startEnd, "endHour")
         
-        const initialHours = Array.from({length: 9}, (_, index) => index + 10)
-
-        const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
         
+        const initialHours = Array.from({length: hoursLeft}, (_, index) => hours + index)
+        const freeHours = removeValuesInRangesFromArray(initialHours, startHours, endHours)
         setButtonHours(freeHours)
     }
 
@@ -191,9 +202,9 @@ const TimelineCalendar = () => {
                         </Typography>
 
                         <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
+                            
                             {buttonHours.map((hour) => {
                             const isSelected = choosenHours.includes(hour)
-
                             return  (
                                 <Button 
                                     key={hour}
@@ -207,7 +218,12 @@ const TimelineCalendar = () => {
                             })}
                         </Stack>
                         <Stack spacing={1} mt={1}>
-                        {   checkConsecutiveNumbers 
+                        
+                        {
+                        hoursLeft > 0 ? (
+                            <>
+                            {   
+                            checkConsecutiveNumbers 
                             ?
                             <Typography variant='h6' color='black'>
                                 For your service you need to choose a maximum of {countHoursLeft}h consecutive!
@@ -215,8 +231,10 @@ const TimelineCalendar = () => {
                             :
                             <Typography variant='h6' color='red'>
                                 Please choose consecutive Hours!
-                            </Typography>}
-                            {   choosenHours.length > countHoursLeft
+                            </Typography>
+                            }
+                            {   
+                            choosenHours.length > countHoursLeft
                             ?
                             <Typography variant='h6' color='red'>
                                 Please deselect: {choosenHours.length - countHoursLeft}h
@@ -225,7 +243,16 @@ const TimelineCalendar = () => {
                             <Typography variant='h6' color='black'>
                                 Time choosen: {choosenHours.length}h
                             </Typography>
+                            }
+                            </>)
+                            :
+                            (<>
+                            <Typography variant='h5' color='red'>
+                                Unfortunatelly the is NO free time left for today!
+                            </Typography>
+                            </>)
                         }
+                        
                         </Stack>
                     </Box>
                 )}
