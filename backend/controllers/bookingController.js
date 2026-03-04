@@ -17,14 +17,20 @@ const createBooking = async (req, res) => {
         const {serviceId} = req.matchedData;
         const {id} = req.params;
 
-        const foundBookings = await Bookings.findOne({
+        const foundBookings = await Bookings.find({
             $or: [{phone}, {email}]
         })
         const now = new Date();
-        // Wenn true dann man muss die Buchung ändern
         
-        if (foundBookings && (!foundBookings.isCanceled || now < foundBookings.end)) {
-            return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
+        
+        // Wenn true dann man muss die Buchung ändern
+        for (let i = 0; i < foundBookings.length; ++i) {
+            let dateAndHourOfTheEndOfBooking = foundBookings[i]
+            dateAndHourOfTheEndOfBooking.date.setHours(foundBookings[i].endHour)
+            const convertedToDateObj = new Date(dateAndHourOfTheEndOfBooking.date)
+            if (foundBookings[i] && !foundBookings[i].isCanceled && now < convertedToDateObj) {
+                return res.status(400).json({ message: "Sie haben schon eine Buchung!" });
+            }
         }
         
         // 1️ Basic validation
@@ -123,8 +129,6 @@ const cancelBooking = async (req, res) => {
 
 const requestCode = async (req, res) => {
     try {
-            console.log(req.session.booking, ' request code booking 2')
-            console.log(req.sessionID, ' req.session.id')
         if (req.sessionID) {
             const objData = req.session.booking;
             const email = objData.email;
@@ -195,9 +199,6 @@ const verifyCode = async (req, res) => {
             const stylist = await Stylist.findById(booking.stylistId)
             if (stylist) {
                 const matchedServices = getServiceNamesByIds(booking.serviceId, stylist.services)
-                console.log(matchedServices, ' services')
-                console.log(booking.serviceId, ' booking.serviceId')
-                console.log(stylist.services, ' stylist.services')
 
                 const bookingCancelLink = bookingEditLink + bookingId + "/cancel?code=" + codeCrypted;
 

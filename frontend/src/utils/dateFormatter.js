@@ -11,6 +11,16 @@ const formatDate = (dateString, createdOrUpdated) => {
     return `${createdOrUpdated} At: ${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
-export {formatDate}
+const isTodayAndSelectedDateEqual = (today, selectedDate) => {
+    let dd = today.getDate()
+    let mm = today.getMonth();
+    let yyyy = today.getFullYear()
+    if (selectedDate.$y === yyyy && selectedDate.$M === mm && selectedDate.$D === dd) {
+        return true;
+    }
+    return false;
+}
+
+export {formatDate, isTodayAndSelectedDateEqual}
 
 
