@@ -95,6 +95,18 @@ const useStore = create((set, get) => ({
         // SessionStorage updaten
         sessionStorage.setItem(STORAGEKEY, JSON.stringify({token: get().token, decodedToken: get().decodedToken, loggedinAdmin}))
     },
+    getStylists: async() => {
+        try {
+            const response = await axios.get(APIURL + '/stylists')
+            if (!response) {
+                return false;
+            }
+            return response;
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Get stylist free slots not working', text: error.message})
+        }
+    },
     createStylist: async(data) => {
         try {
             const config = {headers: {Authorization: 'Bearer ' + get().token}}

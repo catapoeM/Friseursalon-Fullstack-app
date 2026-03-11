@@ -47,13 +47,13 @@ const AddServicesStylist = () => {
             // custom alert
             raiseAlert({
                 title: 'Success!',
-                text: 'Service has been added to stylist successfully.'
+                text: 'Der Service wurde dem Stylisten erfolgreich hinzugefügt.'
             })
         }else {
             // custom alert
             raiseAlert({
                 title: 'Fast geschafft...', 
-                text: 'Service could not be added.',
+                text: 'Der Service konnte nicht hinzugefügt werden.',
                 severity: 'warning'
             })
         }
@@ -63,7 +63,7 @@ const AddServicesStylist = () => {
         <Paper sx={{p: 4, maxWidth: 600}}>
             <Stack spacing={3}>
                 <Typography variant="h5">
-                    Add Service to Stylist
+                    Service zum Stylisten hinzufügen
                 </Typography>
 
                 <TextField
@@ -77,7 +77,7 @@ const AddServicesStylist = () => {
                 />
 
                 <TextField
-                    label="Duration (min)"
+                    label="Dauer (min)"
                     name="duration"
                     type="number"
                     value={formData.duration}
@@ -87,7 +87,7 @@ const AddServicesStylist = () => {
                 />
 
                 <TextField
-                    label="Price (€)"
+                    label="Preis (€)"
                     name="price"
                     type="number"
                     value={formData.price}
@@ -97,7 +97,7 @@ const AddServicesStylist = () => {
                 />
 
                 <TextField
-                    label="Client Type (Woman/Man/Child)"
+                    label="Kunde Typ (Woman/Man/Child)"
                     name="clientType"
                     type="text"
                     value={formData.clientType}
@@ -112,7 +112,7 @@ const AddServicesStylist = () => {
                         startIcon={<SaveIcon/>}
                         onClick={handleSubmit}
                     >
-                        Save Service
+                        Speichern
                     </Button>
                 </Stack>
             </Stack>

@@ -19,14 +19,14 @@ const StylistActionDialog = ({
           // custom alert
           raiseAlert({
               title: 'Success!',
-              text: 'The status of the stylist has been successfully changed!'
+              text: 'Der Status des Stylisten wurde erfolgreich geändert!'
           })
           onClose()
       }else {
           // custom alert
           raiseAlert({
               title: 'Fast geschafft...', 
-              text: 'The status of the stylist cannot be changed!',
+              text: 'Der Status des Stylisten kann nicht geändert werden!',
               severity: 'warning'
           })
       }
@@ -42,29 +42,29 @@ const StylistActionDialog = ({
     
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Stylist Actions</DialogTitle>
+      <DialogTitle>Stylistenaktionen</DialogTitle>
 
       <DialogContent>
         <Typography variant="body2" color="text.secondary">
-          What would you like to do with <strong>{stylist?.name}</strong>?
+          Was möchten Sie tun mit <strong>{stylist?.name}</strong>?
         </Typography>
       </DialogContent>
 
       <DialogActions>
         <Stack spacing={1} width="100%">
           <Button variant="contained" onClick={() => onEdit(stylist)}>
-            Edit Service to Stylist
+            Bearbeitungsservice
           </Button>
           {status ? 
             <Button variant="outlined" color="warning" onClick={() => onChangeStatus(stylist)}>
-              Deactivate Stylist
+              Stylist deaktivieren
             </Button> :
             <Button variant="outlined" onClick={() => onChangeStatus(stylist)}>
-              Activate Stylist
+              Stylist activieren
             </Button>
           }
           <Button variant="text" onClick={() => onAddService(stylist)}>
-            Add Service To Stylist
+            Service zum Stylisten hinzufügen
           </Button>
         </Stack>
       </DialogActions>

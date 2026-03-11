@@ -57,7 +57,7 @@ const AdminRegisterPage = () => {
             />
             <AuthLayout>
                 <Typography variant="h4" align="center" mb={3}>
-                    Admin Registration
+                    Admin Anmelden
                 </Typography>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
@@ -74,7 +74,7 @@ const AdminRegisterPage = () => {
 
                     <TextField
                         defaultValue="12345678"
-                        //label="Password"
+                        //label="Passwort"
                         {...register('password', registerRules.password)}
                         error={!!errors.password}
                         helperText={errors.password?.message}
@@ -85,7 +85,7 @@ const AdminRegisterPage = () => {
 
                     <TextField
                         defaultValue="12345678"
-                        //label="Confirm Password"
+                        //label="Passwort bestätigen"
                         {...register('confirmPassword', confirmPasswordRule(getValues))}
                         error={!!errors.confirmPassword}
                         helperText={errors.confirmPassword?.message}
@@ -96,7 +96,7 @@ const AdminRegisterPage = () => {
 
                     <TextField
                         defaultValue="f§0hV3&aYpAs%Bv74FJ7S3%/!@rz€"
-                        //label="Admin Secret Key"
+                        //label="Geheimer Administratorschlüssel"
                         {...register('adminSecret', registerRules.adminSecret)}
                         error={!!errors.adminSecret}
                         helperText={errors.adminSecret?.message}
@@ -105,10 +105,10 @@ const AdminRegisterPage = () => {
                         fullWidth
                     />
                     <Button type="submit" variant="contained" size="large">
-                        Register
+                        Anmelden
                     </Button>
                     <MuiLink component={Link} to="/login" color="inherit" sx={{ ml: 1 }}>
-                        Login
+                        Einloggen
                     </MuiLink>
                     </Stack>
                 </form>

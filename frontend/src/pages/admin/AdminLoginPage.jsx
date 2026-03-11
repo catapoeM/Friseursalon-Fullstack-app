@@ -47,7 +47,7 @@ const AdminLoginPage = () => {
         <>
             <AuthLayout>
                 <Typography variant="h4" align="center" mb={3}>
-                    Admin Login
+                    Admin Einloggen
                 </Typography>
                 <form onSubmit={handleSubmit(handleLoginSubmit)}>
                     <Stack spacing={3}>
@@ -74,10 +74,10 @@ const AdminLoginPage = () => {
                         />
 
                         <Button type="submit" variant="contained" size="large">
-                            Login
+                            Einloggen
                         </Button>
                         <MuiLink component={Link} to="/register" color="inherit" sx={{ ml: 1 }}>
-                            Register
+                            Anmelden
                         </MuiLink>
                     </Stack>
                 </form>

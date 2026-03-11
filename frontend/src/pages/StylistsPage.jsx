@@ -2,29 +2,35 @@ import { useEffect, useState } from "react";
 import {Grid, Card, CardContent, CardActionArea, Typography, Box, CardMedia, CircularProgress} from "@mui/material"
 import axios from 'axios'
 import {useNavigate} from 'react-router-dom';
+import useStore from "../hooks/useStore";
 
 const StylistsPage = () => {
   const [stylists, setStylists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log(stylists)
+  const {getStylists, raiseAlert} = useStore((state) => state)
   const navigate = useNavigate();
 
   // Initialisieren (läuft einmal)
+  const fetchStylists = async () => {
+    const res = await getStylists();
+    if (!res) {
+      // custom alert
+      raiseAlert({
+          title: 'Fast geschafft...', 
+          text: 'Die stylists konnten nicht abgeruft werden',
+          severity: 'warning'
+      })
+      return
+    }
+    setStylists(res.data)
+    setIsLoading(false);
+  }
+  
   useEffect(() => {
-      const fetchStylists = async () => {
-        try{
-          const res = await axios.get("http://localhost:5000/api/stylists")
-          setStylists(res.data)
-        }catch(err) {
-          setError('Could not load stylist', err)
-        }finally {
-          setIsLoading(false);
-        }
-      }
-
-      fetchStylists();
+    fetchStylists();
   }, []);
+  
 
   // Speichern (läuft bei Änderungen)
   useEffect(() => {
@@ -79,7 +85,7 @@ const StylistsPage = () => {
                   <CardContent >
                     <Typography variant="h5" align="center">{stylist.name}</Typography>
                     <Typography variant="body2" align="center" sx={{mt:1}}>{stylist.bio}</Typography>
-                    <Typography variant="h6" sx={{mt: 1}} align="center">Services:</Typography>
+                    <Typography variant="h6" sx={{mt: 1}} align="center">Dienstleistungen:</Typography>
                     {stylist.services.map(service => (
                       <Typography key={service._id} variant="body2" align="center">
                         {service.serviceName} - €{service.price}

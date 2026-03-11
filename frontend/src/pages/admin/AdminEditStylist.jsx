@@ -53,13 +53,13 @@ const StylistServices = () => {
             // custom alert
             raiseAlert({
                 title: 'Success!',
-                text: 'The Service of the stylist has been successfully updated!'
+                text: 'Der Service des Stylisten wurde erfolgreich aktualisiert!'
             })
         }else {
             // custom alert
             raiseAlert({
                 title: 'Fast geschafft...', 
-                text: 'The Service of the stylist cannot be updated!',
+                text: 'Der Service des Stylisten konnten nicht aktualisiert werden!',
                 severity: 'warning'
             })
         }
