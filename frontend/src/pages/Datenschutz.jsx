@@ -2,9 +2,9 @@ import { Container, Stack, Typography } from "@mui/material";
 
 const PrivacyPage = () => {
   return (
-    <Container maxWidth="md" sx={{ py: 8 }}>
+    <Container maxWidth="md" sx={{ py: 8 , p:2}}>
       <Stack spacing={4}>
-        <Typography variant="h3" fontWeight="bold">
+        <Typography variant="h4" fontWeight="bold">
           Datenschutzerklärung
         </Typography>
 

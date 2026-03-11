@@ -56,7 +56,7 @@ const CreateStylist = () => {
             <Card>
                 <CardContent>
                     <Typography variant='h6'mb={2}>
-                        Create New Stylist
+                        Neuen Stylisten erstellen
                     </Typography>
 
                     <form onSubmit={handleSubmit(onSubmit)}>
@@ -84,7 +84,7 @@ const CreateStylist = () => {
 
                         <Box sx={{mt:2}}>
                             <Button variant='outlined' component="label">
-                                Upload Photo
+                                Foto hochladen
                                 <input 
                                     type="file"
                                     {...register('photo', photoRules)}
@@ -117,7 +117,7 @@ const CreateStylist = () => {
                             fullWidth
                             sx={{mt:2}}
                         >
-                        Create
+                        Erstellen
                         </Button>
                     </form>
                 </CardContent>

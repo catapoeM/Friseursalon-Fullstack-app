@@ -145,7 +145,7 @@ const StylistServices = () => {
                                 Gesamtzeit: <AccessAlarmIcon fontSize="small"/> {totalDuration} min
                             </Typography>
                             <Typography variant="h5" sx={{ mb: 1 }}>
-                                Services <ContentCutIcon/>
+                                Dienstleistungen <ContentCutIcon/>
                             </Typography>
                             <List>
                                 {stylist?.services?.map((service) => (
@@ -191,7 +191,7 @@ const StylistServices = () => {
                                 ))}
                                 <Stack spacing={1} width="100%">
                                     <Button variant="outlined" onClick={() => {toCalendar(selectedServicesIds)}}>
-                                        Go to calendar
+                                        Zum Kalendar navigieren
                                     </Button>
                                 </Stack>
                             </List>

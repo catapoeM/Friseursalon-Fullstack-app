@@ -18,18 +18,12 @@ export default function ContactPage() {
         alignItems: "center",
     }}
     >
-    <Container maxWidth="lg">
-        <Grid container justifyContent="center">
-        <Grid item xs={12} md={8}>
+    <Container maxWidth="lg" sx={{ py: 8 }}>
+        <Stack spacing={6}>
             <Card
-            sx={{
-                p: 6,
-                width: "100%",
-                backgroundColor: "rgba(255,255,255,0.9)",
-                borderRadius: 4
-            }}
+            sx={{ p: 10, height: "100%", display: "flex", flexDirection: "column" }}
             >
-            <Stack spacing={3}>
+            <Stack spacing={4}>
                 <Typography
                 variant="h3"
                 fontWeight="bold"
@@ -38,37 +32,43 @@ export default function ContactPage() {
                 Kontakt
                 </Typography>
 
-                <Typography variant="h6">
+                <Typography variant="h6" fontWeight="bold"
+                textAlign="center">
                 Salon Elegance
                 </Typography>
 
-                <Typography>
+                <Typography
+                textAlign="center">
                 Musterstraße 1, 12345 Musterstadt
                 </Typography>
 
-                <Typography>
+                <Typography
+                textAlign="center">
                 Telefon: 0123 456789
                 </Typography>
 
-                <Typography>
+                <Typography
+                textAlign="center">
                 E-Mail: info@salon-elegance.de
                 </Typography>
 
-                <Typography sx={{ mt: 2 }} fontWeight="bold">
+                <Typography sx={{ mt: 2 }} fontWeight="bold"
+                textAlign="center">
                 Öffnungszeiten:
                 </Typography>
 
-                <Typography>
+                <Typography
+                textAlign="center">
                 Di - Fr: 10:00 - 19:00
                 </Typography>
 
-                <Typography>
+                <Typography
+                textAlign="center">
                 Mo, Sa, So: Geschlossen
                 </Typography>
             </Stack>
             </Card>
-        </Grid>
-        </Grid>
+        </Stack>
     </Container>
     </Box>
   );

@@ -21,7 +21,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 const navItems = [
-  { label: "Home", path: "/" },
+  { label: "Startseite", path: "/" },
   { label: "Termin", path: "/stylists" },
   { label: "Preise", path: "/preise" },
   { label: "Produkte", path: "/produkte" },
@@ -74,7 +74,7 @@ const Header = () => {
                   startIcon={<PersonAddIcon/>}
                   to='/createstylist'
                 >
-                  Create Stylist
+                  Stylist erstellen
                 </Button>
               </Stack>
             </>
@@ -106,7 +106,7 @@ const Header = () => {
                 startIcon={<LogoutIcon/>}
                 onClick={() => {adminLogout()}}
               >
-                Logout
+                Ausloggen
               </Button>
             )}
           </Box>
@@ -136,7 +136,7 @@ const Header = () => {
                 startIcon={<LogoutIcon/>}
                 onClick={() => {adminLogout()}}
               >
-                Logout
+                Ausloggen
               </Button>
             )}
           </List>

@@ -2,109 +2,109 @@ import { duration } from "@mui/material";
 
 export const loginRules = {
     email: {
-        required: 'Email is required',
+        required: 'E-Mail ist erforderlich',
         pattern: {
             value: /^\S+@\S+\.\S+$/,
-            message: 'Invalid email format'
+            message: 'Ungültiges E-Mail-Format'
         }
     },
     password: {
-        required: 'Password is required',
+        required: 'Passwort ist erforderlich',
         minLength: {
             value: 8,
-            message: 'Password must be at least 8 Characters'
+            message: 'Das Passwort muss mindestens 8 Zeichen lang sein'
         },
         maxLength: {
             value: 50,
-            message: 'Password can be maximum of 50 Characters'
+            message: 'Das Passwort darf maximal 50 Zeichen lang sein'
         }
     }
 }
 
 export const registerRules = {
     email: {
-        required: 'Email is required',
+        required: 'E-Mail ist erforderlich',
         pattern: {
             value: /^\S+@\S+\.\S+$/,
-            message: 'Invalid email format'
+            message: 'Ungültiges E-Mail-Format'
         }
     },
     password: {
-        required: 'Password is required',
+        required: 'Passwort ist erforderlich',
         minLength: {
             value: 8,
-            message: 'Password must be at least 8 Characters'
+            message: 'Das Passwort muss mindestens 8 Zeichen lang sein'
         },
         maxLength: {
             value: 50,
-            message: 'Password can be maximum of 50 Characters'
+            message: 'Das Passwort darf maximal 50 Zeichen lang sein'
         }
     },
     adminSecret: {
-        required: 'Admin secret key is required',
-            minLength: {
+        required: 'Admin-Geheimschlüssel ist erforderlich',
+        minLength: {
             value: 12,
-            message: 'Secret key must be at least 12 characters'
+            message: 'Der Geheimschlüssel muss mindestens 12 Zeichen lang sein'
         }
     }
 }
 
 export const createStylistRules = {
     name: {
-        required: 'Full Name is required',
+        required: 'Vollständiger Name ist erforderlich',
         minLength: {
             value: 2,
-            message: 'Full Name must be at least 2 Characters'
+            message: 'Der vollständige Name muss mindestens 2 Zeichen lang sein'
         },
         maxLength: {
             value: 50,
-            message: 'Full name can be maximum of 50 Characters'
+            message: 'Der vollständige Name darf maximal 50 Zeichen lang sein'
         }
     },
     bio: {
-        required: 'Bio is required',
+        required: 'Beschreibung ist erforderlich',
         minLength: {
             value: 10,
-            message: 'Bio must be at least 10 Characters'
+            message: 'Die Beschreibung muss mindestens 10 Zeichen lang sein'
         },
         maxLength: {
             value: 250,
-            message: 'Bio can be maximum of 250 Characters'
+            message: 'Die Beschreibung darf maximal 250 Zeichen lang sein'
         }
     }
 }
 
 export const servicesRules = {
     serviceName: {
-        required: 'Service Name is required',
+        required: 'Service-Name ist erforderlich',
         minLength: {
             value: 3,
-            message: 'Service Name must be at least 3 Characters'
+            message: 'Der Service-Name muss mindestens 3 Zeichen lang sein'
         },
         maxLength: {
             value: 40,
-            message: 'Service Name can be maximum of 40 Characters'
+            message: 'Der Service-Name darf maximal 40 Zeichen lang sein'
         }
     },
     duration: {
-        required: 'The duration in minutes is required',
+        required: 'Die Dauer in Minuten ist erforderlich',
         pattern: {
             value: /^(1[5-9]|[2-9][0-9]|1[0-9]{2}|2[0-3][0-9]|240)$/,
-            message: 'The duration must be between 15 and 240 minutes'
+            message: 'Die Dauer muss zwischen 15 und 240 Minuten liegen'
         }
     },
     price: {
-        required: 'The price is required',
+        required: 'Der Preis ist erforderlich',
         pattern: {
             value: /^(1[5-9]|[2-9][0-9]|1[0-9]{2}|2[0-3][0-9]|300)$/,
-            message: 'The price must be between 10 and 300'
+            message: 'Der Preis muss zwischen 10 und 300 liegen'
         }
     },
     clientType: {
-        required: 'The Client type is required',
+        required: 'Der Kundentyp ist erforderlich',
         pattern: {
             value: /^(Woman|Man|Child)$/,
-            message: 'Invalid Service type'
+            message: 'Ungültiger Servicetyp'
         }
     }
 }
@@ -167,72 +167,70 @@ export const createBookingRules = {
 }
 
 export const verifyCodeRules = {
-    
     verifyCode: {
-        required: 'Verifizierungscode is erforderlich',
+        required: 'Verifizierungscode ist erforderlich',
         minLength: {
             value: 6,
             message: 'Der Code muss mindestens 6 Zahlen lang sein'
         },
         maxLength: {
             value: 6,
-            message: 'Der Code darf Maximal 6 Zahlen lang sein'
+            message: 'Der Code darf maximal 6 Zahlen lang sein'
         }
     },
 }
 
 export const clientTypeRules = {
-    required: "Client Type is required.",
+    required: "Kundentyp ist erforderlich.",
     pattern: {
         value: /\b(Mann|Frau|Kinder)\b/,
-        message: "Please enter with capital letter at the beginning [Mann / Frau / Kinder].",
+        message: "Bitte mit Großbuchstaben am Anfang eingeben [Mann / Frau / Kinder].",
     },
 };
 
 export const emailRules = {
-    required: "Email is required",
+    required: "E-Mail ist erforderlich",
     pattern: {
         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message: "Please enter a valid email address",
+        message: "Bitte eine gültige E-Mail-Adresse eingeben",
     },
 };
 
 export const phoneRules = {
-    required: "Phone number is required",
+    required: "Telefonnummer ist erforderlich",
     pattern: {
         value: /^\+?[0-9\s\-()]{7,15}$/,
-        message: "Invalid phone number format",
+        message: "Ungültiges Telefonnummernformat",
     },
 };
 
 export const photoRules = {
     validate: {
         required: (files) =>
-        files?.length > 0 || 'Photo is required',
+        files?.length > 0 || 'Foto ist erforderlich',
 
         fileType: (files) => {
             if (!files?.length) return true;
             const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
             return (
                 allowed.includes(files[0].type) ||
-                'Only JPG, PNG or JPEG images are allowed'
+                'Nur JPG-, PNG- oder JPEG-Bilder sind erlaubt'
             );
         },
 
         fileSize: (files) => {
             if (!files?.length) return true;
-            const maxSize = 2 * 1024 * 1024; // 2MB
+            const maxSize = 2 * 1024 * 1024;
             return (
                 files[0].size <= maxSize ||
-                'Image must be smaller than 2MB'
+                'Das Bild muss kleiner als 2MB sein'
             );
         }
     }
 };
 
-
 export const confirmPasswordRule = (getValues) => ({
-    required: 'Please confirm password',
+    required: 'Bitte Passwort bestätigen',
     validate: (value) => 
-        value === getValues('password') || 'Password do not match'
+        value === getValues('password') || 'Passwörter stimmen nicht überein'
 })

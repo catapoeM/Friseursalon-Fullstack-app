@@ -8,6 +8,7 @@ import useStore from '../hooks/useStore';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { isTodayAndSelectedDateEqual } from '../utils/dateFormatter';
+import 'dayjs/locale/de'
 
 import {minutesToHours, filterByDateKey, extractStartEndHours} from '../utils/booking'
 import { areNumbersConsecutive, extractKeysValuesFromArrayOfObjects, removeValuesInRangesFromArray, sort } from '../hooks/helperFunctions';
@@ -75,7 +76,7 @@ const TimelineCalendar = () => {
             // custom alert
             raiseAlert({
                 title: 'Fast geschafft...', 
-                text: 'The free slots of the stylist cannot be updated',
+                text: 'Die freien Plätze des Stylisten können nicht aktualisiert werden',
                 severity: 'warning'
             })
             return
@@ -119,14 +120,14 @@ const TimelineCalendar = () => {
             if (responseCreateBooking) {
                 setStep("REQUEST_CODE")
             raiseAlert({
-                title: 'Create booking!',
-                text: 'The create booking process has been now started!'
+                title: 'Buchung erstellen!',
+                text: 'Der Buchungsprozess wurde nun gestartet!'
             })
             }else {
                 // custom alert
                 raiseAlert({
                     title: 'Fast geschafft...', 
-                    text: 'The booking creation code could done!',
+                    text: 'Der Code zur Buchungserstellung konnte fertiggestellt werden!',
                     severity: 'warning'
                 })
             }
@@ -137,14 +138,14 @@ const TimelineCalendar = () => {
         if (responseRequestCode) {
             setStep("VERIFY_CODE")
             raiseAlert({
-                title: 'Request code!',
-                text: 'The requested code has been sent to your email-address successfully!'
+                title: 'Code anfordern!',
+                text: 'Der angeforderte Code wurde erfolgreich an Ihre E-Mail-Adresse gesendet.'
             })
         }else {
             // custom alert
             raiseAlert({
                 title: 'Fast geschafft...', 
-                text: 'The confirmation code could not be sent!',
+                text: 'Der Bestätigungscode konnte nicht gesendet werden!',
                 severity: 'warning'
             })
         }
@@ -155,14 +156,14 @@ const TimelineCalendar = () => {
         if (responseVerifyCode) {
             setStep("CONGRATULATIONS")
             raiseAlert({
-                title: 'Verify code!',
-                text: 'The requested code has been successfully verified and your reservation is now completely finished!'
+                title: 'Code bestätigen!',
+                text: 'Der angeforderte Code wurde erfolgreich verifiziert und Ihre Reservierung ist nun vollständig abgeschlossen!'
             })
         }else {
             // custom alert
             raiseAlert({
                 title: 'Fast geschafft...', 
-                text: 'You could not be verified',
+                text: 'Ihre Verifizierung konnte nicht durchgeführt werden.',
                 severity: 'warning'
             })
         }
@@ -177,12 +178,12 @@ const TimelineCalendar = () => {
     }
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de'>
             <Box components={['DateCalendar']}>
                 <DateCalendar 
                     disablePast
                     shouldDisableDate={isDateDisabled}
-                    label="Select a date"
+                    label="Datumn Auswählen"
                     value={selectedDate}
                     onChange={(newValue) => {
                         if (!newValue) {
@@ -195,10 +196,10 @@ const TimelineCalendar = () => {
                 {selectedDate && step !== "DONE" &&(
                     <Box sx={{mt: "3"}}>
                         <Typography variant='h6'>
-                            The total price is: {totalPrice}€
+                            Total Preis: {totalPrice}€
                         </Typography>
                         <Typography variant='h6'>
-                            Available hours for: "{selectedDate.format("YYYY-MM-DD")}"
+                            Verfügbare Stunden für: "{selectedDate.format("YYYY-MM-DD")}"
                         </Typography>
 
                         <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
@@ -226,29 +227,29 @@ const TimelineCalendar = () => {
                             checkConsecutiveNumbers 
                             ?
                             <Typography variant='h6' color='black'>
-                                For your service you need to choose a maximum of {countHoursLeft}h consecutive!
+                                Für Ihren Service müssen Sie maximal Folgendes auswählen: {countHoursLeft}h aufeinanderfolgend!
                             </Typography> 
                             :
                             <Typography variant='h6' color='red'>
-                                Please choose consecutive Hours!
+                                Bitte wählen Sie aufeinanderfolgende Stunden!
                             </Typography>
                             }
                             {   
                             choosenHours.length > countHoursLeft
                             ?
                             <Typography variant='h6' color='red'>
-                                Please deselect: {choosenHours.length - countHoursLeft}h
+                                Bitte abwählen: {choosenHours.length - countHoursLeft}h
                             </Typography>
                             :   
                             <Typography variant='h6' color='black'>
-                                Time choosen: {choosenHours.length}h
+                                Zeit gewählt: {choosenHours.length}h
                             </Typography>
                             }
                             </>)
                             :
                             (<>
                             <Typography variant='h5' color='red'>
-                                Unfortunatelly the is NO free time left for today!
+                                Leider bleibt heute keine freie Zeit mehr.
                             </Typography>
                             </>)
                         }
@@ -316,7 +317,7 @@ const TimelineCalendar = () => {
 
                             <TextField
                                 //defaultValue=""
-                                label="Zusätzliche Informationen"
+                                label="Zusätzliche Informationen (Nicht erforderlich)"
                                 {...register('clientAdditionalNotes', registerRules.clientAdditionalNotes)}
                                 error={!!errors.clientAdditionalNotes}
                                 helperText={errors.clientAdditionalNotes?.message}
@@ -325,7 +326,7 @@ const TimelineCalendar = () => {
                                 fullWidth
                             />
                             <Button type="submit" variant="contained" size="large">
-                                Buchen Sie Jetzt
+                                Jetzt buchen
                             </Button>
                         </Stack>
                     </form>
@@ -335,12 +336,12 @@ const TimelineCalendar = () => {
                     (
                     <Stack spacing={1} mt={3}>
                         <Typography variant='h6' color='black'>
-                            You have to send code to your email address to be verified
+                            Sie müssen einen Code an Ihre E-Mail-Adresse senden, um sich zu verifizieren.
                         </Typography>
                         <form onSubmit={handleSubmit(handleRequesCode)}>
                             <Stack spacing={1} mt={3}>
                                 <Button type="submit" variant="contained" size="large">
-                                        Send Code
+                                        Code senden
                                 </Button>
                             </Stack>
                         </form>
