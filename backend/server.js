@@ -47,6 +47,7 @@ app.use(session({
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+app.use(express.static("public"));
 
 // Use routes
 app.use('/api/home', homeRoutes);
