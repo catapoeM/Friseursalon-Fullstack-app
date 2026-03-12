@@ -294,7 +294,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                defaultValue="067765039451"
+                                defaultValue="067765039111"
                                 label="Telefonnummer"
                                 {...register('phone', phoneRules)}
                                 error={!!errors.phone}
@@ -305,7 +305,7 @@ const TimelineCalendar = () => {
                             />
 
                             <TextField
-                                defaultValue="garth51@ethereal.email"
+                                defaultValue="carleton.cummings21@ethereal.email"
                                 label="E-mail"
                                 {...register('email', emailRules)}
                                 error={!!errors.email}

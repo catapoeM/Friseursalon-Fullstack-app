@@ -18,6 +18,7 @@ const bookingsSchema = new mongoose.Schema({
     clientType: {type: String, required: true},
     phone: {type: String, required: true},
     email: {type: String, required: true},
+    code: {type: String, default: false},
     clientAdditionalNotes: {type: String},
     confirmed: {type: Boolean, default: false},
     isCanceled: {type: Boolean, default: false},

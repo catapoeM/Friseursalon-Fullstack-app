@@ -1,5 +1,5 @@
 import express from 'express';
-import {createBooking, cancelBooking,
+import {createBooking, cancelBookingPatch,
     requestCode, verifyCode, notFound } from '../controllers/bookingController.js';
 import { body, param, query } from 'express-validator';
 
@@ -7,6 +7,12 @@ import { startAtLeastTwoHoursAhead, startOnValidWeekday, startWithinHours,
     endWithinHours, endNotAfter19, durationValid,
      validatePhoneNumber } from '../validators/bookingValidation.js';
 import { checkValidation } from '../middlewares/middlewares.js';
+
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -86,22 +92,21 @@ router.post('/:id/create',
     createBooking
 );
 
+// Cancel the booking get
+router.get('/cancel', (req, res) => {
+  res.sendFile("cancelPage.html", { root: "public" });
+})
+
 // Cancel the booking
-router.patch('/:id/cancel',
-    param("id")
-        .isMongoId(),
-    query("code")
-        .isString()
-        .isLength({min:32, max: 64}),
-    body('clientAdditionalNotes')
-        .optional()
-        .trim()
-        .escape()
-        .isString()
-        .isLength({min:10, max: 100})
-        .withMessage('Mindestens 10 Buchstaben, maximal 100'),
+router.patch('/cancel',
+    body("code")
+    .isLength({ min: 6, max: 6 })
+    .isNumeric()
+    .withMessage("Code muss 6-stellig sein"),
+    body("bookingId")
+    .isMongoId(),
     checkValidation,
-    cancelBooking
+    cancelBookingPatch
 );
 
 // Request code for the visitor to its booking
