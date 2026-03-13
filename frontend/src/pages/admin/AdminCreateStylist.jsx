@@ -33,7 +33,6 @@ const CreateStylist = () => {
         formData.append("name", data.name);
         formData.append("bio", data.bio);
 
-        console.log(formData, ' data')
         const ok = await createStylist(formData)
         if (ok) {
             // custom alert
@@ -94,7 +93,6 @@ const CreateStylist = () => {
                                         register('photo').onChange(e);
                                         const file = e.target.files[0]
                                         if (file) {
-                                            console.log(file, ' file')
                                             setPreview(URL.createObjectURL(file));
                                         }
                                     }}
