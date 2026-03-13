@@ -58,8 +58,6 @@ const PricesPage = () => {
         <Loading></Loading>
     }
 
-
-    console.log(stylists)
     return (
         <BackgroundPic
         >

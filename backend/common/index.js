@@ -59,8 +59,6 @@ const createEmailAndSend = async (emailContent) => {
         });
     
         const emailSent = await transporter.sendMail(emailContent);
-        
-        console.log(emailSent, ' email Content sent');
         if (emailSent) {
             return true;
         }return false;
@@ -99,15 +97,5 @@ const formatDateTimeUTC = (isoString, locale) => {
     hour12: false
   }).format(new Date(isoString));
 }
-/*
-const calculateTheDifferenceTimeInHours = (firstDate, secondDate) => {
-    // difference in milliseconds
-    const diffMs = secondDate - firstDate;
-    // convert to hours
-    const diffHours = diffMs / (1000 * 60 * 60);
-    console.log(diffHours, ' diff H')
-    return diffHours;
-}
-*/
 
 export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC, getToken, getServiceNamesByIds};

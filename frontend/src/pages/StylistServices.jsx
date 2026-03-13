@@ -61,7 +61,6 @@ const StylistServices = () => {
     };
 
     useEffect(() => {
-        console.log(selectedServicesIds)
         sessionStorage.setItem('totalDuration', JSON.stringify(totalDuration))
         sessionStorage.setItem('totalPrice', JSON.stringify(totalPrice))
         sessionStorage.setItem('selectedServicesIds', JSON.stringify(selectedServicesIds))
