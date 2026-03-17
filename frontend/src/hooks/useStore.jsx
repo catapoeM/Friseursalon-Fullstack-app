@@ -39,7 +39,7 @@ const useStore = create((set, get) => ({
             const loggedinAdmin = response.data;
             set({token, decodedToken, loggedinAdmin})
             
-            sessionStorage.setItem(STORAGEKEY, JSON.stringify({token, decodedToken, loggedinAdmin}))
+            localStorage.setItem(STORAGEKEY, JSON.stringify({token, decodedToken, loggedinAdmin}))
             
             return true;
         } catch (error) {
@@ -48,8 +48,8 @@ const useStore = create((set, get) => ({
         }
     },
     adminLogout: () => {
-        // SessionStorage Löschen
-        sessionStorage.removeItem(STORAGEKEY);
+        // localStorage Löschen
+        localStorage.removeItem(STORAGEKEY);
         
         // Store auf Initialwerte zurucksetzen
         set({...initialState});
@@ -57,11 +57,12 @@ const useStore = create((set, get) => ({
     adminCheckLogin: () => {
         // wenn angemeldet, gar nix tun
         // mit det(). greife ich auf elemente im eigenen Store zu
+        /*
         if (!get().loggedinAdmin) {
             return;
-        }
+        }*/
         // Objekt aus SessionStore holen
-        const backup = JSON.parse(sessionStorage.getItem(STORAGEKEY));
+        const backup = JSON.parse(localStorage.getItem(STORAGEKEY));
 
         // Prüfen, ob Objekt da ist
         if (!backup) {
@@ -79,7 +80,7 @@ const useStore = create((set, get) => ({
             get().adminLogout();
             return;
         }
-        // Zustand mit den Daten vom SessionStorage updaten
+        // Zustand mit den Daten vom localStorage updaten
         set({token, decodedToken, loggedinAdmin})
     },
     adminRefreshMe: async() => {
@@ -92,8 +93,8 @@ const useStore = create((set, get) => ({
         // Store updaten
         set({loggedinAdmin})
 
-        // SessionStorage updaten
-        sessionStorage.setItem(STORAGEKEY, JSON.stringify({token: get().token, decodedToken: get().decodedToken, loggedinAdmin}))
+        // localStorage updaten
+        localStorage.setItem(STORAGEKEY, JSON.stringify({token: get().token, decodedToken: get().decodedToken, loggedinAdmin}))
     },
     getStylists: async() => {
         try {
@@ -109,6 +110,7 @@ const useStore = create((set, get) => ({
     },
     createStylist: async(data) => {
         try {
+            await get().adminCheckLogin();
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
             const response = await axios.post(APIURL + '/admin/stylist', data, config)
             if (!response) {
@@ -122,6 +124,7 @@ const useStore = create((set, get) => ({
     },
     editStylistServices: async(formData, serviceId, stylistId) => {
         try {
+            await get().adminCheckLogin();
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
             const response = await axios.put(APIURL + `/admin/stylist/${stylistId}/services/${serviceId}`, formData, config)
             if (!response) {
@@ -136,6 +139,7 @@ const useStore = create((set, get) => ({
     },
     addServiceToStylist: async(formData, stylistId) => {
         try {
+            await get().adminCheckLogin();
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
             const response = await axios.post(APIURL + `/admin/stylist/${stylistId}/services`, formData, config)
             if (!response) {
@@ -150,6 +154,7 @@ const useStore = create((set, get) => ({
     },
     changeStatusStylist: async(stylist) => {
         try {
+            await get().adminCheckLogin();
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
             const stylistStatus = {
                 "isActive": null
@@ -172,7 +177,6 @@ const useStore = create((set, get) => ({
     },
     getStylistBookings: async(stylistId) => {
         try {
-            console.log(stylistId)
             const response = await axios.get(APIURL + '/stylists/' + stylistId)
             if (!response) {
                 return false;
