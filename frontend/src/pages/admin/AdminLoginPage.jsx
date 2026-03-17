@@ -52,7 +52,7 @@ const AdminLoginPage = () => {
                 <form onSubmit={handleSubmit(handleLoginSubmit)}>
                     <Stack spacing={3}>
                         <TextField
-                            defaultValue="cata2@adm.com"
+                            defaultValue="cata3@mail.com"
                             //label="Email"
                             {...register('email', loginRules.email)}
                             error={!!errors.email}
@@ -63,7 +63,7 @@ const AdminLoginPage = () => {
                         />
 
                         <TextField
-                            defaultValue="12345678"
+                            defaultValue="123456789"
                             //label="Password"
                             {...register('password', loginRules.password)}
                             error={!!errors.password}

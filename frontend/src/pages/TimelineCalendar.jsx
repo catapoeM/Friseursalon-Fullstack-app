@@ -34,8 +34,6 @@ const TimelineCalendar = () => {
         return newDate;
     }
 
-
-    
     const [selectedDate, setSelectedDate] = useState(getNextValidDate(dayjs()));
     
     const [choosenHours, setChoosenHours] = useState([])
