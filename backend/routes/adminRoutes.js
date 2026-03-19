@@ -2,7 +2,7 @@ import express from 'express';
 import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
 import { checkToken, checkValidation } from '../middlewares/middlewares.js';
 import { adminRegisterLimiter, loginLimiter } from '../middlewares/rateLimit.js';
-import { body, check} from 'express-validator';
+import { body} from 'express-validator';
 import upload from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();

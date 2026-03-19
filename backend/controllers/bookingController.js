@@ -1,7 +1,7 @@
 import {Bookings, UserVerification} from "../models/bookingModel.js";
 import Stylist from "../models/stylistModel.js";
-import { createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject,
-     decryptObject, getHash, checkHash, randomNumber, formatDateTimeUTC} from "../common/index.js";
+import { createEmailAndSend,
+    getHash, checkHash, randomNumber} from "../common/index.js";
 import {getToken, getServiceNamesByIds} from "../common/index.js";
 import dotenv from 'dotenv';
 import { bookingExists } from "../services/booking.js";
@@ -214,7 +214,6 @@ const verifyCode = async (req, res) => {
                 //Löscht jeden Code der im DB befindet mit dem Email
                 await UserVerification.where(email).deleteMany();
                 
-                //const humanReadableDateAndTimeEnd = formatDateTimeUTC(objData.end, 'de-DE');
                 const emailContent = {
                     from: '"Test" <test@example.com>',
                     to: process.env.NODEMAILER_USER,

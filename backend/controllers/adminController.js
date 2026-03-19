@@ -13,6 +13,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_SECRET
 })
 
+// Admin register controller
 const adminRegister = async (req, res) => {
     try {
         const {email, password, confirmPassword, adminSecret} = req.matchedData;
@@ -39,6 +40,7 @@ const adminRegister = async (req, res) => {
     }
 }
 
+// Admin login controller
 const adminLogin = async (req, res) => {
     try {
         const {email, password} = req.body;
@@ -62,7 +64,7 @@ const adminLogin = async (req, res) => {
     }
 }
 
-
+// Admin create Stylist controller
 const createStylist = async (req, res) => {
     try {
         const {name, bio} = req.body;
@@ -96,6 +98,7 @@ const createStylist = async (req, res) => {
     }
 }
 
+// Admin update stylist controller
 // For now only the status of the stylist can be changed here: Activated/Deactivated : True/False
 const updateStylist = async (req, res) => {
     try {
@@ -120,6 +123,7 @@ const updateStylist = async (req, res) => {
     }
 }
 
+// Admin ADD service to the stylist controller
 const addServiceToStylist = async (req, res) => {
     try {
         const { id } = req.params;
@@ -144,6 +148,7 @@ const addServiceToStylist = async (req, res) => {
     }
 }
 
+// Admin UPDATE service to the stylist controller
 const updateServiceToStylist = async (req, res) => {
     try {
         const { stylistId, serviceId } = req.params;
@@ -182,6 +187,7 @@ const updateServiceToStylist = async (req, res) => {
     }
 }
 
+// Admin delete service to the stylist controller
 const deleteServiceFromStylist = async (req, res) => {
     try {
         const { stylistId, serviceId } = req.params;
@@ -206,11 +212,12 @@ const deleteServiceFromStylist = async (req, res) => {
     }
 }
 
+// Get stylists which are sorted as: Active and the newest ones
 const getStylists = async (req, res) => {
     try {
         const stylists = await Stylist.find().sort({
-                isActive: -1, // true zuerst
-                createdAt: -1 // neueste zuerst
+                isActive: -1, // true first
+                createdAt: -1 // newest first
             });
         res.json(stylists);
     }   catch (err) {
@@ -218,6 +225,7 @@ const getStylists = async (req, res) => {
     }
 }
 
+// Not found page as backup
 const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };

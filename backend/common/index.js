@@ -8,41 +8,33 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
+// Crypt the code 
 const cryptTheCode = (rawCode) => {
     rawCode = crypto.randomBytes(32).toString("hex");
     return rawCode;
 } 
 
+// Returns a random number of 6 digits between 100000 and 999999
 const randomNumber = () => {
    return random.int(100000, 999999).toString();
 }
 
+// Hashed the plainText using bcrypt
 const getHash = (plainText) => {
     return bcrypt.hashSync(plainText, 10);
 };
 
+// Checks and compares the plain text with the one hashed before (F.e. using the function getHash)
 const checkHash = (plainText, hash) => {
     return bcrypt.compareSync(plainText, hash);
 };
 
-// Function to encrypt an object
-const encryptObject = (obj) => {
-    const jsonString = JSON.stringify(obj);
-    const encryptedObj = CryptoJS.AES.encrypt(jsonString, process.env.CRYPTOJS_SECRET).toString();
-    return encryptedObj;
-}
-
-// Function to decrypt to an object
-const decryptObject = (encryptedObj) => {
-    const bytes = CryptoJS.AES.decrypt(encryptedObj, process.env.CRYPTOJS_SECRET);
-    const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
-    return JSON.parse(decryptedString);
-}
-
+// Gets (creates) a Json web token
 const getToken = (data, secret, expiresTime) => {
     return jwt.sign(data, secret, { expiresIn: expiresTime });
 };
 
+// Creates the email using (nodemailer) and sends it
 const createEmailAndSend = async (emailContent) => {
     try {
         const transporter = nodemailer.createTransport({
@@ -67,16 +59,9 @@ const createEmailAndSend = async (emailContent) => {
     }
 }
 
-const fromStringToDatePlusExtraHours = (stringDate, extraHours) => {
-    // In Date umwandeln
-    let date = new Date(stringDate );
-    // 24 Stunden hinzufügen
-    date.setHours(date.getHours() + extraHours);
-    // zurück zu ISO-String
-    const newDateWithExtraHours = date.toISOString();
-    return newDateWithExtraHours;
-}
-
+    // It takes a list of IDs and a list of service objects
+    // Finds which services match those IDs
+    // Returns only the service names of the matching ones
 const getServiceNamesByIds = (ids, services) => {
     const idSet = new Set(ids.map(id => id.toString()));
 
@@ -86,16 +71,4 @@ const getServiceNamesByIds = (ids, services) => {
     return matchedServices;
 }
 
-const formatDateTimeUTC = (isoString, locale) => {
-  return new Intl.DateTimeFormat(locale, {
-    year: "numeric",
-    month: "long",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-    hour12: false
-  }).format(new Date(isoString));
-}
-
-export { getHash, checkHash, cryptTheCode, createEmailAndSend, fromStringToDatePlusExtraHours, encryptObject, decryptObject, randomNumber, formatDateTimeUTC, getToken, getServiceNamesByIds};
+export { getHash, checkHash, cryptTheCode, createEmailAndSend, randomNumber, getToken, getServiceNamesByIds};
