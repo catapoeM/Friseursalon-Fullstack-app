@@ -17,7 +17,6 @@
     "cloudinary": "^2.9.0",
     "connect-mongo": "^6.0.0",
     "cors": "^2.8.5",
-    "crypto-js": "^4.2.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
@@ -29,10 +28,10 @@
     "mongoose": "^8.19.2",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
-    "random": "^5.4.1",
-    "socket.io": "^4.8.1"
+    "random": "^5.4.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
   }
 }

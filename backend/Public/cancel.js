@@ -5,7 +5,6 @@
 
   const statusMessage = document.getElementById("statusMessage");
   const button = document.getElementById("cancelBtn");
-  console.log(button, ' button')
   button.addEventListener("click", async () => {
     if (!bookingId || !code) {
       statusMessage.textContent = "Ungültiger Link!";
@@ -14,7 +13,6 @@
     }
 
     try {
-      console.log(' button 1!!!!')
       const res = await fetch("http://localhost:5000/api/booking/cancel", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
