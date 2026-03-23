@@ -16,6 +16,7 @@ const BackButton = () => {
 
   return (
     <Button
+        data-cy="back"
         onClick={handleBack}
         aria-label="zurück"
         size="large"

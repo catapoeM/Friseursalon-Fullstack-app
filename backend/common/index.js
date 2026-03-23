@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import CryptoJS from 'crypto-js';
 import random from 'random';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
