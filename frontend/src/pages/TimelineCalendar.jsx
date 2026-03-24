@@ -354,9 +354,9 @@ const TimelineCalendar = () => {
                             <TextField
                                     //defaultValue="cata2@adm.com"
                                     label="Verifizierungscode eingeben"
-                                    {...register('verifyCode', verifyCodeRules)}
-                                    error={!!errors.verifyCodeRules}
-                                    helperText={errors.verifyCodeRules?.message}
+                                    {...register('verifyCode', verifyCodeRules.verifyCode)}
+                                    error={!!errors.verifyCode}
+                                    helperText={errors.verifyCode?.message}
                                     name="verifyCode"
                                     type="text"
                                     fullWidth
