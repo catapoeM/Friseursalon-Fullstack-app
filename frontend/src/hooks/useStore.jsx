@@ -172,7 +172,22 @@ const useStore = create((set, get) => ({
             return true
         } catch (error) {
             // TODO: Snackbar/Alert ausgeben
-            get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
+            get().raiseAlert({severity: 'error', title: 'Change status stylist error', text: error.message})
+        }
+    },
+    changeBioStylist: async(stylist, bioText) => {
+        try {
+            await get().adminCheckLogin();
+            const config = {headers: {Authorization: 'Bearer ' + get().token}}
+            const response = await axios.patch(APIURL + '/admin/stylist/' + stylist._id, bioText, config)
+            if (!response) {
+                return false;
+            }
+            await get().adminRefreshMe();
+            return true
+        } catch (error) {
+            // TODO: Snackbar/Alert ausgeben
+            get().raiseAlert({severity: 'error', title: 'Change stylist Bio error', text: error.message})
         }
     },
     getStylistBookings: async(stylistId) => {

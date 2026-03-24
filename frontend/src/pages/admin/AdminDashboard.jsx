@@ -8,7 +8,6 @@ import { formatDate } from "../../utils/dateFormatter";
 
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import EuroIcon from '@mui/icons-material/Euro';
-import ContentCutIcon from '@mui/icons-material/ContentCut';
 import FaceIconMan from '@mui/icons-material/Face';
 import FaceIconWoman from '@mui/icons-material/Face3';
 import ChildIcon from '@mui/icons-material/ChildCare';
@@ -16,6 +15,7 @@ import ChildIcon from '@mui/icons-material/ChildCare';
 const AdminDashboard = () => {
   const {loggedinAdmin} = useStore((state) => state);
   const [stylists, setStylists] = useState([]);
+  const [step, setStep]  = useState('standard')
   // Initialisieren (läuft wenn loggedinAdmin data in useStore is changed)
   useEffect(() => {
     setStylists(loggedinAdmin)
@@ -31,6 +31,7 @@ const AdminDashboard = () => {
   const [statusStylist, setStatusStylist] = useState(null)
 
   const handleOpenDialog = (stylist) => {
+    setStep('standard')
     setStatusStylist(stylist.isActive)
     setSelectedStylist(stylist);
     setDialogOpen(true);
@@ -116,6 +117,9 @@ const AdminDashboard = () => {
         {/* Dialog nur einmal laden */}
         <StylistActionDialog
           open={dialogOpen}
+          setOpen={setDialogOpen}
+          step={step}
+          setStep={setStep}
           stylist={selectedStylist}
           status={statusStylist}
           onClose={handleCloseDialog}
