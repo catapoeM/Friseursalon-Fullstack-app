@@ -99,7 +99,7 @@ const createStylist = async (req, res) => {
 }
 
 // Admin update stylist controller
-// For now only the status of the stylist can be changed here: Activated/Deactivated : True/False
+// The status of the stylist can be changed here: Activated/Deactivated : True/False
 const updateStylist = async (req, res) => {
     try {
         const {id} = req.params;
@@ -120,6 +120,30 @@ const updateStylist = async (req, res) => {
 
     }   catch (err) {
             res.status(500).json({ error: "Failed to Deactivate stylist " + err});
+    }
+}
+
+// Admin update stylist - bio text
+// The bio-text of the stylist can be changed here
+const updateBioStylist = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const {bio} = req.body;
+        const stylist = await Stylist.findById(id);
+        if (!stylist) {
+            return res.status(404).json({error: "Stylist not found!"})
+        }
+
+        stylist.bio = bio;
+        const saveStylist = await stylist.save();
+        if (!saveStylist) {
+            return res.status(404).json({error: "Bio could not be changed!"})
+        }
+
+        res.status(200).json(saveStylist.bio);
+
+    }   catch (err) {
+            res.status(500).json({ error: "Failed to Update bio of the stylist " + err});
     }
 }
 
@@ -230,4 +254,4 @@ const notFound = (req, res) => {
     res.status(404).send('<h1>Seite nicht gefunden</h1>');
 };
 
-export {adminLogin, adminRegister, createStylist, updateStylist, addServiceToStylist, updateServiceToStylist, getStylists, deleteServiceFromStylist, notFound}
+export {adminLogin, adminRegister, createStylist, updateStylist, updateBioStylist, addServiceToStylist, updateServiceToStylist, getStylists, deleteServiceFromStylist, notFound}

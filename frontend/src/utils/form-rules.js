@@ -1,5 +1,3 @@
-import { duration } from "@mui/material";
-
 export const loginRules = {
     email: {
         required: 'E-Mail ist erforderlich',
