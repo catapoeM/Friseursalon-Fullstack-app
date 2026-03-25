@@ -175,11 +175,14 @@ const useStore = create((set, get) => ({
             get().raiseAlert({severity: 'error', title: 'Change status stylist error', text: error.message})
         }
     },
-    changeBioStylist: async(stylist, bioText) => {
+    changeBioStylist: async(stylist, bio) => {
         try {
+            const bioStylist = {
+                "bio": bio
+            }
             await get().adminCheckLogin();
             const config = {headers: {Authorization: 'Bearer ' + get().token}}
-            const response = await axios.patch(APIURL + '/admin/stylist/' + stylist._id, bioText, config)
+            const response = await axios.patch(APIURL + '/admin/stylist/' + stylist._id + '/bio', bioStylist, config)
             if (!response) {
                 return false;
             }

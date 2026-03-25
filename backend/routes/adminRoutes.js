@@ -1,5 +1,5 @@
 import express from 'express';
-import { notFound, adminRegister, adminLogin, createStylist, updateStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
+import { notFound, adminRegister, adminLogin, createStylist, updateStylist, updateBioStylist, addServiceToStylist, getStylists, updateServiceToStylist, deleteServiceFromStylist } from '../controllers/adminController.js';
 import { checkToken, checkValidation } from '../middlewares/middlewares.js';
 import { adminRegisterLimiter, loginLimiter } from '../middlewares/rateLimit.js';
 import { body} from 'express-validator';
@@ -53,6 +53,14 @@ router.patch("/stylist/:id", checkToken,
   body("isActive")
     .isBoolean(),
   updateStylist)
+
+router.patch("/stylist/:id/bio", checkToken,
+  body("bio")
+    .trim()
+    .notEmpty()
+    .isLength({min: 10, max: 250})
+    .withMessage("Biography must be between 10 and 250 characters"),
+  updateBioStylist)
 
 router.post("/stylist/:id/services", checkToken, 
   body("serviceName")

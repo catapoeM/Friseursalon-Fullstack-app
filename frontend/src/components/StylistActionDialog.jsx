@@ -3,6 +3,8 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, Typog
 import useStore from '../hooks/useStore';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { validateInputFieldBio } from '../utils/validateRules';
+import { createStylistRules } from '../utils/form-rules';
 
 const StylistActionDialog = ({
   open,
@@ -18,6 +20,7 @@ const StylistActionDialog = ({
     const navigate = useNavigate();
     const [bioStylist, setBioStylist] = useState()
     const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+    const [error, setError] = useState("")
     const onChangeStatus = async(stylist) => {
     const ok = await changeStatusStylist(stylist);
       if (ok) {
@@ -59,7 +62,10 @@ const StylistActionDialog = ({
     }
 
     // This function edits the bio text of the stylist while enables the button again, this way the text can be saved
-    const changeText = (text) => {
+    const handleChangeText = (event) => {
+      const text = event.target.value;
+
+      setError(validateInputFieldBio(text, createStylistRules.bio))
       setIsButtonDisabled(false);
       setBioStylist(text);
     }
@@ -129,8 +135,9 @@ const StylistActionDialog = ({
               rows={5}
               fullWidth
               value={bioStylist}
-              onChange={(e) => changeText(e.target.value)
-              }
+              helperText={error}
+              error={!!error}
+              onChange={handleChangeText}
             />
             <Stack spacing={1}>
               <Button variant='contained' disabled={isButtonDisabled} onClick={() => saveNewText()}>
