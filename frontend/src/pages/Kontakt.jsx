@@ -1,16 +1,46 @@
-import React from "react";
 import {
   Box,
   Container,
   Stack,
   Typography,
-  Grid,
-  Card
+  TextField,
+  Card,
+  Button
 } from "@mui/material";
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
+import EmailIcon from '@mui/icons-material/Email';
 
-export default function ContactPage() {
+import useStore from "../hooks/useStore";
+import { useState } from "react";
+
+const ContactPage = () => {
+  const {loggedinAdmin} = useStore((state) => state)
+
+  // Default data values
+  const [editFormData, setEditFormData] = useState({salonName: '',
+     adresse: '', telefon: '', emailAdresse: '',
+    openTimeHours: '', closeTimeDays: ''})
+  
+  // State to toggle edit mode
+  const [isEditing, setIsEditing] = useState(false)
+  const [error, setError] = useState("")
+
+  // Handler for toggling edit mode
+  const handleEditSaveToggle = () => {
+    setIsEditing((prev) => !prev)
+    if (isEditing) {
+      console.log("save")
+    }
+  }
+
+  const handleEditClick = (e) => {
+    setEditFormData({salonName: e.salonName,
+      adresse: e.adresse, telefon: e.telefon, emailAdresse: e.emailAdresse,
+      openTimeHours: e.openTimeHours, closeTimeDays: e.closeTimeDays
+    })
+  }
+  
   return (
-
     <Box
     sx={{
         minHeight: "70vh",
@@ -20,56 +50,138 @@ export default function ContactPage() {
     >
     <Container maxWidth="lg" sx={{ py: 8 }}>
         <Stack spacing={6}>
-            <Card
+          <Card
             sx={{ p: 10, height: "100%", display: "flex", flexDirection: "column" }}
             >
             <Stack spacing={4}>
-                <Typography
+              <Typography
                 variant="h3"
                 fontWeight="bold"
                 textAlign="center"
-                >
+              >
                 Kontakt
-                </Typography>
-
+              </Typography>
+              {
+                isEditing ? (
+                <TextField
+                  label="Name"
+                  fullWidth
+                  value={editFormData.salonName}
+                  helperText={error}
+                  error={!!error}
+                  onChange={handleEditClick}
+                  size="small"
+                />
+                ) : (
                 <Typography variant="h6" fontWeight="bold"
-                textAlign="center">
-                Salon Elegance
+                  textAlign="center">
+                  Name: {editFormData.salonName}
                 </Typography>
-
-                <Typography
-                textAlign="center">
-                Musterstraße 1, 12345 Musterstadt
+                )
+              }
+              {
+                isEditing ? (
+                <TextField
+                  label="Adresse"
+                  fullWidth
+                  value={editFormData.adresse}
+                  helperText={error}
+                  error={!!error}
+                  onChange={handleEditClick}
+                  size="small"
+                />
+                ) : (
+                <Typography variant="h6" fontWeight="bold"
+                  textAlign="center"> 
+                  Adresse: {editFormData.adresse}
                 </Typography>
-
-                <Typography
-                textAlign="center">
-                Telefon: 0123 456789
+                )
+              }
+              {
+                isEditing ? (
+                <TextField
+                  label="Telefon"
+                  fullWidth
+                  value={editFormData.telefon}
+                  helperText={error}
+                  error={!!error}
+                  onChange={handleEditClick}
+                  size="small"
+                />
+                ) : (
+                <Typography variant="h6" fontWeight="bold"
+                  textAlign="center">
+                  <LocalPhoneIcon/> Telefon: {editFormData.telefon}
                 </Typography>
-
-                <Typography
-                textAlign="center">
-                E-Mail: info@salon-elegance.de
+                )
+              }
+              {
+                isEditing ? (
+                <TextField
+                  label="Email"
+                  fullWidth
+                  value={editFormData.emailAdresse}
+                  helperText={error}
+                  error={!!error}
+                  onChange={handleEditClick}
+                  size="small"
+                />
+                ) : (
+                <Typography variant="h6" fontWeight="bold"
+                  textAlign="center">
+                  <EmailIcon/> Email: {editFormData.emailAdresse}
                 </Typography>
-
-                <Typography sx={{ mt: 2 }} fontWeight="bold"
-                textAlign="center">
-                Öffnungszeiten:
+                )
+              }
+              {
+                isEditing ? (
+                <TextField
+                  label="Öffnungszeiten"
+                  fullWidth
+                  value={editFormData.openTimeHours}
+                  helperText={error}
+                  error={!!error}
+                  onChange={handleEditClick}
+                  size="small"
+                />
+                ) : (
+                <Typography variant="h6" fontWeight="bold"
+                  textAlign="center">
+                  Öffnungszeiten: {editFormData.openTimeHours}
                 </Typography>
-
-                <Typography
-                textAlign="center">
-                Di - Fr: 10:00 - 19:00
+                )
+              }
+              {
+                isEditing ? (
+                <TextField
+                  label="Geschlossen"
+                  fullWidth
+                  value={editFormData.closeTimeDays}
+                  helperText={error}
+                  error={!!error}
+                  onChange={handleEditClick}
+                  size="small"
+                />
+                ) : (
+                <Typography variant="h6" fontWeight="bold"
+                  textAlign="center">
+                  Geschlossen: {editFormData.closeTimeDays}
                 </Typography>
-
-                <Typography
-                textAlign="center">
-                Mo, Sa, So: Geschlossen
-                </Typography>
+                )
+              }
+              {
+                loggedinAdmin && (
+                  <Button variant={isEditing ? 'contained' : 'outlined'} color={isEditing ? 'secondary' : 'primary'} onClick={handleEditSaveToggle}>
+                    {isEditing ? 'Save' : 'Edit'}
+                  </Button>
+                )
+              }
             </Stack>
-            </Card>
+          </Card>
         </Stack>
     </Container>
     </Box>
   );
 }
+
+export default ContactPage

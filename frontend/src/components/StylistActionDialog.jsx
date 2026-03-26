@@ -21,6 +21,7 @@ const StylistActionDialog = ({
     const [bioStylist, setBioStylist] = useState()
     const [isButtonDisabled, setIsButtonDisabled] = useState(true)
     const [error, setError] = useState("")
+    
     const onChangeStatus = async(stylist) => {
     const ok = await changeStatusStylist(stylist);
       if (ok) {
