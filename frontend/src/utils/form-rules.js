@@ -227,6 +227,71 @@ export const photoRules = {
     }
 };
 
+export const editContactRules = {
+    name: {
+        required: 'Der Name ist erforderlich',
+        minLength: {
+            value: 5,
+            message: 'Der Name muss mindestenst 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 20,
+            message: 'Der Name darf maximal 20 Zeichen lang sein'
+        }
+    },
+    adresse: {
+        required: 'Die Adresse ist erforderlich',
+        minLength: {
+            value: 5,
+            message: 'Die Adresse muss mindestenst 5 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Die Adresse darf maximal 50 Zeichen lang sein'
+        }
+    },
+    phone: {
+        required: 'Telefonnummer ist erforderlich',
+        minLength: {
+            value: 2,
+            message: 'Die Telefonnummer muss mindestens 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Die Telefonnummer darf maximal 50 Zeichen lang sein'
+        }
+    },
+    email: {
+        required: 'E-Mail ist erforderlich',
+        pattern: {
+            value: /^\S+@\S+\.\S+$/,
+            message: 'Ungültiges E-Mail-Format'
+        },
+        minLength: {
+            value: 2,
+            message: 'Die E-Mail-Adresse muss mindestens 2 Zeichen lang sein'
+        },
+        maxLength: {
+            value: 50,
+            message: 'Die E-Mail-Adresse darf maximal 50 Zeichen lang sein'
+        }
+    },
+    openTime: {
+        required: 'Öffnungszeiten ist erforderlich',
+        pattern: {
+            value: /^([01]\d|2[0-3]):([0-5]\d) - ([01]\d|2[0-3]):([0-5]\d)$/,
+            message: 'Ungültiges Format. Format erforderlich ("HH:MM - HH:MM")'
+        }
+    },
+    closeTime: {
+        required: 'Geschlossen ist erforderlich',
+        pattern: {
+            value: /^(\s*(Mo|Di|Mi|Do|Fr|Sa|So)(\s*,\s*(Mo|Di|Mi|Do|Fr|Sa|So))*\s*)?$/i,
+            message: 'Ungültiges Format. Format erforderlich ("Mo, Di, Mi")'
+        }
+    }
+};
+
 export const confirmPasswordRule = (getValues) => ({
     required: 'Bitte Passwort bestätigen',
     validate: (value) => 
