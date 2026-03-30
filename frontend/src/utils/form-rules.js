@@ -251,14 +251,10 @@ export const editContactRules = {
         }
     },
     phone: {
-        required: 'Telefonnummer ist erforderlich',
-        minLength: {
-            value: 2,
-            message: 'Die Telefonnummer muss mindestens 2 Zeichen lang sein'
-        },
-        maxLength: {
-            value: 50,
-            message: 'Die Telefonnummer darf maximal 50 Zeichen lang sein'
+        required: "Telefonnummer ist erforderlich",
+        pattern: {
+            value: /^\+?[0-9\s\-()]{7,15}$/,
+            message: "Ungültiges Telefonnummernformat",
         }
     },
     email: {
@@ -279,7 +275,7 @@ export const editContactRules = {
     openTime: {
         required: 'Öffnungszeiten ist erforderlich',
         pattern: {
-            value: /^([01]\d|2[0-3]):([0-5]\d) - ([01]\d|2[0-3]):([0-5]\d)$/,
+            value: /^([01]\d|2[0-3]):([0-5]\d)-([01]\d|2[0-3]):([0-5]\d)$/,
             message: 'Ungültiges Format. Format erforderlich ("HH:MM - HH:MM")'
         }
     },
