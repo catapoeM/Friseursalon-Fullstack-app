@@ -43,7 +43,7 @@ const useStore = create((set, get) => ({
             
             return true;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
         }
     },
@@ -104,7 +104,7 @@ const useStore = create((set, get) => ({
             }
             return response;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Get stylist free slots not working', text: error.message})
         }
     },
@@ -118,7 +118,7 @@ const useStore = create((set, get) => ({
             }
             return true;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
         }
     },
@@ -133,8 +133,23 @@ const useStore = create((set, get) => ({
             await get().adminRefreshMe();
             return true;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
+        }
+    },
+    editKontaktDataSave: async(formData) => {
+        try {
+            await get().adminCheckLogin();
+            const config = {headers: {Authorization: 'Bearer ' + get().token}}
+            const response = await axios.put(APIURL + `/admin/kontakt`, formData, config)
+            if (!response) {
+                return false;
+            }
+            await get().adminRefreshMe();
+            return true;
+        } catch (error) {
+             
+            get().raiseAlert({severity: 'error', title: 'Kontakt change error', text: error.message})
         }
     },
     addServiceToStylist: async(formData, stylistId) => {
@@ -148,7 +163,7 @@ const useStore = create((set, get) => ({
             await get().adminRefreshMe();
             return true;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Login error', text: error.message})
         }
     },
@@ -171,7 +186,7 @@ const useStore = create((set, get) => ({
             await get().adminRefreshMe();
             return true
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Change status stylist error', text: error.message})
         }
     },
@@ -189,7 +204,7 @@ const useStore = create((set, get) => ({
             await get().adminRefreshMe();
             return true
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Change stylist Bio error', text: error.message})
         }
     },
@@ -201,7 +216,7 @@ const useStore = create((set, get) => ({
             }
             return response;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Get stylist free slots not working', text: error.message})
         }
     },
@@ -213,7 +228,7 @@ const useStore = create((set, get) => ({
             }
             return response;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Booking creation', text: error.message})
         }
     },
@@ -225,7 +240,7 @@ const useStore = create((set, get) => ({
             }
             return response;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Request code', text: error.message})
         }
     },
@@ -237,7 +252,7 @@ const useStore = create((set, get) => ({
             }
             return response;
         } catch (error) {
-            // TODO: Snackbar/Alert ausgeben
+             
             get().raiseAlert({severity: 'error', title: 'Verify code', text: error.message})
         }
     },

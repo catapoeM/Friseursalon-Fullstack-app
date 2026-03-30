@@ -9,36 +9,55 @@ import {
 } from "@mui/material";
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import EmailIcon from '@mui/icons-material/Email';
+import { validateInputFieldBio } from "../utils/validateRules";
+import { editContactRules } from "../utils/form-rules";
 
 import useStore from "../hooks/useStore";
 import { useState } from "react";
 
 const ContactPage = () => {
-  const {loggedinAdmin} = useStore((state) => state)
+  const {loggedinAdmin,  editKontaktDataSave} = useStore((state) => state)
 
   // Default data values
-  const [editFormData, setEditFormData] = useState({salonName: '',
-     adresse: '', telefon: '', emailAdresse: '',
-    openTimeHours: '', closeTimeDays: ''})
+  const [formData, setFormData] = useState({salonName: '',
+     adresse: '', phone: '', email: '',
+    openTime: '', closeTime: ''})
+  const [errors, seterrors] = useState({salonName: '',
+      adresse: '', phone: '', email: '',
+    openTime: '', closeTime: ''})
   
   // State to toggle edit mode
   const [isEditing, setIsEditing] = useState(false)
-  const [error, setError] = useState("")
 
   // Handler for toggling edit mode
-  const handleEditSaveToggle = () => {
+  const  handleSaveToggle = async() => {
     setIsEditing((prev) => !prev)
-    if (isEditing) {
-      console.log("save")
+    // Daten an Methoden Zustand-store übergeben
+    const ok = await editKontaktDataSave(formData)
+    if (!ok) {
+      // custom alert
+      return raiseAlert({
+          title: 'Fast geschafft...', 
+          text: 'Kontakt Data cannot be Changed!',
+          severity: 'warning'
+      })
     }
-  }
-
-  const handleEditClick = (e) => {
-    setEditFormData({salonName: e.salonName,
-      adresse: e.adresse, telefon: e.telefon, emailAdresse: e.emailAdresse,
-      openTimeHours: e.openTimeHours, closeTimeDays: e.closeTimeDays
+    // custom alert
+    raiseAlert({
+        title: 'Success!',
+        text: 'Kontakt Data Changed successfully!'
     })
   }
+
+  const handleChange = (e) => {
+    const {name, value} = e.target;
+
+    setFormData(prev => ({...prev, [name]: value }))
+    // This sets the errors by validating the 'editcontactrules' using the function 'validateInputFieldBio'
+    seterrors(prev => ({...prev, [name]: validateInputFieldBio(value, editContactRules[name])}))
+  }
+
+  const isFormValid = Object.values(errors).every(error => error === '')
   
   return (
     <Box
@@ -65,17 +84,18 @@ const ContactPage = () => {
                 isEditing ? (
                 <TextField
                   label="Name"
+                  name="salonName"
                   fullWidth
-                  value={editFormData.salonName}
-                  helperText={error}
-                  error={!!error}
-                  onChange={handleEditClick}
+                  value={formData.salonName}
+                  helperText={errors.salonName}
+                  error={!!errors.salonName}
+                  onChange={handleChange}
                   size="small"
                 />
                 ) : (
                 <Typography variant="h6" fontWeight="bold"
                   textAlign="center">
-                  Name: {editFormData.salonName}
+                  Name: {formData.salonName}
                 </Typography>
                 )
               }
@@ -83,17 +103,18 @@ const ContactPage = () => {
                 isEditing ? (
                 <TextField
                   label="Adresse"
+                  name="adresse"
                   fullWidth
-                  value={editFormData.adresse}
-                  helperText={error}
-                  error={!!error}
-                  onChange={handleEditClick}
+                  value={formData.adresse}
+                  helperText={errors.adresse}
+                  error={!!errors.adresse.toString()}
+                  onChange={handleChange}
                   size="small"
                 />
                 ) : (
                 <Typography variant="h6" fontWeight="bold"
                   textAlign="center"> 
-                  Adresse: {editFormData.adresse}
+                  Adresse: {formData.adresse}
                 </Typography>
                 )
               }
@@ -101,17 +122,18 @@ const ContactPage = () => {
                 isEditing ? (
                 <TextField
                   label="Telefon"
+                  name="phone"
                   fullWidth
-                  value={editFormData.telefon}
-                  helperText={error}
-                  error={!!error}
-                  onChange={handleEditClick}
+                  value={formData.phone}
+                  helperText={errors.phone}
+                  error={!!errors.phone.toString()}
+                  onChange={handleChange}
                   size="small"
                 />
                 ) : (
                 <Typography variant="h6" fontWeight="bold"
                   textAlign="center">
-                  <LocalPhoneIcon/> Telefon: {editFormData.telefon}
+                  <LocalPhoneIcon/> Telefon: {formData.phone}
                 </Typography>
                 )
               }
@@ -119,59 +141,62 @@ const ContactPage = () => {
                 isEditing ? (
                 <TextField
                   label="Email"
+                  name="email"
                   fullWidth
-                  value={editFormData.emailAdresse}
-                  helperText={error}
-                  error={!!error}
-                  onChange={handleEditClick}
+                  value={formData.email}
+                  helperText={errors.email}
+                  error={!!errors.email.toString()}
+                  onChange={handleChange}
                   size="small"
                 />
                 ) : (
                 <Typography variant="h6" fontWeight="bold"
                   textAlign="center">
-                  <EmailIcon/> Email: {editFormData.emailAdresse}
+                  <EmailIcon/> Email: {formData.email}
                 </Typography>
                 )
               }
               {
                 isEditing ? (
                 <TextField
-                  label="Öffnungszeiten"
+                  label="Öffnungsz. z.B.'HH:MM-HH:MM'"
                   fullWidth
-                  value={editFormData.openTimeHours}
-                  helperText={error}
-                  error={!!error}
-                  onChange={handleEditClick}
+                  name="openTime"
+                  value={formData.openTime}
+                  helperText={errors.openTime}
+                  error={!!errors.openTime.toString()}
+                  onChange={handleChange}
                   size="small"
                 />
                 ) : (
                 <Typography variant="h6" fontWeight="bold"
                   textAlign="center">
-                  Öffnungszeiten: {editFormData.openTimeHours}
+                  Öffnungszeiten: {formData.openTime}
                 </Typography>
                 )
               }
               {
                 isEditing ? (
                 <TextField
-                  label="Geschlossen"
+                  label="Geschlossen z.B 'Mo,Di,Mi'"
                   fullWidth
-                  value={editFormData.closeTimeDays}
-                  helperText={error}
-                  error={!!error}
-                  onChange={handleEditClick}
+                  name="closeTime"
+                  value={formData.closeTime}
+                  helperText={errors.closeTime}
+                  error={!!errors.closeTime.toString()}
+                  onChange={handleChange}
                   size="small"
                 />
                 ) : (
                 <Typography variant="h6" fontWeight="bold"
                   textAlign="center">
-                  Geschlossen: {editFormData.closeTimeDays}
+                  Geschlossen: {formData.closeTime}
                 </Typography>
                 )
               }
               {
                 loggedinAdmin && (
-                  <Button variant={isEditing ? 'contained' : 'outlined'} color={isEditing ? 'secondary' : 'primary'} onClick={handleEditSaveToggle}>
+                  <Button disabled={!isFormValid} variant={isEditing ? 'contained' : 'outlined'} color={isEditing ? 'secondary' : 'primary'} onClick={ handleSaveToggle}>
                     {isEditing ? 'Save' : 'Edit'}
                   </Button>
                 )

@@ -51,6 +51,13 @@ const validateInputFieldBio = (value, rules) => {
         }
     }
 
+    // check if value matches specific pattern 
+    if (rules.pattern) {
+        if (!rules.pattern.value.test(value)) {
+            return rules.pattern.message
+        }
+    }
+
     return "";
 }
 
